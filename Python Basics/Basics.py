@@ -111,3 +111,18 @@ s2 = "banana"
 print(s1 == s2)
 print(s1 != s2)
 print(s1 < s2)
+print(s1 <= s2)
+print(s1 > s2)
+print(s1 >= s2)
+#Convert integer to string in Python
+n = 42
+s = str(n)
+print(s)
+s = f"{n}"
+print(s)
+s = "{}".format(n)
+print(s)
+s = "%s" % n
+print(s)
+s = repr(n)
+print(s)
