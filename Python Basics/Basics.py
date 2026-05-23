@@ -77,5 +77,19 @@ print(s[5])
 print(s[-1])
 
 #String Slicing
-
+print(s[1:4])
+print(s[0:-1])
+print(s[:3])
+print(s[::-1])#reverse method for strings in python
+for char in s:
+    print(char,end=" ")
+print()
+print(s)
+del s
+s = "ABCD EF"
+s1 = "H" + s[1:]
+s2 = s.replace("ABC", "abc")
+print(s)
+print(s1)
+print(s2)
 
