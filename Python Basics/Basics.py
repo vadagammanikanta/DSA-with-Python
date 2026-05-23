@@ -36,6 +36,8 @@ print(j)
 print(type(j))
 
 #String Functions
+print(d*3)
+print(len(d))
 print(d.lower())
 print(d.upper())
 print(c.strip())
@@ -92,4 +94,20 @@ s2 = s.replace("ABC", "abc")
 print(s)
 print(s1)
 print(s2)
-
+#Formatting Strings
+# 1. Using f-strings: f-strings allows to directly insert variables and expressions inside a string using {} brackets.
+# 2. Using format(): format() method allows inserting values into placeholders {} inside a string.
+name = "Mani"
+age = 20
+print(f"Name: {name}, Age: {age}")
+s="My name is {} and I am {} years old.".format(name,age)
+print(s)
+# String Membership Testing
+print("My" in s)
+print("You" in s)
+#String Comparisions
+s1 = "apple"
+s2 = "banana"
+print(s1 == s2)
+print(s1 != s2)
+print(s1 < s2)
