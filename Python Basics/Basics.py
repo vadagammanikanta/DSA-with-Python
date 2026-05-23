@@ -57,8 +57,25 @@ print(d.isalnum())
 print(d.isupper())
 print(d.islower())
 print(c.isspace())
+print(d.isprintable())
 print(d.capitalize())
 print(c.title())
 print(d.swapcase())
+print(d.ljust(0))
+print(d.rjust(0))
+print(d.lstrip())
+print(d.rstrip())
+s="""Hi There,
+I'm 
+Manikanta"""
+print(s)
+print(type(s))
+s="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+print(s)
+print(s[0])
+print(s[5])
+print(s[-1])
+
+#String Slicing
 
 
