@@ -126,3 +126,14 @@ s = "%s" % n
 print(s)
 s = repr(n)
 print(s)
+#Lists
+l=[10,20,30,40,50]
+print(l)
+l1=l[0]
+print(l1)
+del l[0]
+print(l)
+print()
+l[1]=69
+print(l)
+print(l)
