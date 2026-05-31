@@ -2,117 +2,182 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>6-Week Python & DSA Mastery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DSA Mastery — Dashboard</title>
+
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DSA Tracker">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzAwMCIgcng9IjI0Ii8+PHRleHQgeD0iOTYiIHk9IjEwNSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iNjAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRTQTwvdGV4dD48L3N2Zz4=">
+<link rel="manifest" id="pwa-manifest">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-    --color-text-primary: #111827;
-    --color-text-secondary: #4B5563;
-    --color-text-tertiary: #9CA3AF;
-    --color-border-secondary: #D1D5DB;
-    --color-border-tertiary: #E5E7EB;
-    --color-background-primary: #F9FAFB;
-    --color-background-secondary: #ffffff;
-    --color-background-tertiary: #F3F4F6;
+    --bg: #ffffff;
+    --bg-secondary: #fafafa;
+    --fg: #000000;
+    --fg-secondary: #666666;
+    --accents-1: #fafafa;
+    --accents-2: #eaeaea;
+    --accents-3: #999999;
+    --accents-4: #888888;
+    --success: #0070f3;
+    --radius: 6px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000;
+      --bg-secondary: #111111;
+      --fg: #ffffff;
+      --fg-secondary: #888888;
+      --accents-1: #111111;
+      --accents-2: #333333;
+      --accents-3: #444444;
+      --accents-4: #666666;
+      --success: #3291ff;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--color-background-primary);
-    margin: 0;
-    padding: 20px;
-    color: var(--color-text-primary);
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    padding: 32px 24px;
+    line-height: 1.5;
   }
 
-  .schedule { max-width: 1200px; margin: 0 auto; padding: 1rem 0; font-family: var(--font-sans); }
-  .header { text-align: center; margin-bottom: 2rem; }
-  .header h2 { font-size: 24px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px; }
-  .header p { font-size: 14px; color: var(--color-text-secondary); margin: 0; }
-  .phase-badge { display: inline-block; font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; background: #EEEDFE; color: #3C3489; margin-top: 8px; }
-  
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* Header & Deployment Status */
+  .header { margin-bottom: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--accents-2); padding-bottom: 24px; }
+
+  .title-group { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .header h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.04em; }
+  .header p { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
+
+  .status-badge { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; border: 1px solid var(--accents-2); padding: 4px 10px; border-radius: 16px; background: var(--bg-secondary); }
+  .status-dot { width: 8px; height: 8px; background-color: var(--success); border-radius: 50%; display: inline-block; box-shadow: 0 0 0 0 rgba(0, 112, 243, 0.4); animation: pulse 2s infinite; }
+  .status-dot.completed { background-color: var(--fg); animation: none; box-shadow: none; }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 112, 243, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(0, 112, 243, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 112, 243, 0); }
+  }
+
   /* Progress Bar */
-  .progress-wrapper { max-width: 400px; margin: 1.5rem auto 0; text-align: left; }
-  .progress-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 6px; }
-  .progress-track { height: 8px; background: var(--color-border-tertiary); border-radius: 4px; overflow: hidden; }
-  .progress-fill { height: 100%; width: 0%; background: #0F6E56; transition: width 0.4s ease; }
+  .progress-wrapper { width: 100%; max-width: 300px; }
+  .progress-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--fg-secondary); margin-bottom: 8px; font-weight: 500; }
+  .progress-track { height: 4px; background: var(--accents-2); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: var(--fg); transition: width 0.4s ease; }
 
-  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
-  .day-card { border-radius: 12px; padding: 12px 10px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); cursor: pointer; transition: all .2s; position: relative; }
-  .day-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: var(--color-border-secondary); transform: translateY(-2px); }
-  
-  /* Completed State */
-  .day-card.completed { opacity: 0.6; background: var(--color-background-primary); }
-  .day-card.completed .day-num { text-decoration: line-through; color: var(--color-text-tertiary); }
-  
-  .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .day-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
-  .day-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: #0F6E56; }
-  
-  .day-num { font-size: 22px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 8px; transition: color 0.2s; }
-  .topic-badge { font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 20px; margin-bottom: 8px; display: inline-block; }
-  .tasks { margin-top: 6px; }
-  .task { font-size: 12px; color: var(--color-text-secondary); display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; line-height: 1.4; }
-  .task::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--color-text-tertiary); flex-shrink: 0; margin-top: 6px; }
-  
-  .detail-panel { margin-top: 24px; border-radius: 12px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); padding: 20px; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-  .detail-panel.active { display: block; animation: fadeIn 0.3s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-  
-  .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-tertiary); }
-  .detail-title { font-size: 18px; font-weight: 600; color: var(--color-text-primary); }
-  .detail-controls { display: flex; align-items: center; gap: 16px; }
-  .detail-close { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.2s; }
-  .detail-close:hover { background: var(--color-background-tertiary); color: var(--color-text-primary); }
-  
-  .code-block { background: #1e1e1e; border-radius: 8px; padding: 16px; font-family: var(--font-mono); font-size: 13px; color: #d4d4d4; white-space: pre; overflow-x: auto; margin: 12px 0; line-height: 1.5; }
-  .section-label { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin: 16px 0 6px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .tip { font-size: 13px; color: var(--color-text-secondary); background: var(--color-background-primary); border-left: 4px solid #534AB7; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-top: 16px; font-weight: 500; }
+  /* Grid & Cards */
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 16px; }
 
-  /* Standardized Theme Colors */
-  .d1 .day-label { color: #534AB7; } .d1 .topic-badge { background: #EEEDFE; color: #3C3489; }
-  .d2 .day-label { color: #0F6E56; } .d2 .topic-badge { background: #E1F5EE; color: #085041; }
-  .d3 .day-label { color: #993C1D; } .d3 .topic-badge { background: #FAECE7; color: #712B13; }
-  .d4 .day-label { color: #185FA5; } .d4 .topic-badge { background: #E6F1FB; color: #0C447C; }
-  .d5 .day-label { color: #854F0B; } .d5 .topic-badge { background: #FAEEDA; color: #633806; }
-  .d6 .day-label { color: #993556; } .d6 .topic-badge { background: #FBEAF0; color: #72243E; }
-  .d7 .day-label { color: #3B6D11; } .d7 .topic-badge { background: #EAF3DE; color: #27500A; }
+  .day-card { border: 1px solid var(--accents-2); background: var(--bg); border-radius: var(--radius); padding: 16px 12px; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease; display: flex; flex-direction: column; }
+  .day-card:hover { border-color: var(--fg); }
 
-  @media (max-width: 1024px) { .grid { grid-template-columns: repeat(4, 1fr); } }
-  @media (max-width: 768px) { .grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  .day-card.completed { background: var(--bg-secondary); border-color: var(--accents-2); opacity: 0.7; }
+  .day-card.completed:hover { border-color: var(--accents-4); }
+  .day-card.completed .day-num { text-decoration: line-through; color: var(--accents-4); }
+
+  .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .day-label { font-size: 11px; font-weight: 500; color: var(--fg-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .checkbox-wrapper { position: relative; width: 16px; height: 16px; }
+  .day-checkbox { appearance: none; width: 16px; height: 16px; border: 1px solid var(--accents-3); border-radius: 4px; background: var(--bg); cursor: pointer; transition: all 0.1s ease; margin: 0; display: block; }
+  .day-checkbox:checked { background: var(--fg); border-color: var(--fg); }
+  .day-checkbox:checked::after { content: ''; position: absolute; left: 5px; top: 2px; width: 4px; height: 8px; border: solid var(--bg); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+
+  .day-num { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; transition: color 0.2s; }
+  .topic-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border: 1px solid var(--accents-2); border-radius: 12px; margin-bottom: 12px; display: inline-block; color: var(--fg-secondary); background: var(--bg-secondary); }
+
+  .tasks { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+  .task { font-size: 12px; color: var(--fg-secondary); display: flex; align-items: flex-start; gap: 6px; line-height: 1.4; }
+  .task::before { content: '-'; color: var(--accents-3); }
+
+  /* Detail Panel Modal/Inline */
+  .detail-panel { margin-top: 32px; border: 1px solid var(--accents-2); border-radius: var(--radius); background: var(--bg); padding: 24px; display: none; }
+  .detail-panel.active { display: block; animation: fade-in 0.2s ease; }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .detail-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--accents-2); padding-bottom: 16px; margin-bottom: 24px; }
+  .detail-title { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+  .detail-controls { display: flex; align-items: center; gap: 24px; }
+
+  .btn { font-family: var(--font-sans); font-size: 13px; font-weight: 500; background: var(--bg); color: var(--fg); border: 1px solid var(--accents-2); padding: 6px 12px; border-radius: var(--radius); cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; justify-content: center; }
+  .btn:hover { background: var(--bg-secondary); border-color: var(--fg); }
+  .btn-install { border-color: var(--fg); border-radius: 20px; font-weight: 600; padding: 4px 12px; }
+
+  .code-block { background: #000000; border: 1px solid var(--accents-2); border-radius: var(--radius); padding: 16px; font-family: var(--font-mono); font-size: 13px; color: #f8f8f2; white-space: pre; overflow-x: auto; margin: 12px 0 24px; line-height: 1.5; }
+  .section-label { font-size: 12px; font-weight: 500; color: var(--fg-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px; }
+
+  .practice-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+  .practice-item { font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .practice-item::before { content: '→'; color: var(--accents-3); font-family: var(--font-mono); }
+
+  .tip { font-size: 13px; color: var(--fg); border: 1px solid var(--accents-2); background: var(--bg-secondary); padding: 12px 16px; border-radius: var(--radius); font-weight: 400; display: flex; gap: 8px; }
+  .tip::before { content: '💡'; }
+
+  @media (max-width: 1200px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 800px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } .header-top { flex-direction: column; align-items: flex-start; } .progress-wrapper { max-width: 100%; } }
+  @media (max-width: 400px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<div class="schedule">
+<div class="container">
   <div class="header">
-    <h2>6-Week Python & DSA Mastery</h2>
-    <div class="phase-badge">Phase 1 & Phase 2 Integrated Tracker</div>
-    <p style="margin-top:8px">Click any day to see details, code & LeetCode problems</p>
-    
-    <div class="progress-wrapper">
-      <div class="progress-header">
-        <span>Overall Progress</span>
-        <span id="progress-text">0 / 42 completed</span>
+    <div class="header-top">
+      <div>
+        <div class="title-group">
+          <h1>Python & DSA Architecture</h1>
+          <button id="installAppBtn" class="btn btn-install" style="display: none;" onclick="installPWA()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Install App
+          </button>
+        </div>
+        <p>Phase 1 & 2 • 42-Day Curriculum</p>
       </div>
-      <div class="progress-track">
-        <div id="progress-fill" class="progress-fill"></div>
+
+      <div class="progress-wrapper">
+        <div class="progress-header">
+          <span class="status-badge" id="status-badge">
+            <span class="status-dot" id="status-dot"></span> Building...
+          </span>
+          <span id="progress-text">0 / 42</span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="grid" id="grid"></div>
-  
+
   <div class="detail-panel" id="detail">
     <div class="detail-header">
       <div class="detail-title" id="detail-title"></div>
       <div class="detail-controls">
-        <label style="font-size: 13px; font-weight: 500; color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 6px;">
-          <input type="checkbox" id="detail-checkbox" class="day-checkbox" onchange="toggleCompleteFromDetail()"> 
-          Mark Completed
+        <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--fg-secondary);">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="detail-checkbox" class="day-checkbox" onchange="toggleCompleteFromDetail()">
+          </div>
+          Complete
         </label>
-        <div class="detail-close" onclick="closeDetail()">✕ Close</div>
+        <button class="btn" onclick="closeDetail()">Close</button>
       </div>
     </div>
     <div id="detail-body"></div>
@@ -120,199 +185,112 @@
 </div>
 
 <script>
-// Combined 42-day curriculum
+// --- PWA Initialization ---
+const manifest = {
+  name: "DSA Architecture Tracker",
+  short_name: "DSA Tracker",
+  start_url: window.location.pathname,
+  display: "standalone",
+  background_color: "#ffffff",
+  theme_color: "#000000",
+  description: "42-Day Python & DSA Mastery Curriculum",
+  icons: [{
+    src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzAwMCIgcng9IjI0Ii8+PHRleHQgeD0iOTYiIHk9IjEwNSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iNjAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRTQTwvdGV4dD48L3N2Zz4=",
+    sizes: "192x192",
+    type: "image/svg+xml"
+  }]
+};
+const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+document.getElementById('pwa-manifest').setAttribute('href', URL.createObjectURL(manifestBlob));
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installAppBtn').style.display = 'inline-flex';
+});
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then((choice) => {
+    if (choice.outcome === 'accepted') document.getElementById('installAppBtn').style.display = 'none';
+    deferredPrompt = null;
+  });
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => console.log('Deploy sw.js to enable full offline caching.'));
+  });
+}
+
+// --- App Data ---
 const days = [
   // --- WEEK 1 ---
-  {
-    day: 1, label: "Mon", cls: "d1", topic: "Variables & Types", tasks: ["int, float, str, bool", "Type casting", "Arithmetic operators"],
-    detail: { goal: "Understand how Python stores data", code: `x = 10          # int\ny = 3.14        # float\nname = "Python" # str\nflag = True     # bool\n\n# Type casting\nprint(int("42"))   # 42\nprint(str(100))    # "100"\nprint(float(5))    # 5.0`, practice: ["Print your name + age", "Convert '99' string to int and add 1", "Check type using type()"], tip: "Python doesn't need you to declare types — it figures it out automatically!" }
-  },
-  {
-    day: 2, label: "Tue", cls: "d1", topic: "Operators & Input", tasks: ["Arithmetic (+,-,*,/,//,%)", "Comparison & logical", "input() function"],
-    detail: { goal: "Do calculations and take user input", code: `# Arithmetic\nprint(10 // 3)   # 3 (floor div)\nprint(10 % 3)    # 1 (modulo)\nprint(2 ** 8)    # 256 (power)\n\n# Comparison\nprint(5 > 3)     # True\nprint(5 == 5)    # True\n\n# Input\nname = input("Enter name: ")\nage  = int(input("Age: "))\nprint(f"Hi {name}, you are {age}")`, practice: ["Build a simple calculator", "Take 2 numbers and print sum/diff/product", "Check if a number is even using %"], tip: "Always wrap input() in int() or float() when you need a number, not a string." }
-  },
-  {
-    day: 3, label: "Wed", cls: "d2", topic: "Lists & Tuples", tasks: ["Create & index lists", "append, pop, sort", "Tuple basics"],
-    detail: { goal: "Work with ordered collections — your main DSA tool", code: `# List\narr = [3, 1, 4, 1, 5]\narr.append(9)      # add end\narr.pop()          # remove end\narr.sort()         # sort in-place\nprint(arr[0])      # indexing\nprint(arr[-1])     # last element\n\n# Slicing\nprint(arr[1:3])    # [1, 3]\n\n# Tuple (immutable)\nt = (10, 20, 30)\nprint(t[0])        # 10`, practice: ["Store 5 student marks in a list", "Find max and min without built-ins", "Reverse a list without reverse()"], tip: "Lists = mutable (changeable). Tuples = immutable. Use lists 90% of the time in DSA." }
-  },
-  {
-    day: 4, label: "Thu", cls: "d2", topic: "Dicts & Sets", tasks: ["dict key-value pairs", "set for unique elements", "in operator"],
-    detail: { goal: "Master hash-based structures — key in almost every DSA problem", code: `# Dictionary\nd = {"a": 1, "b": 2}\nd["c"] = 3         # add\ndel d["a"]         # remove\nprint("b" in d)    # True\nprint(d.keys())\nprint(d.values())\n\n# defaultdict (bonus)\nfrom collections import defaultdict\nfreq = defaultdict(int)\nfor ch in "hello":\n    freq[ch] += 1\n\n# Set\ns = {1, 2, 3, 3}  # {1,2,3}\ns.add(4)\ns.discard(2)\nprint(1 in s)      # O(1) lookup`, practice: ["Count frequency of chars in a word", "Find duplicate numbers using set", "Store name→score pairs in a dict"], tip: "dict and set have O(1) lookup. This is why they're so powerful in DSA for frequency problems." }
-  },
-  {
-    day: 5, label: "Fri", cls: "d3", topic: "Loops", tasks: ["for loop + range()", "while loop", "break & continue"],
-    detail: { goal: "Iterate over data — the backbone of every algorithm", code: `# for loop\nfor i in range(5):       # 0..4\n    print(i)\n\nfor i in range(1, 10, 2): # 1,3,5,7,9\n    print(i)\n\n# iterate list\narr = [10, 20, 30]\nfor val in arr:\n    print(val)\n\n# enumerate\nfor i, val in enumerate(arr):\n    print(i, val)\n\n# while loop\nn = 10\nwhile n > 0:\n    print(n)\n    n -= 2\n\n# break & continue\nfor i in range(10):\n    if i == 5: break      # stop\n    if i % 2 == 0: continue  # skip even`, practice: ["Print multiplication table of 5", "Sum of digits of a number", "Print all even numbers 1–50"], tip: "enumerate() gives you index + value together — very useful in DSA." }
-  },
-  {
-    day: 6, label: "Sat", cls: "d3", topic: "Functions", tasks: ["def + return", "Default arguments", "Lambda basics"],
-    detail: { goal: "Write reusable code blocks — essential for DSA solutions", code: `# Basic function\ndef add(a, b):\n    return a + b\n\nprint(add(3, 4))   # 7\n\n# Default argument\ndef greet(name, msg="Hello"):\n    return f"{msg}, {name}!"\n\nprint(greet("Ravi"))\nprint(greet("Ravi", "Hi"))\n\n# Multiple return\ndef min_max(arr):\n    return min(arr), max(arr)\n\nlo, hi = min_max([3,1,4,1,5])\n\n# Lambda (one-liner)\nsquare = lambda x: x ** 2\nprint(square(5))   # 25\n\n# Useful with sort\narr = [(1,'b'), (3,'a'), (2,'c')]\narr.sort(key=lambda x: x[0])`, practice: ["Write is_prime(n) function", "Write factorial(n) function", "Sort list of strings by length using lambda"], tip: "Every LeetCode solution is inside a function. Get comfortable writing and calling them fast." }
-  },
-  {
-    day: 7, label: "Sun", cls: "d4", topic: "Revision + Problems", tasks: ["Revise all week topics", "Solve 3 LeetCode Easys", "Review mistakes"],
-    detail: { goal: "Solidify Week 1 — apply everything you learned", code: `# LeetCode #1 — Two Sum\ndef twoSum(nums, target):\n    seen = {}\n    for i, n in enumerate(nums):\n        diff = target - n\n        if diff in seen:\n            return [seen[diff], i]\n        seen[n] = i\n\n# LeetCode #412 — FizzBuzz\ndef fizzBuzz(n):\n    res = []\n    for i in range(1, n+1):\n        if i % 15 == 0: res.append("FizzBuzz")\n        elif i % 3 == 0: res.append("Fizz")\n        elif i % 5 == 0: res.append("Buzz")\n        else: res.append(str(i))\n    return res\n\n# LeetCode #344 — Reverse String\ndef reverseString(s):\n    l, r = 0, len(s)-1\n    while l < r:\n        s[l], s[r] = s[r], s[l]\n        l += 1; r -= 1`, practice: ["Two Sum (#1)", "FizzBuzz (#412)", "Reverse String (#344)"], tip: "Don't memorize solutions — understand WHY each approach works. That's what interviews test." }
-  },
+  { day: 1, label: "Mon", topic: "Variables & Types", tasks: ["int, float, str, bool", "Type casting", "Arithmetic operators"], detail: { goal: "Understand how Python stores data", code: `x = 10          # int\ny = 3.14        # float\nname = "Python" # str\nflag = True     # bool\n\n# Type casting\nprint(int("42"))   # 42\nprint(str(100))    # "100"\nprint(float(5))    # 5.0`, practice: ["Print your name + age", "Convert '99' string to int and add 1", "Check type using type()"], tip: "Python doesn't need you to declare types — it figures it out automatically!" } },
+  { day: 2, label: "Tue", topic: "Operators & Input", tasks: ["Arithmetic (+,-,*,/,//,%)", "Comparison & logical", "input() function"], detail: { goal: "Do calculations and take user input", code: `# Arithmetic\nprint(10 // 3)   # 3 (floor div)\nprint(10 % 3)    # 1 (modulo)\nprint(2 ** 8)    # 256 (power)\n\n# Comparison\nprint(5 > 3)     # True\nprint(5 == 5)    # True\n\n# Input\nname = input("Enter name: ")\nage  = int(input("Age: "))\nprint(f"Hi {name}, you are {age}")`, practice: ["Build a simple calculator", "Take 2 numbers and print sum/diff/product", "Check if a number is even using %"], tip: "Always wrap input() in int() or float() when you need a number, not a string." } },
+  { day: 3, label: "Wed", topic: "Lists & Tuples", tasks: ["Create & index lists", "append, pop, sort", "Tuple basics"], detail: { goal: "Work with ordered collections — your main DSA tool", code: `# List\narr = [3, 1, 4, 1, 5]\narr.append(9)      # add end\narr.pop()          # remove end\narr.sort()         # sort in-place\nprint(arr[0])      # indexing\nprint(arr[-1])     # last element\n\n# Slicing\nprint(arr[1:3])    # [1, 3]\n\n# Tuple (immutable)\nt = (10, 20, 30)\nprint(t[0])        # 10`, practice: ["Store 5 student marks in a list", "Find max and min without built-ins", "Reverse a list without reverse()"], tip: "Lists = mutable (changeable). Tuples = immutable. Use lists 90% of the time in DSA." } },
+  { day: 4, label: "Thu", topic: "Dicts & Sets", tasks: ["dict key-value pairs", "set for unique elements", "in operator"], detail: { goal: "Master hash-based structures — key in almost every DSA problem", code: `# Dictionary\nd = {"a": 1, "b": 2}\nd["c"] = 3         # add\ndel d["a"]         # remove\nprint("b" in d)    # True\nprint(d.keys())\nprint(d.values())\n\n# Set\ns = {1, 2, 3, 3}  # {1,2,3}\ns.add(4)\ns.discard(2)\nprint(1 in s)      # O(1) lookup`, practice: ["Count frequency of chars in a word", "Find duplicate numbers using set", "Store name→score pairs in a dict"], tip: "dict and set have O(1) lookup. This is why they're so powerful in DSA for frequency problems." } },
+  { day: 5, label: "Fri", topic: "Loops", tasks: ["for loop + range()", "while loop", "break & continue"], detail: { goal: "Iterate over data — the backbone of every algorithm", code: `# for loop\nfor i in range(5):       # 0..4\n    print(i)\n\n# iterate list\narr = [10, 20, 30]\nfor val in arr:\n    print(val)\n\n# enumerate\nfor i, val in enumerate(arr):\n    print(i, val)\n\n# while loop\nn = 10\nwhile n > 0:\n    print(n)\n    n -= 2`, practice: ["Print multiplication table of 5", "Sum of digits of a number", "Print all even numbers 1–50"], tip: "enumerate() gives you index + value together — very useful in DSA." } },
+  { day: 6, label: "Sat", topic: "Functions", tasks: ["def + return", "Default arguments", "Lambda basics"], detail: { goal: "Write reusable code blocks — essential for DSA solutions", code: `# Basic function\ndef add(a, b):\n    return a + b\n\nprint(add(3, 4))   # 7\n\n# Default argument\ndef greet(name, msg="Hello"):\n    return f"{msg}, {name}!"\n\n# Lambda (one-liner)\nsquare = lambda x: x ** 2\nprint(square(5))   # 25\n\n# Useful with sort\narr = [(1,'b'), (3,'a'), (2,'c')]\narr.sort(key=lambda x: x[0])`, practice: ["Write is_prime(n) function", "Write factorial(n) function", "Sort list of strings by length using lambda"], tip: "Every LeetCode solution is inside a function. Get comfortable writing and calling them fast." } },
+  { day: 7, label: "Sun", topic: "Revision + Problems", tasks: ["Revise all week topics", "Solve 3 LeetCode Easys", "Review mistakes"], detail: { goal: "Solidify Week 1 — apply everything you learned", code: `# LeetCode #1 — Two Sum\ndef twoSum(nums, target):\n    seen = {}\n    for i, n in enumerate(nums):\n        diff = target - n\n        if diff in seen:\n            return [seen[diff], i]\n        seen[n] = i\n\n# LeetCode #344 — Reverse String\ndef reverseString(s):\n    l, r = 0, len(s)-1\n    while l < r:\n        s[l], s[r] = s[r], s[l]\n        l += 1; r -= 1`, practice: ["Two Sum (#1)", "FizzBuzz (#412)", "Reverse String (#344)"], tip: "Don't memorize solutions — understand WHY each approach works. That's what interviews test." } },
 
   // --- WEEK 2 ---
-  {
-    day: 8, label: "Mon", cls: "d4", topic: "Recursion Basics", tasks: ["Base case & recursive case", "Factorial & Fibonacci", "Call stack concept"],
-    detail: { goal: "Understand how functions call themselves — core to Trees, Graphs, DP", code: `# Factorial\ndef factorial(n):\n    if n == 0:       # base case\n        return 1\n    return n * factorial(n - 1)\n\n# Fibonacci\ndef fib(n):\n    if n <= 1:\n        return n\n    return fib(n-1) + fib(n-2)\n\n# Sum of list using recursion\ndef rec_sum(arr):\n    if not arr:\n        return 0\n    return arr[0] + rec_sum(arr[1:])`, practice: ["Write recursive power(base, exp)", "Count digits in a number recursively", "Print numbers 10 to 1 using recursion"], tip: "Every recursion MUST have a base case — otherwise it runs forever and crashes (RecursionError)." }
-  },
-  {
-    day: 9, label: "Tue", cls: "d5", topic: "Recursion Advanced", tasks: ["Reverse string recursively", "Check palindrome", "Binary search recursive"],
-    detail: { goal: "Apply recursion to real DSA problems", code: `# Reverse string\ndef reverse(s):\n    if len(s) <= 1: return s\n    return reverse(s[1:]) + s[0]\n\n# Check palindrome\ndef is_palindrome(s):\n    if len(s) <= 1: return True\n    if s[0] != s[-1]: return False\n    return is_palindrome(s[1:-1])\n\n# Binary search (recursive)\ndef binary_search(arr, target, lo, hi):\n    if lo > hi: return -1\n    mid = (lo + hi) // 2\n    if arr[mid] == target: return mid\n    elif arr[mid] < target:\n        return binary_search(arr, target, mid+1, hi)\n    else:\n        return binary_search(arr, target, lo, mid-1)`, practice: ["LeetCode #206 — Reverse Linked List (concept)", "Write recursive flatten for nested list", "Sum of all digits recursively"], tip: "Recursion = solve a smaller version of the same problem. Draw the call tree on paper first." }
-  },
-  {
-    day: 10, label: "Wed", cls: "d5", topic: "List Comprehensions", tasks: ["Basic syntax", "Conditional filtering", "Nested comprehensions"],
-    detail: { goal: "Write cleaner, faster Python — used heavily in DSA solutions", code: `# Basic\nsquares = [x**2 for x in range(10)]\n\n# With condition (filter)\nevens = [x for x in range(20) if x % 2 == 0]\n\n# Dict comprehension\nfreq = {ch: "hello".count(ch) for ch in set("hello")}\n\n# Flatten 2D list\nmatrix = [[1,2,3],[4,5,6],[7,8,9]]\nflat = [val for row in matrix for val in row]\n\n# Set comprehension\nunique_sq = {x**2 for x in [-2,-1,0,1,2]}`, practice: ["Get all vowels from a string using comprehension", "Square only odd numbers from a list", "Build a dict of word lengths from a sentence"], tip: "List comprehensions are 30–50% faster than for loops in Python. Use them whenever you can." }
-  },
-  {
-    day: 11, label: "Thu", cls: "d6", topic: "String Methods", tasks: ["split, join, strip", "replace, find, count", "String formatting"],
-    detail: { goal: "String manipulation — appears in almost every DSA problem", code: `s = "  Hello World  "\n\n# Basic methods\nprint(s.strip())\nprint(s.lower())\n\n# Split & Join\nwords = "a,b,c,d".split(",")\njoined = "-".join(words)\n\n# Find & Replace\nprint("banana".count("a"))\nprint("banana".find("n"))\nprint("banana".replace("a","o"))\n\n# Check\nprint("abc123".isalnum())\n\n# f-string formatting\nname, score = "Ravi", 95\nprint(f"{name} scored {score}/100")`, practice: ["LeetCode #125 — Valid Palindrome", "Count vowels and consonants in a string", "Reverse words in a sentence"], tip: "s[::-1] is the fastest way to reverse a string in Python. Remember it for interviews!" }
-  },
-  {
-    day: 12, label: "Fri", cls: "d6", topic: "OOP Basics", tasks: ["class & __init__", "Methods & self", "Build a Node class"],
-    detail: { goal: "OOP is how you build Linked Lists, Trees, Graphs in Python", code: `class Student:\n    def __init__(self, name, marks):\n        self.name = name\n        self.marks = marks\n\n    def __str__(self):\n        return f"{self.name}: {self.marks}"\n\n# Node class — used in Linked List & Trees\nclass Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None   # pointer to next node\n\n# Create linked nodes manually\nn1 = Node(10)\nn2 = Node(20)\nn1.next = n2\n\n# Traverse\ncur = n1\nwhile cur:\n    print(cur.data)\n    cur = cur.next`, practice: ["Build a Stack class using list", "Build a BankAccount class with deposit/withdraw", "Traverse a manually built linked list"], tip: "The Node class is the building block for Linked Lists, Trees, and Graphs. Master it now!" }
-  },
-  {
-    day: 13, label: "Sat", cls: "d7", topic: "Collections", tasks: ["defaultdict", "Counter", "deque"],
-    detail: { goal: "Python's secret DSA weapons — saves you hours in interviews", code: `from collections import defaultdict, Counter, deque\n\n# defaultdict — no KeyError ever\nfreq = defaultdict(int)\nfor ch in "mississippi":\n    freq[ch] += 1\n\n# Counter — frequency in ONE line\ncnt = Counter("mississippi")\nprint(cnt.most_common(2)) # [('i',4),('s',4)]\n\n# deque — fast queue / double-ended\ndq = deque()\ndq.append(1)        # add right\ndq.appendleft(0)    # add left\ndq.pop()            # remove right\ndq.popleft()        # remove left O(1)`, practice: ["Find most frequent element in a list", "Check if two strings are anagrams using Counter", "Implement a Queue using deque"], tip: "Counter and defaultdict together can solve 30% of LeetCode Easy/Medium problems. Learn them well!" }
-  },
-  {
-    day: 14, label: "Sun", cls: "d7", topic: "Revision + Problems", tasks: ["Revise Week 1 & 2", "Solve 3 LeetCode problems", "Plan Phase 2 start"],
-    detail: { goal: "Lock in everything from both weeks before moving to DSA topics", code: `# LeetCode #242 — Valid Anagram\nfrom collections import Counter\ndef isAnagram(s, t):\n    return Counter(s) == Counter(t)\n\n# LeetCode #217 — Contains Duplicate\ndef containsDuplicate(nums):\n    return len(nums) != len(set(nums))\n\n# LeetCode #20 — Valid Parentheses\ndef isValid(s):\n    stack = []\n    mapping = {')':'(', ']':'[', '}':'{'}\n    for ch in s:\n        if ch in mapping:\n            top = stack.pop() if stack else '#'\n            if mapping[ch] != top: return False\n        else:\n            stack.append(ch)\n    return not stack`, practice: ["Valid Anagram (#242)", "Contains Duplicate (#217)", "Valid Parentheses (#20)"], tip: "You've completed Phase 1! You now know enough Python to start Arrays & Strings in Phase 2." }
-  },
+  { day: 8, label: "Mon", topic: "Recursion Basics", tasks: ["Base case & recursive case", "Factorial & Fibonacci", "Call stack concept"], detail: { goal: "Understand how functions call themselves — core to Trees, Graphs, DP", code: `# Factorial\ndef factorial(n):\n    if n == 0:       # base case\n        return 1\n    return n * factorial(n - 1)\n\n# Fibonacci\ndef fib(n):\n    if n <= 1:\n        return n\n    return fib(n-1) + fib(n-2)`, practice: ["Write recursive power(base, exp)", "Count digits in a number recursively", "Print numbers 10 to 1 using recursion"], tip: "Every recursion MUST have a base case — otherwise it runs forever and crashes (RecursionError)." } },
+  { day: 9, label: "Tue", topic: "Recursion Advanced", tasks: ["Reverse string recursively", "Check palindrome", "Binary search recursive"], detail: { goal: "Apply recursion to real DSA problems", code: `# Reverse string\ndef reverse(s):\n    if len(s) <= 1: return s\n    return reverse(s[1:]) + s[0]\n\n# Check palindrome\ndef is_palindrome(s):\n    if len(s) <= 1: return True\n    if s[0] != s[-1]: return False\n    return is_palindrome(s[1:-1])`, practice: ["LeetCode #206 — Reverse Linked List (concept)", "Write recursive flatten for nested list", "Sum of all digits recursively"], tip: "Recursion = solve a smaller version of the same problem. Draw the call tree on paper first." } },
+  { day: 10, label: "Wed", topic: "List Comprehensions", tasks: ["Basic syntax", "Conditional filtering", "Nested comprehensions"], detail: { goal: "Write cleaner, faster Python — used heavily in DSA solutions", code: `# Basic\nsquares = [x**2 for x in range(10)]\n\n# With condition (filter)\nevens = [x for x in range(20) if x % 2 == 0]\n\n# Flatten 2D list\nmatrix = [[1,2,3],[4,5,6],[7,8,9]]\nflat = [val for row in matrix for val in row]\n\n# Set comprehension\nunique_sq = {x**2 for x in [-2,-1,0,1,2]}`, practice: ["Get all vowels from a string using comprehension", "Square only odd numbers from a list", "Build a dict of word lengths from a sentence"], tip: "List comprehensions are 30–50% faster than for loops in Python. Use them whenever you can." } },
+  { day: 11, label: "Thu", topic: "String Methods", tasks: ["split, join, strip", "replace, find, count", "String formatting"], detail: { goal: "String manipulation — appears in almost every DSA problem", code: `s = "  Hello World  "\n\n# Basic methods\nprint(s.strip())\nprint(s.lower())\n\n# Split & Join\nwords = "a,b,c,d".split(",")\njoined = "-".join(words)\n\n# Check\nprint("abc123".isalnum())\n\n# f-string formatting\nname, score = "Ravi", 95\nprint(f"{name} scored {score}/100")`, practice: ["LeetCode #125 — Valid Palindrome", "Count vowels and consonants in a string", "Reverse words in a sentence"], tip: "s[::-1] is the fastest way to reverse a string in Python. Remember it for interviews!" } },
+  { day: 12, label: "Fri", topic: "OOP Basics", tasks: ["class & __init__", "Methods & self", "Build a Node class"], detail: { goal: "OOP is how you build Linked Lists, Trees, Graphs in Python", code: `class Student:\n    def __init__(self, name, marks):\n        self.name = name\n        self.marks = marks\n\n    def __str__(self):\n        return f"{self.name}: {self.marks}"\n\n# Node class — used in Linked List & Trees\nclass Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None   # pointer to next node\n\n# Create linked nodes manually\nn1 = Node(10)\nn2 = Node(20)\nn1.next = n2`, practice: ["Build a Stack class using list", "Build a BankAccount class with deposit/withdraw", "Traverse a manually built linked list"], tip: "The Node class is the building block for Linked Lists, Trees, and Graphs. Master it now!" } },
+  { day: 13, label: "Sat", topic: "Collections", tasks: ["defaultdict", "Counter", "deque"], detail: { goal: "Python's secret DSA weapons — saves you hours in interviews", code: `from collections import defaultdict, Counter, deque\n\n# defaultdict — no KeyError ever\nfreq = defaultdict(int)\nfor ch in "mississippi":\n    freq[ch] += 1\n\n# Counter — frequency in ONE line\ncnt = Counter("mississippi")\nprint(cnt.most_common(2)) # [('i',4),('s',4)]\n\n# deque — fast queue / double-ended\ndq = deque()\ndq.append(1)        # add right\ndq.appendleft(0)    # add left\ndq.popleft()        # remove left O(1)`, practice: ["Find most frequent element in a list", "Check if two strings are anagrams using Counter", "Implement a Queue using deque"], tip: "Counter and defaultdict together can solve 30% of LeetCode Easy/Medium problems. Learn them well!" } },
+  { day: 14, label: "Sun", topic: "Revision + Problems", tasks: ["Revise Week 1 & 2", "Solve 3 LeetCode problems", "Plan Phase 2 start"], detail: { goal: "Lock in everything from both weeks before moving to DSA topics", code: `# LeetCode #242 — Valid Anagram\nfrom collections import Counter\ndef isAnagram(s, t):\n    return Counter(s) == Counter(t)\n\n# LeetCode #20 — Valid Parentheses\ndef isValid(s):\n    stack = []\n    mapping = {')':'(', ']':'[', '}':'{'}\n    for ch in s:\n        if ch in mapping:\n            top = stack.pop() if stack else '#'\n            if mapping[ch] != top: return False\n        else:\n            stack.append(ch)\n    return not stack`, practice: ["Valid Anagram (#242)", "Contains Duplicate (#217)", "Valid Parentheses (#20)"], tip: "You've completed Phase 1! You now know enough Python to start Arrays & Strings in Phase 2." } },
 
   // --- WEEK 3 ---
-  {
-    day: 15, label: "Mon", cls: "d1", topic: "Array Basics", tasks: ["Traversal & indexing", "Prefix sum concept", "Kadane's algorithm idea"],
-    detail: { goal: "Master core array operations — foundation of all DSA", code: `# Prefix sum — very common in interviews\narr = [1, 2, 3, 4, 5]\nprefix = [0] * (len(arr) + 1)\nfor i in range(len(arr)):\n    prefix[i+1] = prefix[i] + arr[i]\n# sum(l..r) = prefix[r+1] - prefix[l]\nprint(prefix[4] - prefix[1])  # sum(1..3) = 9\n\n# Kadane's — max subarray sum\ndef maxSubArray(nums):\n    cur = best = nums[0]\n    for n in nums[1:]:\n        cur = max(n, cur + n)\n        best = max(best, cur)\n    return best`, practice: ["LeetCode #53 — Maximum Subarray (Easy)", "LeetCode #303 — Range Sum Query (Easy)"], tip: "Prefix sum is asked in at least 1 problem in every major interview. Memorize the pattern." }
-  },
-  {
-    day: 16, label: "Tue", cls: "d1", topic: "Two Pointers", tasks: ["Left & right pointers", "Remove duplicates", "Pair with target sum"],
-    detail: { goal: "Two pointer technique — solves O(n²) problems in O(n)", code: `# Two Sum II (sorted array)\ndef twoSum(numbers, target):\n    l, r = 0, len(numbers) - 1\n    while l < r:\n        s = numbers[l] + numbers[r]\n        if s == target:\n            return [l+1, r+1]\n        elif s < target:\n            l += 1\n        else:\n            r -= 1\n\n# Valid Palindrome (two pointer)\ndef isPalindrome(s):\n    s = [c.lower() for c in s if c.isalnum()]\n    l, r = 0, len(s) - 1\n    while l < r:\n        if s[l] != s[r]: return False\n        l += 1; r -= 1\n    return True`, practice: ["LeetCode #167 — Two Sum II (Medium)", "LeetCode #26 — Remove Duplicates (Easy)", "LeetCode #125 — Valid Palindrome (Easy)"], tip: "Whenever you see 'sorted array + find pair', think Two Pointers first. It's almost always the answer." }
-  },
-  {
-    day: 17, label: "Wed", cls: "d2", topic: "Sliding Window", tasks: ["Fixed window size", "Variable window", "Max sum subarray"],
-    detail: { goal: "Sliding window — converts O(n²) brute force to O(n) elegantly", code: `# Fixed window — max sum of size k\ndef maxSumSubarray(arr, k):\n    win = sum(arr[:k])\n    best = win\n    for i in range(k, len(arr)):\n        win += arr[i] - arr[i-k]\n        best = max(best, win)\n    return best\n\n# Variable window — longest substring no repeat\ndef lengthOfLongestSubstring(s):\n    seen = {}\n    l = best = 0\n    for r, ch in enumerate(s):\n        if ch in seen and seen[ch] >= l:\n            l = seen[ch] + 1\n        seen[ch] = r\n        best = max(best, r - l + 1)\n    return best`, practice: ["LeetCode #643 — Max Avg Subarray I (Easy)", "LeetCode #3 — Longest Substring No Repeat (Medium)", "LeetCode #209 — Min Size Subarray Sum (Medium)"], tip: "Sliding window = expand right pointer, shrink left when condition breaks. That's the whole pattern." }
-  },
-  {
-    day: 18, label: "Thu", cls: "d2", topic: "Sorting & Searching", tasks: ["Built-in sort with key", "Binary search", "bisect module"],
-    detail: { goal: "Sorting and searching are in almost every DSA problem", code: `# Binary search — O(log n)\ndef binary_search(arr, target):\n    lo, hi = 0, len(arr) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1\n\n# bisect module (built-in binary search)\nimport bisect\narr = [1, 3, 5, 7, 9]\nprint(bisect.bisect_left(arr, 5))   # 2`, practice: ["LeetCode #704 — Binary Search (Easy)", "LeetCode #35 — Search Insert Position (Easy)", "LeetCode #75 — Sort Colors (Medium)"], tip: "Always ask in interviews: 'Is the array sorted?' If yes, binary search is probably the answer." }
-  },
-  {
-    day: 19, label: "Fri", cls: "d3", topic: "String Patterns", tasks: ["Anagram checks", "Character frequency", "Sliding window strings"],
-    detail: { goal: "String problems are the most common in online assessments", code: `from collections import Counter, defaultdict\n\n# Group anagrams together\ndef groupAnagrams(strs):\n    d = defaultdict(list)\n    for s in strs:\n        key = tuple(sorted(s))\n        d[key].append(s)\n    return list(d.values())\n\n# Longest palindromic substring\ndef longestPalindrome(s):\n    res = ""\n    for i in range(len(s)):\n        for odd, even in [(i,i),(i,i+1)]:\n            l, r = odd, even\n            while l >= 0 and r < len(s) and s[l] == s[r]:\n                if r - l + 1 > len(res):\n                    res = s[l:r+1]\n                l -= 1; r += 1\n    return res`, practice: ["LeetCode #242 — Valid Anagram (Easy)", "LeetCode #49 — Group Anagrams (Medium)", "LeetCode #438 — Find All Anagrams (Medium)"], tip: "For string problems, Counter is your best friend. It makes frequency checks a one-liner." }
-  },
-  {
-    day: 20, label: "Sat", cls: "d3", topic: "Matrix / 2D Arrays", tasks: ["Row & column traversal", "Diagonal & spiral", "Rotate & transpose"],
-    detail: { goal: "2D arrays appear in graph problems, DP, and image processing", code: `# Rotate 90 degrees clockwise\ndef rotate(matrix):\n    n = len(matrix)\n    # Step 1: transpose\n    for i in range(n):\n        for j in range(i+1, n):\n            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]\n    # Step 2: reverse each row\n    for row in matrix:\n        row.reverse()\n\n# Set zeros\ndef setZeroes(matrix):\n    rows = {r for r in range(len(matrix)) if 0 in matrix[r]}\n    cols = {c for r in matrix for c,v in enumerate(r) if v==0}\n    for r in rows:\n        matrix[r] = [0]*len(matrix[0])\n    for r in matrix:\n        for c in cols:\n            r[c] = 0`, practice: ["LeetCode #48 — Rotate Image (Medium)", "LeetCode #54 — Spiral Matrix (Medium)", "LeetCode #73 — Set Matrix Zeroes (Medium)"], tip: "Transpose + reverse = 90° rotation. This trick appears in at least 2–3 top company interviews every year." }
-  },
-  {
-    day: 21, label: "Sun", cls: "d4", topic: "Week 3 Revision", tasks: ["Revise all patterns", "Timed LeetCode session", "Note weak areas"],
-    detail: { goal: "Consolidate all Week 3 patterns with timed practice", code: `# Pattern 2: Two Pointer (Container With Most Water)\ndef maxArea(height):\n    l, r = 0, len(height) - 1\n    best = 0\n    while l < r:\n        best = max(best, min(height[l], height[r]) * (r - l))\n        if height[l] < height[r]: l += 1\n        else: r -= 1\n    return best\n\n# Pattern 3: Sliding Window (Best Time to Buy Stock)\ndef maxProfit(prices):\n    buy = float('inf')\n    profit = 0\n    for p in prices:\n        buy = min(buy, p)\n        profit = max(profit, p - buy)\n    return profit`, practice: ["LeetCode #560 — Subarray Sum Equals K (Medium)", "LeetCode #11 — Container With Most Water (Medium)", "LeetCode #121 — Best Time to Buy Stock (Easy)"], tip: "After Week 3, you know 4 core patterns: Prefix Sum, Two Pointer, Sliding Window, Binary Search. These alone solve 40% of interview problems!" }
-  },
+  { day: 15, label: "Mon", topic: "Array Basics", tasks: ["Traversal & indexing", "Prefix sum concept", "Kadane's algorithm idea"], detail: { goal: "Master core array operations — foundation of all DSA", code: `# Prefix sum — very common in interviews\narr = [1, 2, 3, 4, 5]\nprefix = [0] * (len(arr) + 1)\nfor i in range(len(arr)):\n    prefix[i+1] = prefix[i] + arr[i]\nprint(prefix[4] - prefix[1])  # sum(1..3) = 9\n\n# Kadane's — max subarray sum\ndef maxSubArray(nums):\n    cur = best = nums[0]\n    for n in nums[1:]:\n        cur = max(n, cur + n)\n        best = max(best, cur)\n    return best`, practice: ["LeetCode #53 — Maximum Subarray (Easy)", "LeetCode #303 — Range Sum Query (Easy)"], tip: "Prefix sum is asked in at least 1 problem in every major interview. Memorize the pattern." } },
+  { day: 16, label: "Tue", topic: "Two Pointers", tasks: ["Left & right pointers", "Remove duplicates", "Pair with target sum"], detail: { goal: "Two pointer technique — solves O(n²) problems in O(n)", code: `# Two Sum II (sorted array)\ndef twoSum(numbers, target):\n    l, r = 0, len(numbers) - 1\n    while l < r:\n        s = numbers[l] + numbers[r]\n        if s == target: return [l+1, r+1]\n        elif s < target: l += 1\n        else: r -= 1\n\n# Valid Palindrome (two pointer)\ndef isPalindrome(s):\n    s = [c.lower() for c in s if c.isalnum()]\n    l, r = 0, len(s) - 1\n    while l < r:\n        if s[l] != s[r]: return False\n        l += 1; r -= 1\n    return True`, practice: ["LeetCode #167 — Two Sum II (Medium)", "LeetCode #26 — Remove Duplicates (Easy)", "LeetCode #125 — Valid Palindrome (Easy)"], tip: "Whenever you see 'sorted array + find pair', think Two Pointers first. It's almost always the answer." } },
+  { day: 17, label: "Wed", topic: "Sliding Window", tasks: ["Fixed window size", "Variable window", "Max sum subarray"], detail: { goal: "Sliding window — converts O(n²) brute force to O(n) elegantly", code: `# Variable window — longest substring no repeat\ndef lengthOfLongestSubstring(s):\n    seen = {}\n    l = best = 0\n    for r, ch in enumerate(s):\n        if ch in seen and seen[ch] >= l:\n            l = seen[ch] + 1\n        seen[ch] = r\n        best = max(best, r - l + 1)\n    return best`, practice: ["LeetCode #643 — Max Avg Subarray I (Easy)", "LeetCode #3 — Longest Substring No Repeat (Medium)", "LeetCode #209 — Min Size Subarray Sum (Medium)"], tip: "Sliding window = expand right pointer, shrink left when condition breaks. That's the whole pattern." } },
+  { day: 18, label: "Thu", topic: "Sorting & Searching", tasks: ["Built-in sort with key", "Binary search", "bisect module"], detail: { goal: "Sorting and searching are in almost every DSA problem", code: `# Binary search — O(log n)\ndef binary_search(arr, target):\n    lo, hi = 0, len(arr) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1\n\n# bisect module (built-in binary search)\nimport bisect\narr = [1, 3, 5, 7, 9]\nprint(bisect.bisect_left(arr, 5))   # 2`, practice: ["LeetCode #704 — Binary Search (Easy)", "LeetCode #35 — Search Insert Position (Easy)", "LeetCode #75 — Sort Colors (Medium)"], tip: "Always ask in interviews: 'Is the array sorted?' If yes, binary search is probably the answer." } },
+  { day: 19, label: "Fri", topic: "String Patterns", tasks: ["Anagram checks", "Character frequency", "Sliding window strings"], detail: { goal: "String problems are the most common in online assessments", code: `from collections import Counter, defaultdict\n\n# Group anagrams together\ndef groupAnagrams(strs):\n    d = defaultdict(list)\n    for s in strs:\n        key = tuple(sorted(s))\n        d[key].append(s)\n    return list(d.values())\n\n# Longest palindromic substring\ndef longestPalindrome(s):\n    res = ""\n    for i in range(len(s)):\n        for odd, even in [(i,i),(i,i+1)]:\n            l, r = odd, even\n            while l >= 0 and r < len(s) and s[l] == s[r]:\n                if r - l + 1 > len(res):\n                    res = s[l:r+1]\n                l -= 1; r += 1\n    return res`, practice: ["LeetCode #242 — Valid Anagram (Easy)", "LeetCode #49 — Group Anagrams (Medium)", "LeetCode #438 — Find All Anagrams (Medium)"], tip: "For string problems, Counter is your best friend. It makes frequency checks a one-liner." } },
+  { day: 20, label: "Sat", topic: "Matrix / 2D Arrays", tasks: ["Row & column traversal", "Diagonal & spiral", "Rotate & transpose"], detail: { goal: "2D arrays appear in graph problems, DP, and image processing", code: `# Rotate 90 degrees clockwise\ndef rotate(matrix):\n    n = len(matrix)\n    # Step 1: transpose\n    for i in range(n):\n        for j in range(i+1, n):\n            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]\n    # Step 2: reverse each row\n    for row in matrix:\n        row.reverse()\n\n# Set zeros\ndef setZeroes(matrix):\n    rows = {r for r in range(len(matrix)) if 0 in matrix[r]}\n    cols = {c for r in matrix for c,v in enumerate(r) if v==0}\n    for r in rows: matrix[r] = [0]*len(matrix[0])\n    for r in matrix: \n        for c in cols: r[c] = 0`, practice: ["LeetCode #48 — Rotate Image (Medium)", "LeetCode #54 — Spiral Matrix (Medium)", "LeetCode #73 — Set Matrix Zeroes (Medium)"], tip: "Transpose + reverse = 90° rotation. This trick appears in at least 2–3 top company interviews every year." } },
+  { day: 21, label: "Sun", topic: "Week 3 Revision", tasks: ["Revise all patterns", "Timed LeetCode session", "Note weak areas"], detail: { goal: "Consolidate all Week 3 patterns with timed practice", code: `# Pattern 2: Two Pointer (Container With Most Water)\ndef maxArea(height):\n    l, r = 0, len(height) - 1\n    best = 0\n    while l < r:\n        best = max(best, min(height[l], height[r]) * (r - l))\n        if height[l] < height[r]: l += 1\n        else: r -= 1\n    return best\n\n# Pattern 3: Sliding Window (Best Time to Buy Stock)\ndef maxProfit(prices):\n    buy = float('inf')\n    profit = 0\n    for p in prices:\n        buy = min(buy, p)\n        profit = max(profit, p - buy)\n    return profit`, practice: ["LeetCode #560 — Subarray Sum Equals K (Medium)", "LeetCode #11 — Container With Most Water (Medium)", "LeetCode #121 — Best Time to Buy Stock (Easy)"], tip: "After Week 3, you know 4 core patterns: Prefix Sum, Two Pointer, Sliding Window, Binary Search. These alone solve 40% of interview problems!" } },
 
   // --- WEEK 4 ---
-  {
-    day: 22, label: "Mon", cls: "d4", topic: "HashMap Basics", tasks: ["dict CRUD operations", "O(1) lookup concept", "Frequency counting"],
-    detail: { goal: "Understand why HashMap is the #1 tool in DSA interviews", code: `# OPTIMAL with HashMap — O(n)\ndef twoSum(nums, target):\n    seen = {}              # val -> index\n    for i, n in enumerate(nums):\n        diff = target - n\n        if diff in seen:\n            return [seen[diff], i]\n        seen[n] = i\n\n# Frequency count pattern\ndef freqCount(arr):\n    freq = {}\n    for x in arr:\n        freq[x] = freq.get(x, 0) + 1\n    return freq`, practice: ["LeetCode #1 — Two Sum (Easy)", "LeetCode #217 — Contains Duplicate (Easy)", "LeetCode #169 — Majority Element (Easy)"], tip: "Whenever you see O(n²) with nested loops, ask: can a HashMap reduce this to O(n)? Usually yes!" }
-  },
-  {
-    day: 23, label: "Tue", cls: "d5", topic: "defaultdict & Counter", tasks: ["defaultdict(int/list/set)", "Counter most_common", "Subtract & update"],
-    detail: { goal: "Master Python's power tools — they cut interview code in half", code: `from collections import defaultdict, Counter\n\n# defaultdict(list) — group items\ndef groupAnagrams(strs):\n    groups = defaultdict(list)\n    for s in strs:\n        groups[tuple(sorted(s))].append(s)\n    return list(groups.values())\n\n# Counter arithmetic\nc1 = Counter("aab")\nc2 = Counter("abb")\nprint(c1 + c2)   # Counter({'a':3,'b':3})\nprint(c1 - c2)   # Counter({'a':1})\nprint(c1 & c2)   # intersection (min)\nprint(c1 | c2)   # union (max)`, practice: ["LeetCode #49 — Group Anagrams (Medium)", "LeetCode #347 — Top K Frequent Elements (Medium)", "LeetCode #383 — Ransom Note (Easy)"], tip: "defaultdict(list) for grouping, defaultdict(int) for counting. These two patterns cover 80% of HashMap problems." }
-  },
-  {
-    day: 24, label: "Wed", cls: "d5", topic: "HashSet Patterns", tasks: ["Set for O(1) lookup", "Duplicate detection", "Set operations"],
-    detail: { goal: "Sets give you O(1) membership check — critical for cycle & duplicate detection", code: `# Longest Consecutive Sequence — O(n)\ndef longestConsecutive(nums):\n    num_set = set(nums)\n    best = 0\n    for n in num_set:\n        if n - 1 not in num_set:   # start of sequence\n            cur, length = n, 1\n            while cur + 1 in num_set:\n                cur += 1\n                length += 1\n            best = max(best, length)\n    return best\n\n# Set operations\na = {1, 2, 3, 4}; b = {3, 4, 5, 6}\nprint(a & b)   # intersection {3,4}\nprint(a | b)   # union {1,2,3,4,5,6}`, practice: ["LeetCode #128 — Longest Consecutive Sequence (Medium)", "LeetCode #202 — Happy Number (Easy)", "LeetCode #349 — Intersection of Two Arrays (Easy)"], tip: "Use a set whenever you need to check 'have I seen this before?' — it's O(1) vs O(n) for a list." }
-  },
-  {
-    day: 25, label: "Thu", cls: "d6", topic: "HashMap Advanced", tasks: ["Subarray with sum k", "Prefix sum + HashMap", "Count pairs"],
-    detail: { goal: "Combine prefix sum with HashMap — powerful pattern for subarray problems", code: `from collections import defaultdict\n\n# Subarray Sum Equals K — O(n)\ndef subarraySum(nums, k):\n    count = prefix = 0\n    seen = defaultdict(int)\n    seen[0] = 1\n    for n in nums:\n        prefix += n\n        count += seen[prefix - k]\n        seen[prefix] += 1\n    return count\n\n# Longest Subarray with sum k\ndef longestSubarraySum(arr, k):\n    seen = {}\n    prefix = best = 0\n    for i, n in enumerate(arr):\n        prefix += n\n        if prefix == k: best = i + 1\n        if prefix - k in seen:\n            best = max(best, i - seen[prefix - k])\n        if prefix not in seen:\n            seen[prefix] = i\n    return best`, practice: ["LeetCode #560 — Subarray Sum Equals K (Medium)", "LeetCode #454 — 4Sum II (Medium)", "LeetCode #525 — Contiguous Array (Medium)"], tip: "Prefix sum + HashMap is one of the most elegant patterns in DSA. Master it — it appears in FAANG interviews constantly." }
-  },
-  {
-    day: 26, label: "Fri", cls: "d6", topic: "OrderedDict & LRU", tasks: ["OrderedDict usage", "LRU Cache concept", "Move to end trick"],
-    detail: { goal: "OrderedDict powers LRU Cache — a top Microsoft/Amazon interview question", code: `from collections import OrderedDict\n\n# LRU Cache — Design Problem\nclass LRUCache:\n    def __init__(self, capacity):\n        self.cap = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key):\n        if key not in self.cache: return -1\n        self.cache.move_to_end(key)  # mark as recently used\n        return self.cache[key]\n\n    def put(self, key, value):\n        if key in self.cache:\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n        if len(self.cache) > self.cap:\n            self.cache.popitem(last=False)  # evict LRU`, practice: ["LeetCode #146 — LRU Cache (Medium)", "LeetCode #460 — LFU Cache (Hard — optional)"], tip: "LRU Cache is asked in almost every senior-level interview. Understand it deeply — move_to_end is the key trick." }
-  },
-  {
-    day: 27, label: "Sat", cls: "d7", topic: "Hashing Problems", tasks: ["Word frequency analysis", "Top K frequent", "Isomorphic strings"],
-    detail: { goal: "Apply all hashing patterns to mixed interview-style problems", code: `from collections import Counter\nimport heapq\n\n# Top K Frequent Elements — O(n log k)\ndef topKFrequent(nums, k):\n    freq = Counter(nums)\n    return heapq.nlargest(k, freq.keys(), key=freq.get)\n\n# Isomorphic Strings\ndef isIsomorphic(s, t):\n    return len(set(zip(s,t))) == len(set(s)) == len(set(t))\n\n# Word Pattern\ndef wordPattern(pattern, s):\n    words = s.split()\n    if len(pattern) != len(words): return False\n    return len(set(zip(pattern,words))) == len(set(pattern)) == len(set(words))`, practice: ["LeetCode #347 — Top K Frequent Elements (Medium)", "LeetCode #205 — Isomorphic Strings (Easy)", "LeetCode #290 — Word Pattern (Easy)"], tip: "zip(s,t) creates pairs — using set(zip(s,t)) is a one-liner for isomorphism checks. Clean Python trick!" }
-  },
-  {
-    day: 28, label: "Sun", cls: "d7", topic: "Week 4 Revision", tasks: ["Revise all hash patterns", "Timed problem session", "Plan Week 5"],
-    detail: { goal: "Lock in all hashing patterns before moving to Linked Lists", code: `# 1. Subarray sum = k (prefix + HashMap)\ndef subarraySum(nums, k):\n    seen = defaultdict(int)\n    seen[0] = 1\n    prefix = count = 0\n    for n in nums:\n        prefix += n\n        count += seen[prefix - k]\n        seen[prefix] += 1\n    return count\n\n# 2. Longest consecutive (HashSet)\ndef longestConsecutive(nums):\n    s = set(nums)\n    best = 0\n    for n in s:\n        if n-1 not in s:\n            cur = n\n            while cur+1 in s: cur += 1\n            best = max(best, cur - n + 1)\n    return best`, practice: ["LeetCode #128 — Longest Consecutive Sequence (Medium)", "LeetCode #146 — LRU Cache (Medium)"], tip: "You've now completed Arrays, Strings, and Hashing — the 3 most tested topics in product company OAs. Week 5 starts Linked Lists!" }
-  },
+  { day: 22, label: "Mon", topic: "HashMap Basics", tasks: ["dict CRUD operations", "O(1) lookup concept", "Frequency counting"], detail: { goal: "Understand why HashMap is the #1 tool in DSA interviews", code: `# OPTIMAL with HashMap — O(n)\ndef twoSum(nums, target):\n    seen = {}              # val -> index\n    for i, n in enumerate(nums):\n        diff = target - n\n        if diff in seen: return [seen[diff], i]\n        seen[n] = i\n\n# Frequency count pattern\ndef freqCount(arr):\n    freq = {}\n    for x in arr:\n        freq[x] = freq.get(x, 0) + 1\n    return freq`, practice: ["LeetCode #1 — Two Sum (Easy)", "LeetCode #217 — Contains Duplicate (Easy)", "LeetCode #169 — Majority Element (Easy)"], tip: "Whenever you see O(n²) with nested loops, ask: can a HashMap reduce this to O(n)? Usually yes!" } },
+  { day: 23, label: "Tue", topic: "defaultdict & Counter", tasks: ["defaultdict(int/list/set)", "Counter most_common", "Subtract & update"], detail: { goal: "Master Python's power tools — they cut interview code in half", code: `from collections import defaultdict, Counter\n\n# defaultdict(list) — group items\ndef groupAnagrams(strs):\n    groups = defaultdict(list)\n    for s in strs:\n        groups[tuple(sorted(s))].append(s)\n    return list(groups.values())\n\n# Counter arithmetic\nc1 = Counter("aab")\nc2 = Counter("abb")\nprint(c1 + c2)   # Counter({'a':3,'b':3})\nprint(c1 - c2)   # Counter({'a':1})`, practice: ["LeetCode #49 — Group Anagrams (Medium)", "LeetCode #347 — Top K Frequent Elements (Medium)", "LeetCode #383 — Ransom Note (Easy)"], tip: "defaultdict(list) for grouping, defaultdict(int) for counting. These two patterns cover 80% of HashMap problems." } },
+  { day: 24, label: "Wed", topic: "HashSet Patterns", tasks: ["Set for O(1) lookup", "Duplicate detection", "Set operations"], detail: { goal: "Sets give you O(1) membership check — critical for cycle & duplicate detection", code: `# Longest Consecutive Sequence — O(n)\ndef longestConsecutive(nums):\n    num_set = set(nums)\n    best = 0\n    for n in num_set:\n        if n - 1 not in num_set:   # start of sequence\n            cur, length = n, 1\n            while cur + 1 in num_set:\n                cur += 1\n                length += 1\n            best = max(best, length)\n    return best\n\n# Set operations\na = {1, 2, 3, 4}; b = {3, 4, 5, 6}\nprint(a & b)   # intersection {3,4}`, practice: ["LeetCode #128 — Longest Consecutive Sequence (Medium)", "LeetCode #202 — Happy Number (Easy)", "LeetCode #349 — Intersection of Two Arrays (Easy)"], tip: "Use a set whenever you need to check 'have I seen this before?' — it's O(1) vs O(n) for a list." } },
+  { day: 25, label: "Thu", topic: "HashMap Advanced", tasks: ["Subarray with sum k", "Prefix sum + HashMap", "Count pairs"], detail: { goal: "Combine prefix sum with HashMap — powerful pattern for subarray problems", code: `from collections import defaultdict\n\n# Subarray Sum Equals K — O(n)\ndef subarraySum(nums, k):\n    count = prefix = 0\n    seen = defaultdict(int)\n    seen[0] = 1\n    for n in nums:\n        prefix += n\n        count += seen[prefix - k]\n        seen[prefix] += 1\n    return count\n\n# Longest Subarray with sum k\ndef longestSubarraySum(arr, k):\n    seen = {}\n    prefix = best = 0\n    for i, n in enumerate(arr):\n        prefix += n\n        if prefix == k: best = i + 1\n        if prefix - k in seen:\n            best = max(best, i - seen[prefix - k])\n        if prefix not in seen:\n            seen[prefix] = i\n    return best`, practice: ["LeetCode #560 — Subarray Sum Equals K (Medium)", "LeetCode #454 — 4Sum II (Medium)", "LeetCode #525 — Contiguous Array (Medium)"], tip: "Prefix sum + HashMap is one of the most elegant patterns in DSA. Master it — it appears in FAANG interviews constantly." } },
+  { day: 26, label: "Fri", topic: "OrderedDict & LRU", tasks: ["OrderedDict usage", "LRU Cache concept", "Move to end trick"], detail: { goal: "OrderedDict powers LRU Cache — a top Microsoft/Amazon interview question", code: `from collections import OrderedDict\n\n# LRU Cache — Design Problem\nclass LRUCache:\n    def __init__(self, capacity):\n        self.cap = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key):\n        if key not in self.cache: return -1\n        self.cache.move_to_end(key)  # mark as recently used\n        return self.cache[key]\n\n    def put(self, key, value):\n        if key in self.cache:\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n        if len(self.cache) > self.cap:\n            self.cache.popitem(last=False)  # evict LRU`, practice: ["LeetCode #146 — LRU Cache (Medium)", "LeetCode #460 — LFU Cache (Hard — optional)"], tip: "LRU Cache is asked in almost every senior-level interview. Understand it deeply — move_to_end is the key trick." } },
+  { day: 27, label: "Sat", topic: "Hashing Problems", tasks: ["Word frequency analysis", "Top K frequent", "Isomorphic strings"], detail: { goal: "Apply all hashing patterns to mixed interview-style problems", code: `from collections import Counter\nimport heapq\n\n# Top K Frequent Elements — O(n log k)\ndef topKFrequent(nums, k):\n    freq = Counter(nums)\n    return heapq.nlargest(k, freq.keys(), key=freq.get)\n\n# Isomorphic Strings\ndef isIsomorphic(s, t):\n    return len(set(zip(s,t))) == len(set(s)) == len(set(t))\n\n# Word Pattern\ndef wordPattern(pattern, s):\n    words = s.split()\n    if len(pattern) != len(words): return False\n    return len(set(zip(pattern,words))) == len(set(pattern)) == len(set(words))`, practice: ["LeetCode #347 — Top K Frequent Elements (Medium)", "LeetCode #205 — Isomorphic Strings (Easy)", "LeetCode #290 — Word Pattern (Easy)"], tip: "zip(s,t) creates pairs — using set(zip(s,t)) is a one-liner for isomorphism checks. Clean Python trick!" } },
+  { day: 28, label: "Sun", topic: "Week 4 Revision", tasks: ["Revise all hash patterns", "Timed problem session", "Plan Week 5"], detail: { goal: "Lock in all hashing patterns before moving to Linked Lists", code: `# 1. Subarray sum = k (prefix + HashMap)\ndef subarraySum(nums, k):\n    seen = defaultdict(int)\n    seen[0] = 1\n    prefix = count = 0\n    for n in nums:\n        prefix += n\n        count += seen[prefix - k]\n        seen[prefix] += 1\n    return count\n\n# 2. Longest consecutive (HashSet)\ndef longestConsecutive(nums):\n    s = set(nums)\n    best = 0\n    for n in s:\n        if n-1 not in s:\n            cur = n\n            while cur+1 in s: cur += 1\n            best = max(best, cur - n + 1)\n    return best`, practice: ["LeetCode #128 — Longest Consecutive Sequence (Medium)", "LeetCode #146 — LRU Cache (Medium)"], tip: "You've now completed Arrays, Strings, and Hashing — the 3 most tested topics in product company OAs. Week 5 starts Linked Lists!" } },
 
   // --- WEEK 5 ---
-  {
-    day: 29, label: "Mon", cls: "d1", topic: "LL Basics", tasks: ["Node class & structure", "Insert & delete nodes", "Traverse & print"],
-    detail: { goal: "Build a Linked List from scratch — understand pointers deeply", code: `class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def append(self, data):\n        new = Node(data)\n        if not self.head:\n            self.head = new; return\n        cur = self.head\n        while cur.next:\n            cur = cur.next\n        cur.next = new\n\n    def delete(self, data):\n        if not self.head: return\n        if self.head.data == data:\n            self.head = self.head.next; return\n        cur = self.head\n        while cur.next:\n            if cur.next.data == data:\n                cur.next = cur.next.next; return\n            cur = cur.next`, practice: ["LeetCode #707 — Design Linked List (Medium)", "Build your own LL with append/prepend/delete"], tip: "Always draw the pointers on paper before coding. Linked List bugs are 99% pointer mistakes." }
-  },
-  {
-    day: 30, label: "Tue", cls: "d1", topic: "Reverse a LL", tasks: ["Iterative reversal", "Recursive reversal", "Reverse in groups"],
-    detail: { goal: "Reversal is the most asked Linked List operation in interviews", code: `# Iterative reversal — O(n) time O(1) space\ndef reverseList(head):\n    prev = None\n    cur = head\n    while cur:\n        nxt = cur.next   # save next\n        cur.next = prev  # reverse link\n        prev = cur       # move prev\n        cur = nxt        # move cur\n    return prev\n\n# Recursive reversal\ndef reverseList_rec(head):\n    if not head or not head.next:\n        return head\n    new_head = reverseList_rec(head.next)\n    head.next.next = head\n    head.next = None\n    return new_head`, practice: ["LeetCode #206 — Reverse Linked List (Easy)", "LeetCode #92 — Reverse Linked List II (Medium)", "LeetCode #25 — Reverse Nodes in k-Group (Hard)"], tip: "For reversal: prev=None, cur=head, save next, flip link, move both. Repeat this in your head like a mantra." }
-  },
-  {
-    day: 31, label: "Wed", cls: "d2", topic: "Fast & Slow Pointers", tasks: ["Floyd's cycle detection", "Find middle node", "Cycle entry point"],
-    detail: { goal: "Fast & slow pointer is one of the most elegant tricks in all of DSA", code: `# Find middle node\ndef middleNode(head):\n    slow = fast = head\n    while fast and fast.next:\n        slow = slow.next\n        fast = fast.next.next\n    return slow\n\n# Detect cycle — Floyd's algorithm\ndef hasCycle(head):\n    slow = fast = head\n    while fast and fast.next:\n        slow = slow.next\n        fast = fast.next.next\n        if slow == fast:\n            return True\n    return False`, practice: ["LeetCode #876 — Middle of Linked List (Easy)", "LeetCode #141 — Linked List Cycle (Easy)", "LeetCode #142 — Linked List Cycle II (Medium)"], tip: "Fast pointer moves 2x, slow moves 1x. When fast reaches end, slow is at the middle. This single insight solves 5+ problems." }
-  },
-  {
-    day: 32, label: "Thu", cls: "d2", topic: "Merge & Sort LL", tasks: ["Merge two sorted LLs", "Merge k sorted LLs", "Sort a linked list"],
-    detail: { goal: "Merging is a fundamental operation — appears in merge sort and K-way merge problems", code: `# Merge two sorted linked lists\ndef mergeTwoLists(l1, l2):\n    dummy = ListNode(0)\n    cur = dummy\n    while l1 and l2:\n        if l1.val <= l2.val:\n            cur.next = l1\n            l1 = l1.next\n        else:\n            cur.next = l2\n            l2 = l2.next\n        cur = cur.next\n    cur.next = l1 or l2\n    return dummy.next`, practice: ["LeetCode #21 — Merge Two Sorted Lists (Easy)", "LeetCode #23 — Merge K Sorted Lists (Hard)", "LeetCode #148 — Sort List (Medium)"], tip: "Always use a dummy node when merging — it removes the need for special-casing the head and makes code cleaner." }
-  },
-  {
-    day: 33, label: "Fri", cls: "d3", topic: "LL Removal Patterns", tasks: ["Remove nth from end", "Remove duplicates", "Delete node without head"],
-    detail: { goal: "Removal patterns use dummy nodes and two-pointer tricks — very common in interviews", code: `# Remove nth node from end — one pass\ndef removeNthFromEnd(head, n):\n    dummy = ListNode(0)\n    dummy.next = head\n    fast = slow = dummy\n    for _ in range(n + 1):\n        fast = fast.next\n    while fast:\n        fast = fast.next\n        slow = slow.next\n    slow.next = slow.next.next\n    return dummy.next\n\n# Delete node without head reference\ndef deleteNode(node):\n    node.val = node.next.val\n    node.next = node.next.next`, practice: ["LeetCode #19 — Remove Nth Node From End (Medium)", "LeetCode #83 — Remove Duplicates from Sorted List (Easy)", "LeetCode #82 — Remove Duplicates II (Medium)"], tip: "Use a dummy node before head whenever you might delete the head itself. It saves a ton of edge case handling." }
-  },
-  {
-    day: 34, label: "Sat", cls: "d3", topic: "Doubly LL & Advanced", tasks: ["Doubly linked list", "Add two numbers as LL", "Reorder list"],
-    detail: { goal: "Advanced LL problems combine multiple techniques — great interview prep", code: `# Add two numbers represented as LL\ndef addTwoNumbers(l1, l2):\n    dummy = cur = ListNode(0)\n    carry = 0\n    while l1 or l2 or carry:\n        v1 = l1.val if l1 else 0\n        v2 = l2.val if l2 else 0\n        total = v1 + v2 + carry\n        carry = total // 10\n        cur.next = ListNode(total % 10)\n        cur = cur.next\n        if l1: l1 = l1.next\n        if l2: l2 = l2.next\n    return dummy.next`, practice: ["LeetCode #2 — Add Two Numbers (Medium)", "LeetCode #143 — Reorder List (Medium)", "LeetCode #61 — Rotate List (Medium)"], tip: "Reorder List = find middle + reverse second half + merge. It combines 3 techniques in one problem — great practice!" }
-  },
-  {
-    day: 35, label: "Sun", cls: "d4", topic: "Week 5 Revision", tasks: ["Revise all LL patterns", "Timed problem session", "Plan Week 6"],
-    detail: { goal: "Solidify all Linked List patterns with timed practice", code: `# Pattern 1: Reverse\ndef reverseList(head):\n    prev, cur = None, head\n    while cur:\n        nxt = cur.next\n        cur.next = prev\n        prev = cur\n        cur = nxt\n    return prev\n\n# Pattern 3: Dummy node + two pointer\ndef removeNthFromEnd(head, n):\n    dummy = ListNode(0, head)\n    fast = slow = dummy\n    for _ in range(n + 1): fast = fast.next\n    while fast:\n        fast = fast.next\n        slow = slow.next\n    slow.next = slow.next.next\n    return dummy.next`, practice: ["LeetCode #234 — Palindrome Linked List (Easy)", "LeetCode #160 — Intersection of Two Linked Lists (Easy)", "LeetCode #138 — Copy List with Random Pointer (Medium)"], tip: "You now know 5 core LL patterns: Reverse, Fast/Slow, Dummy Node, Merge, Cycle Detection. Week 6 starts Stacks & Queues!" }
-  },
+  { day: 29, label: "Mon", topic: "LL Basics", tasks: ["Node class & structure", "Insert & delete nodes", "Traverse & print"], detail: { goal: "Build a Linked List from scratch — understand pointers deeply", code: `class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def append(self, data):\n        new = Node(data)\n        if not self.head:\n            self.head = new; return\n        cur = self.head\n        while cur.next:\n            cur = cur.next\n        cur.next = new\n\n    def delete(self, data):\n        if not self.head: return\n        if self.head.data == data:\n            self.head = self.head.next; return\n        cur = self.head\n        while cur.next:\n            if cur.next.data == data:\n                cur.next = cur.next.next; return\n            cur = cur.next`, practice: ["LeetCode #707 — Design Linked List (Medium)", "Build your own LL with append/prepend/delete"], tip: "Always draw the pointers on paper before coding. Linked List bugs are 99% pointer mistakes." } },
+  { day: 30, label: "Tue", topic: "Reverse a LL", tasks: ["Iterative reversal", "Recursive reversal", "Reverse in groups"], detail: { goal: "Reversal is the most asked Linked List operation in interviews", code: `# Iterative reversal — O(n) time O(1) space\ndef reverseList(head):\n    prev = None\n    cur = head\n    while cur:\n        nxt = cur.next   # save next\n        cur.next = prev  # reverse link\n        prev = cur       # move prev\n        cur = nxt        # move cur\n    return prev\n\n# Recursive reversal\ndef reverseList_rec(head):\n    if not head or not head.next:\n        return head\n    new_head = reverseList_rec(head.next)\n    head.next.next = head\n    head.next = None\n    return new_head`, practice: ["LeetCode #206 — Reverse Linked List (Easy)", "LeetCode #92 — Reverse Linked List II (Medium)", "LeetCode #25 — Reverse Nodes in k-Group (Hard)"], tip: "For reversal: prev=None, cur=head, save next, flip link, move both. Repeat this in your head like a mantra." } },
+  { day: 31, label: "Wed", topic: "Fast & Slow Pointers", tasks: ["Floyd's cycle detection", "Find middle node", "Cycle entry point"], detail: { goal: "Fast & slow pointer is one of the most elegant tricks in all of DSA", code: `# Find middle node\ndef middleNode(head):\n    slow = fast = head\n    while fast and fast.next:\n        slow = slow.next\n        fast = fast.next.next\n    return slow\n\n# Detect cycle — Floyd's algorithm\ndef hasCycle(head):\n    slow = fast = head\n    while fast and fast.next:\n        slow = slow.next\n        fast = fast.next.next\n        if slow == fast:\n            return True\n    return False`, practice: ["LeetCode #876 — Middle of Linked List (Easy)", "LeetCode #141 — Linked List Cycle (Easy)", "LeetCode #142 — Linked List Cycle II (Medium)"], tip: "Fast pointer moves 2x, slow moves 1x. When fast reaches end, slow is at the middle. This single insight solves 5+ problems." } },
+  { day: 32, label: "Thu", topic: "Merge & Sort LL", tasks: ["Merge two sorted LLs", "Merge k sorted LLs", "Sort a linked list"], detail: { goal: "Merging is a fundamental operation — appears in merge sort and K-way merge problems", code: `# Merge two sorted linked lists\ndef mergeTwoLists(l1, l2):\n    dummy = ListNode(0)\n    cur = dummy\n    while l1 and l2:\n        if l1.val <= l2.val:\n            cur.next = l1\n            l1 = l1.next\n        else:\n            cur.next = l2\n            l2 = l2.next\n        cur = cur.next\n    cur.next = l1 or l2\n    return dummy.next`, practice: ["LeetCode #21 — Merge Two Sorted Lists (Easy)", "LeetCode #23 — Merge K Sorted Lists (Hard)", "LeetCode #148 — Sort List (Medium)"], tip: "Always use a dummy node when merging — it removes the need for special-casing the head and makes code cleaner." } },
+  { day: 33, label: "Fri", topic: "LL Removal Patterns", tasks: ["Remove nth from end", "Remove duplicates", "Delete node without head"], detail: { goal: "Removal patterns use dummy nodes and two-pointer tricks — very common in interviews", code: `# Remove nth node from end — one pass\ndef removeNthFromEnd(head, n):\n    dummy = ListNode(0)\n    dummy.next = head\n    fast = slow = dummy\n    for _ in range(n + 1):\n        fast = fast.next\n    while fast:\n        fast = fast.next\n        slow = slow.next\n    slow.next = slow.next.next\n    return dummy.next\n\n# Delete node without head reference\ndef deleteNode(node):\n    node.val = node.next.val\n    node.next = node.next.next`, practice: ["LeetCode #19 — Remove Nth Node From End (Medium)", "LeetCode #83 — Remove Duplicates from Sorted List (Easy)", "LeetCode #82 — Remove Duplicates II (Medium)"], tip: "Use a dummy node before head whenever you might delete the head itself. It saves a ton of edge case handling." } },
+  { day: 34, label: "Sat", topic: "Doubly LL & Advanced", tasks: ["Doubly linked list", "Add two numbers as LL", "Reorder list"], detail: { goal: "Advanced LL problems combine multiple techniques — great interview prep", code: `# Add two numbers represented as LL\ndef addTwoNumbers(l1, l2):\n    dummy = cur = ListNode(0)\n    carry = 0\n    while l1 or l2 or carry:\n        v1 = l1.val if l1 else 0\n        v2 = l2.val if l2 else 0\n        total = v1 + v2 + carry\n        carry = total // 10\n        cur.next = ListNode(total % 10)\n        cur = cur.next\n        if l1: l1 = l1.next\n        if l2: l2 = l2.next\n    return dummy.next`, practice: ["LeetCode #2 — Add Two Numbers (Medium)", "LeetCode #143 — Reorder List (Medium)", "LeetCode #61 — Rotate List (Medium)"], tip: "Reorder List = find middle + reverse second half + merge. It combines 3 techniques in one problem — great practice!" } },
+  { day: 35, label: "Sun", topic: "Week 5 Revision", tasks: ["Revise all LL patterns", "Timed problem session", "Plan Week 6"], detail: { goal: "Solidify all Linked List patterns with timed practice", code: `# Pattern 1: Reverse\ndef reverseList(head):\n    prev, cur = None, head\n    while cur:\n        nxt = cur.next\n        cur.next = prev\n        prev = cur\n        cur = nxt\n    return prev\n\n# Pattern 3: Dummy node + two pointer\ndef removeNthFromEnd(head, n):\n    dummy = ListNode(0, head)\n    fast = slow = dummy\n    for _ in range(n + 1): fast = fast.next\n    while fast:\n        fast = fast.next\n        slow = slow.next\n    slow.next = slow.next.next\n    return dummy.next`, practice: ["LeetCode #234 — Palindrome Linked List (Easy)", "LeetCode #160 — Intersection of Two Linked Lists (Easy)", "LeetCode #138 — Copy List with Random Pointer (Medium)"], tip: "You now know 5 core LL patterns: Reverse, Fast/Slow, Dummy Node, Merge, Cycle Detection. Week 6 starts Stacks & Queues!" } },
 
   // --- WEEK 6 ---
-  {
-    day: 36, label: "Mon", cls: "d5", topic: "Stack Basics", tasks: ["Stack using list", "push, pop, peek", "Valid parentheses"],
-    detail: { goal: "Understand stack (LIFO) and solve bracket matching — most common stack problem", code: `# Valid Parentheses — classic stack problem\ndef isValid(s):\n    stack = []\n    mapping = {')': '(', ']': '[', '}': '{'}\n    for ch in s:\n        if ch in mapping:\n            top = stack.pop() if stack else '#'\n            if mapping[ch] != top:\n                return False\n        else:\n            stack.append(ch)\n    return not stack\n\n# Min Stack — get min in O(1)\nclass MinStack:\n    def __init__(self):\n        self.stack = []\n        self.min_stack = []\n    def push(self, val):\n        self.stack.append(val)\n        min_val = min(val, self.min_stack[-1] if self.min_stack else val)\n        self.min_stack.append(min_val)\n    def pop(self):\n        self.stack.pop(); self.min_stack.pop()\n    def getMin(self): return self.min_stack[-1]`, practice: ["LeetCode #20 — Valid Parentheses (Easy)", "LeetCode #155 — Min Stack (Medium)", "LeetCode #1047 — Remove All Adjacent Duplicates (Easy)"], tip: "Stack = think LIFO. Whenever you see 'matching pairs' or 'undo last action', reach for a stack immediately." }
-  },
-  {
-    day: 37, label: "Tue", cls: "d5", topic: "Stack Applications", tasks: ["Evaluate expressions", "Decode string", "Daily temperatures"],
-    detail: { goal: "Apply stacks to real problems — expression evaluation and string decoding", code: `# Evaluate Reverse Polish Notation\ndef evalRPN(tokens):\n    stack = []\n    ops = {\n        '+': lambda a,b: a+b, '-': lambda a,b: a-b,\n        '*': lambda a,b: a*b, '/': lambda a,b: int(a/b)\n    }\n    for t in tokens:\n        if t in ops:\n            b, a = stack.pop(), stack.pop()\n            stack.append(ops[t](a, b))\n        else:\n            stack.append(int(t))\n    return stack[0]\n\n# Daily Temperatures — next greater element\ndef dailyTemperatures(temps):\n    res = [0] * len(temps)\n    stack = []  # stores indices\n    for i, t in enumerate(temps):\n        while stack and temps[stack[-1]] < t:\n            idx = stack.pop()\n            res[idx] = i - idx\n        stack.append(i)\n    return res`, practice: ["LeetCode #150 — Evaluate Reverse Polish Notation (Medium)", "LeetCode #394 — Decode String (Medium)", "LeetCode #739 — Daily Temperatures (Medium)"], tip: "Decode String is a must-know — it tests stack with both strings and numbers at the same time. Very common in OAs." }
-  },
-  {
-    day: 38, label: "Wed", cls: "d6", topic: "Monotonic Stack", tasks: ["Next greater element", "Next smaller element", "Largest rectangle in histogram"],
-    detail: { goal: "Monotonic stack is the most powerful stack technique — O(n) for next greater/smaller problems", code: `# Next Greater Element II (circular)\ndef nextGreaterElements(nums):\n    n = len(nums)\n    res = [-1] * n\n    stack = []\n    for i in range(2 * n):\n        while stack and nums[stack[-1]] < nums[i % n]:\n            res[stack.pop()] = nums[i % n]\n        if i < n:\n            stack.append(i)\n    return res\n\n# Largest Rectangle in Histogram — O(n)\ndef largestRectangleArea(heights):\n    stack = []   # monotonic increasing\n    max_area = 0\n    heights.append(0)  # sentinel\n    for i, h in enumerate(heights):\n        while stack and heights[stack[-1]] > h:\n            height = heights[stack.pop()]\n            width = i if not stack else i - stack[-1] - 1\n            max_area = max(max_area, height * width)\n        stack.append(i)\n    return max_area`, practice: ["LeetCode #496 — Next Greater Element I (Easy)", "LeetCode #84 — Largest Rectangle in Histogram (Hard)", "LeetCode #42 — Trapping Rain Water (Hard)"], tip: "Monotonic stack maintains increasing or decreasing order. Pop when current element breaks that order — that's the 'next greater' moment." }
-  },
-  {
-    day: 39, label: "Thu", cls: "d6", topic: "Queue Basics", tasks: ["Queue using deque", "Circular queue design", "BFS introduction"],
-    detail: { goal: "Queue (FIFO) is the backbone of BFS — critical for graphs and trees", code: `from collections import deque\n\n# Queue using deque — FIFO\nq = deque()\nq.append(10)      # enqueue right\nq.popleft()       # dequeue → 10\n\n# BFS using Queue — level order traversal\nclass TreeNode:\n    def __init__(self, val=0):\n        self.val = val; self.left = self.right = None\n\ndef levelOrder(root):\n    if not root: return []\n    result, q = [], deque([root])\n    while q:\n        level = []\n        for _ in range(len(q)):\n            node = q.popleft()\n            level.append(node.val)\n            if node.left: q.append(node.left)\n            if node.right: q.append(node.right)\n        result.append(level)\n    return result`, practice: ["LeetCode #232 — Implement Queue using Stacks (Easy)", "LeetCode #225 — Implement Stack using Queues (Easy)", "LeetCode #622 — Design Circular Queue (Medium)"], tip: "Queue = BFS. Stack = DFS. Remember this pairing — it tells you which data structure to use in graph/tree traversals." }
-  },
-  {
-    day: 40, label: "Fri", cls: "d7", topic: "Deque & Sliding Window", tasks: ["Monotonic deque", "Sliding window maximum", "First negative in window"],
-    detail: { goal: "Monotonic deque solves sliding window maximum in O(n) — a popular hard problem", code: `from collections import deque\n\n# Sliding Window Maximum — O(n) using monotonic deque\ndef maxSlidingWindow(nums, k):\n    dq = deque()   # stores indices, decreasing values\n    result = []\n    for i, n in enumerate(nums):\n        # remove elements outside window\n        while dq and dq[0] < i - k + 1:\n            dq.popleft()\n        # remove smaller elements from back\n        while dq and nums[dq[-1]] < n:\n            dq.pop()\n        dq.append(i)\n        if i >= k - 1:\n            result.append(nums[dq[0]])\n    return result\n\nprint(maxSlidingWindow([1,3,-1,-3,5,3,6,7], 3))\n# [3,3,5,5,6,7]`, practice: ["LeetCode #239 — Sliding Window Maximum (Hard)", "LeetCode #862 — Shortest Subarray with Sum >= K (Hard)", "LeetCode #1438 — Longest Subarray with Abs Diff <= Limit (Medium)"], tip: "Monotonic deque = sliding window max/min in O(n). The trick: remove from front if out of window, remove from back if smaller than current." }
-  },
-  {
-    day: 41, label: "Sat", cls: "d7", topic: "Stack + Queue Design", tasks: ["Stack using 2 queues", "Queue using 2 stacks", "Browser history design"],
-    detail: { goal: "Design problems test your understanding of data structure internals — very common in interviews", code: `# Implement Queue using Stacks\nclass MyQueue:\n    def __init__(self):\n        self.in_stack = []\n        self.out_stack = []\n    def push(self, x): self.in_stack.append(x)\n    def pop(self):\n        self._transfer()\n        return self.out_stack.pop()\n    def peek(self):\n        self._transfer()\n        return self.out_stack[-1]\n    def _transfer(self):\n        if not self.out_stack:\n            while self.in_stack:\n                self.out_stack.append(self.in_stack.pop())\n    def empty(self): return not self.in_stack and not self.out_stack`, practice: ["LeetCode #225 — Implement Stack using Queues (Easy)", "LeetCode #232 — Implement Queue using Stacks (Easy)", "LeetCode #1472 — Design Browser History (Medium)"], tip: "Design problems have no 'right' answer — interviewers want to see HOW you think. Talk through trade-offs out loud." }
-  },
-  {
-    day: 42, label: "Sun", cls: "d1", topic: "Week 6 Revision", tasks: ["Revise all patterns", "Timed problem session", "Plan Week 7"],
-    detail: { goal: "Consolidate all Stack & Queue patterns before moving forward", code: `# Pattern 4: Monotonic Deque — sliding window max\nfrom collections import deque\ndef maxSlidingWindow(nums, k):\n    dq, res = deque(), []\n    for i, n in enumerate(nums):\n        while dq and dq[0] < i - k + 1: dq.popleft()\n        while dq and nums[dq[-1]] < n: dq.pop()\n        dq.append(i)\n        if i >= k - 1: res.append(nums[dq[0]])\n    return res\n\n# Pattern 5: Queue using 2 Stacks\nclass MyQueue:\n    def __init__(self): self.i = []; self.o = []\n    def push(self, x): self.i.append(x)\n    def pop(self):\n        if not self.o:\n            while self.i: self.o.append(self.i.pop())\n        return self.o.pop()`, practice: ["LeetCode #84 — Largest Rectangle in Histogram (Hard)", "LeetCode #239 — Sliding Window Maximum (Hard)", "LeetCode #402 — Remove K Digits (Medium)"], tip: "You now know 5 Stack & Queue patterns. You are officially ready for Trees, Graphs, and DP!" }
-  }
+  { day: 36, label: "Mon", topic: "Stack Basics", tasks: ["Stack using list", "push, pop, peek", "Valid parentheses"], detail: { goal: "Understand stack (LIFO) and solve bracket matching — most common stack problem", code: `# Valid Parentheses — classic stack problem\ndef isValid(s):\n    stack = []\n    mapping = {')': '(', ']': '[', '}': '{'}\n    for ch in s:\n        if ch in mapping:\n            top = stack.pop() if stack else '#'\n            if mapping[ch] != top:\n                return False\n        else:\n            stack.append(ch)\n    return not stack\n\n# Min Stack — get min in O(1)\nclass MinStack:\n    def __init__(self):\n        self.stack = []\n        self.min_stack = []\n    def push(self, val):\n        self.stack.append(val)\n        min_val = min(val, self.min_stack[-1] if self.min_stack else val)\n        self.min_stack.append(min_val)\n    def pop(self):\n        self.stack.pop(); self.min_stack.pop()\n    def getMin(self): return self.min_stack[-1]`, practice: ["LeetCode #20 — Valid Parentheses (Easy)", "LeetCode #155 — Min Stack (Medium)", "LeetCode #1047 — Remove All Adjacent Duplicates (Easy)"], tip: "Stack = think LIFO. Whenever you see 'matching pairs' or 'undo last action', reach for a stack immediately." } },
+  { day: 37, label: "Tue", topic: "Stack Applications", tasks: ["Evaluate expressions", "Decode string", "Daily temperatures"], detail: { goal: "Apply stacks to real problems — expression evaluation and string decoding", code: `# Evaluate Reverse Polish Notation\ndef evalRPN(tokens):\n    stack = []\n    ops = {\n        '+': lambda a,b: a+b, '-': lambda a,b: a-b,\n        '*': lambda a,b: a*b, '/': lambda a,b: int(a/b)\n    }\n    for t in tokens:\n        if t in ops:\n            b, a = stack.pop(), stack.pop()\n            stack.append(ops[t](a, b))\n        else:\n            stack.append(int(t))\n    return stack[0]\n\n# Daily Temperatures — next greater element\ndef dailyTemperatures(temps):\n    res = [0] * len(temps)\n    stack = []  # stores indices\n    for i, t in enumerate(temps):\n        while stack and temps[stack[-1]] < t:\n            idx = stack.pop()\n            res[idx] = i - idx\n        stack.append(i)\n    return res`, practice: ["LeetCode #150 — Evaluate Reverse Polish Notation (Medium)", "LeetCode #394 — Decode String (Medium)", "LeetCode #739 — Daily Temperatures (Medium)"], tip: "Decode String is a must-know — it tests stack with both strings and numbers at the same time. Very common in OAs." } },
+  { day: 38, label: "Wed", topic: "Monotonic Stack", tasks: ["Next greater element", "Next smaller element", "Largest rectangle in histogram"], detail: { goal: "Monotonic stack is the most powerful stack technique — O(n) for next greater/smaller problems", code: `# Next Greater Element II (circular)\ndef nextGreaterElements(nums):\n    n = len(nums)\n    res = [-1] * n\n    stack = []\n    for i in range(2 * n):\n        while stack and nums[stack[-1]] < nums[i % n]:\n            res[stack.pop()] = nums[i % n]\n        if i < n:\n            stack.append(i)\n    return res\n\n# Largest Rectangle in Histogram — O(n)\ndef largestRectangleArea(heights):\n    stack = []   # monotonic increasing\n    max_area = 0\n    heights.append(0)  # sentinel\n    for i, h in enumerate(heights):\n        while stack and heights[stack[-1]] > h:\n            height = heights[stack.pop()]\n            width = i if not stack else i - stack[-1] - 1\n            max_area = max(max_area, height * width)\n        stack.append(i)\n    return max_area`, practice: ["LeetCode #496 — Next Greater Element I (Easy)", "LeetCode #84 — Largest Rectangle in Histogram (Hard)", "LeetCode #42 — Trapping Rain Water (Hard)"], tip: "Monotonic stack maintains increasing or decreasing order. Pop when current element breaks that order — that's the 'next greater' moment." } },
+  { day: 39, label: "Thu", topic: "Queue Basics", tasks: ["Queue using deque", "Circular queue design", "BFS introduction"], detail: { goal: "Queue (FIFO) is the backbone of BFS — critical for graphs and trees", code: `from collections import deque\n\n# Queue using deque — FIFO\nq = deque()\nq.append(10)      # enqueue right\nq.popleft()       # dequeue → 10\n\n# BFS using Queue — level order traversal\nclass TreeNode:\n    def __init__(self, val=0):\n        self.val = val; self.left = self.right = None\n\ndef levelOrder(root):\n    if not root: return []\n    result, q = [], deque([root])\n    while q:\n        level = []\n        for _ in range(len(q)):\n            node = q.popleft()\n            level.append(node.val)\n            if node.left: q.append(node.left)\n            if node.right: q.append(node.right)\n        result.append(level)\n    return result`, practice: ["LeetCode #232 — Implement Queue using Stacks (Easy)", "LeetCode #225 — Implement Stack using Queues (Easy)", "LeetCode #622 — Design Circular Queue (Medium)"], tip: "Queue = BFS. Stack = DFS. Remember this pairing — it tells you which data structure to use in graph/tree traversals." } },
+  { day: 40, label: "Fri", topic: "Deque & Sliding Window", tasks: ["Monotonic deque", "Sliding window maximum", "First negative in window"], detail: { goal: "Monotonic deque solves sliding window maximum in O(n) — a popular hard problem", code: `from collections import deque\n\n# Sliding Window Maximum — O(n) using monotonic deque\ndef maxSlidingWindow(nums, k):\n    dq = deque()   # stores indices, decreasing values\n    result = []\n    for i, n in enumerate(nums):\n        # remove elements outside window\n        while dq and dq[0] < i - k + 1:\n            dq.popleft()\n        # remove smaller elements from back\n        while dq and nums[dq[-1]] < n:\n            dq.pop()\n        dq.append(i)\n        if i >= k - 1:\n            result.append(nums[dq[0]])\n    return result\n\nprint(maxSlidingWindow([1,3,-1,-3,5,3,6,7], 3))\n# [3,3,5,5,6,7]`, practice: ["LeetCode #239 — Sliding Window Maximum (Hard)", "LeetCode #862 — Shortest Subarray with Sum >= K (Hard)", "LeetCode #1438 — Longest Subarray with Abs Diff <= Limit (Medium)"], tip: "Monotonic deque = sliding window max/min in O(n). The trick: remove from front if out of window, remove from back if smaller than current." } },
+  { day: 41, label: "Sat", topic: "Stack + Queue Design", tasks: ["Stack using 2 queues", "Queue using 2 stacks", "Browser history design"], detail: { goal: "Design problems test your understanding of data structure internals — very common in interviews", code: `# Implement Queue using Stacks\nclass MyQueue:\n    def __init__(self):\n        self.in_stack = []\n        self.out_stack = []\n    def push(self, x): self.in_stack.append(x)\n    def pop(self):\n        self._transfer()\n        return self.out_stack.pop()\n    def peek(self):\n        self._transfer()\n        return self.out_stack[-1]\n    def _transfer(self):\n        if not self.out_stack:\n            while self.in_stack:\n                self.out_stack.append(self.in_stack.pop())\n    def empty(self): return not self.in_stack and not self.out_stack`, practice: ["LeetCode #225 — Implement Stack using Queues (Easy)", "LeetCode #232 — Implement Queue using Stacks (Easy)", "LeetCode #1472 — Design Browser History (Medium)"], tip: "Design problems have no 'right' answer — interviewers want to see HOW you think. Talk through trade-offs out loud." } },
+  { day: 42, label: "Sun", topic: "Week 6 Revision", tasks: ["Revise all patterns", "Timed problem session", "Plan Week 7"], detail: { goal: "Consolidate all Stack & Queue patterns before moving forward", code: `# Pattern 4: Monotonic Deque — sliding window max\nfrom collections import deque\ndef maxSlidingWindow(nums, k):\n    dq, res = deque(), []\n    for i, n in enumerate(nums):\n        while dq and dq[0] < i - k + 1: dq.popleft()\n        while dq and nums[dq[-1]] < n: dq.pop()\n        dq.append(i)\n        if i >= k - 1: res.append(nums[dq[0]])\n    return res\n\n# Pattern 5: Queue using 2 Stacks\nclass MyQueue:\n    def __init__(self): self.i = []; self.o = []\n    def push(self, x): self.i.append(x)\n    def pop(self):\n        if not self.o:\n            while self.i: self.o.append(self.i.pop())\n        return self.o.pop()`, practice: ["LeetCode #84 — Largest Rectangle in Histogram (Hard)", "LeetCode #239 — Sliding Window Maximum (Hard)", "LeetCode #402 — Remove K Digits (Medium)"], tip: "You now know 5 Stack & Queue patterns. You are officially ready for Trees, Graphs, and DP!" } }
 ];
 
 let currentDay = null;
 
-// Initialize data state
 function getCompletedDays() {
-  try { return JSON.parse(localStorage.getItem('dsaTrackerCompleted')) || {}; } 
+  try { return JSON.parse(localStorage.getItem('vercelDSATracker')) || {}; }
   catch(e) { return {}; }
 }
 
 function saveCompletedDays(completedDays) {
-  localStorage.setItem('dsaTrackerCompleted', JSON.stringify(completedDays));
+  localStorage.setItem('vercelDSATracker', JSON.stringify(completedDays));
 }
 
 function updateProgress() {
@@ -320,23 +298,29 @@ function updateProgress() {
   const count = Object.keys(completedDays).filter(day => completedDays[day]).length;
   const total = days.length;
   const pct = (count / total) * 100;
-  
-  document.getElementById('progress-text').textContent = `${count} / ${total} completed`;
+
+  document.getElementById('progress-text').textContent = `${count} / ${total}`;
   document.getElementById('progress-fill').style.width = `${pct}%`;
+
+  const statusBadge = document.getElementById('status-badge');
+  if (count === total) {
+    statusBadge.innerHTML = `<span class="status-dot completed"></span> Deployed`;
+  } else if (count > 0) {
+    statusBadge.innerHTML = `<span class="status-dot"></span> In Progress`;
+  } else {
+    statusBadge.innerHTML = `<span class="status-dot"></span> Ready`;
+  }
 }
 
-// Toggle individual day complete status
 function toggleComplete(event, dayId) {
-  event.stopPropagation(); // prevent opening the detail panel
-  
+  event.stopPropagation();
   const completedDays = getCompletedDays();
   completedDays[dayId] = !completedDays[dayId];
   saveCompletedDays(completedDays);
-  
-  // Update DOM explicitly without full re-render
+
   const card = document.getElementById(`card-${dayId}`);
   const checkbox = document.getElementById(`check-${dayId}`);
-  
+
   if (completedDays[dayId]) {
     card.classList.add('completed');
     checkbox.checked = true;
@@ -344,27 +328,23 @@ function toggleComplete(event, dayId) {
     card.classList.remove('completed');
     checkbox.checked = false;
   }
-  
-  // Update detail view checkbox if it's currently open
+
   if (currentDay === dayId) {
     document.getElementById('detail-checkbox').checked = completedDays[dayId];
   }
-  
   updateProgress();
 }
 
 function toggleCompleteFromDetail() {
   if (!currentDay) return;
   const isChecked = document.getElementById('detail-checkbox').checked;
-  
   const completedDays = getCompletedDays();
   completedDays[currentDay] = isChecked;
   saveCompletedDays(completedDays);
-  
-  // Sync the Grid Card
+
   const card = document.getElementById(`card-${currentDay}`);
   const checkbox = document.getElementById(`check-${currentDay}`);
-  
+
   if (isChecked) {
     card.classList.add('completed');
     checkbox.checked = true;
@@ -372,33 +352,33 @@ function toggleCompleteFromDetail() {
     card.classList.remove('completed');
     checkbox.checked = false;
   }
-  
   updateProgress();
 }
 
 function showDetail(d) {
   if (currentDay === d.day) { closeDetail(); return; }
   currentDay = d.day;
-  
+
   const completedDays = getCompletedDays();
   document.getElementById('detail-checkbox').checked = !!completedDays[d.day];
-  
   document.getElementById('detail-title').textContent = `Day ${d.day} — ${d.topic}`;
+
+  const tasksHtml = d.detail.practice.map(p => `<div class="practice-item">${p}</div>`).join('');
+
   document.getElementById('detail-body').innerHTML = `
-    <div class="section-label">Goal</div>
-    <div style="font-size:14px;color:var(--color-text-primary);margin-bottom:8px">${d.detail.goal}</div>
-    <div class="section-label">Code to write today</div>
+    <div class="section-label">Objective</div>
+    <div style="font-size:14px; margin-bottom:16px;">${d.detail.goal}</div>
+    <div class="section-label">Code Blueprint</div>
     <div class="code-block">${d.detail.code}</div>
-    <div class="section-label">Practice Exercises</div>
-    ${d.detail.practice.map(p => `<div class="task" style="font-size:13px;color:var(--color-text-primary);margin-bottom:4px">${p}</div>`).join('')}
-    <div class="tip">💡 ${d.detail.tip}</div>
+    <div class="section-label">Practice Constraints</div>
+    <div class="practice-list">${tasksHtml}</div>
+    <div class="tip">${d.detail.tip}</div>
   `;
   document.getElementById('detail').classList.add('active');
-  
-  // Scroll to detail smoothly
+
   setTimeout(() => {
     document.getElementById('detail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 100);
+  }, 50);
 }
 
 function closeDetail() {
@@ -406,27 +386,26 @@ function closeDetail() {
   document.getElementById('detail').classList.remove('active');
 }
 
-// Render Initial Grid
 function init() {
   const grid = document.getElementById('grid');
   const completedDays = getCompletedDays();
-  
+
   days.forEach(d => {
     const isComp = !!completedDays[d.day];
     const card = document.createElement('div');
     card.id = `card-${d.day}`;
-    card.className = `day-card ${d.cls} ${isComp ? 'completed' : ''}`;
-    
+    card.className = `day-card ${isComp ? 'completed' : ''}`;
     card.innerHTML = `
       <div class="card-top">
         <div class="day-label">${d.label}</div>
-        <input type="checkbox" id="check-${d.day}" class="day-checkbox" ${isComp ? 'checked' : ''} onclick="toggleComplete(event, ${d.day})">
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="check-${d.day}" class="day-checkbox" ${isComp ? 'checked' : ''} onclick="toggleComplete(event, ${d.day})">
+        </div>
       </div>
       <div class="day-num">Day ${d.day}</div>
       <span class="topic-badge">${d.topic}</span>
       <div class="tasks">${d.tasks.map(t => `<div class="task">${t}</div>`).join('')}</div>
     `;
-    
     card.onclick = () => showDetail(d);
     grid.appendChild(card);
   });
