@@ -1,0 +1,560 @@
+
+<style>
+  .schedule { padding: 1rem 0; font-family: var(--font-sans); }
+  .header { text-align: center; margin-bottom: 1.5rem; }
+  .header h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin: 0; }
+  .phase-badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: #EEEDFE; color: #3C3489; margin-top: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day-card { border-radius: 10px; padding: 10px 8px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); cursor: pointer; transition: box-shadow .15s; }
+  .day-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: var(--color-border-secondary); }
+  .day-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .day-num { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .topic-badge { font-size: 11px; font-weight: 500; padding: 3px 7px; border-radius: 20px; margin-bottom: 5px; display: inline-block; }
+  .tasks { margin-top: 6px; }
+  .task { font-size: 11px; color: var(--color-text-secondary); display: flex; align-items: flex-start; gap: 5px; margin-bottom: 3px; line-height: 1.4; }
+  .task::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; margin-top: 4px; }
+  .detail-panel { margin-top: 16px; border-radius: 12px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); padding: 16px; display: none; }
+  .detail-panel.active { display: block; }
+  .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .detail-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .detail-close { font-size: 12px; color: var(--color-text-tertiary); cursor: pointer; }
+  .code-block { background: var(--color-background-tertiary); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); white-space: pre; overflow-x: auto; margin: 8px 0; }
+  .section-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 10px 0 4px; }
+  .tip { font-size: 12px; color: var(--color-text-secondary); background: var(--color-background-tertiary); border-left: 3px solid #534AB7; padding: 8px 10px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+
+  .d1 .day-label { color: #534AB7; } .d1 .topic-badge { background: #EEEDFE; color: #3C3489; }
+  .d2 .day-label { color: #534AB7; } .d2 .topic-badge { background: #EEEDFE; color: #3C3489; }
+  .d3 .day-label { color: #0F6E56; } .d3 .topic-badge { background: #E1F5EE; color: #085041; }
+  .d4 .day-label { color: #0F6E56; } .d4 .topic-badge { background: #E1F5EE; color: #085041; }
+  .d5 .day-label { color: #993C1D; } .d5 .topic-badge { background: #FAECE7; color: #712B13; }
+  .d6 .day-label { color: #993C1D; } .d6 .topic-badge { background: #FAECE7; color: #712B13; }
+  .d7 .day-label { color: #185FA5; } .d7 .topic-badge { background: #E6F1FB; color: #0C447C; }
+
+  @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="schedule">
+  <div class="header">
+    <h2>Week 5 — Linked Lists</h2>
+    <div class="phase-badge">Phase 2 continues — pointer mastery week</div>
+    <p style="margin-top:6px">Click any day to see details, code &amp; LeetCode problems</p>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="detail-panel" id="detail">
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title"></div>
+      <div class="detail-close" onclick="closeDetail()">✕ close</div>
+    </div>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+const days = [
+  {
+    day: 29, label: "Mon", cls: "d1", topic: "LL Basics",
+    tasks: ["Node class & structure", "Insert & delete nodes", "Traverse & print"],
+    detail: {
+      goal: "Build a Linked List from scratch — understand pointers deeply",
+      code: `# Node class — building block
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+# Linked List class
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def append(self, data):
+        new = Node(data)
+        if not self.head:
+            self.head = new
+            return
+        cur = self.head
+        while cur.next:
+            cur = cur.next
+        cur.next = new
+
+    def prepend(self, data):
+        new = Node(data)
+        new.next = self.head
+        self.head = new
+
+    def delete(self, data):
+        if not self.head: return
+        if self.head.data == data:
+            self.head = self.head.next
+            return
+        cur = self.head
+        while cur.next:
+            if cur.next.data == data:
+                cur.next = cur.next.next
+                return
+            cur = cur.next
+
+    def print_list(self):
+        cur = self.head
+        while cur:
+            print(cur.data, end=" -> ")
+            cur = cur.next
+        print("None")
+
+ll = LinkedList()
+ll.append(1); ll.append(2); ll.append(3)
+ll.prepend(0)
+ll.print_list()   # 0 -> 1 -> 2 -> 3 -> None
+ll.delete(2)
+ll.print_list()   # 0 -> 1 -> 3 -> None`,
+      practice: [
+        "LeetCode #707 — Design Linked List (Medium)",
+        "Build your own LL with append/prepend/delete",
+        "Count nodes in a linked list"
+      ],
+      tip: "Always draw the pointers on paper before coding. Linked List bugs are 99% pointer mistakes."
+    }
+  },
+  {
+    day: 30, label: "Tue", cls: "d1", topic: "Reverse a LL",
+    tasks: ["Iterative reversal", "Recursive reversal", "Reverse in groups"],
+    detail: {
+      goal: "Reversal is the most asked Linked List operation in interviews",
+      code: `class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# Iterative reversal — O(n) time O(1) space
+def reverseList(head):
+    prev = None
+    cur = head
+    while cur:
+        nxt = cur.next   # save next
+        cur.next = prev  # reverse link
+        prev = cur       # move prev
+        cur = nxt        # move cur
+    return prev
+
+# Recursive reversal
+def reverseList_rec(head):
+    if not head or not head.next:
+        return head
+    new_head = reverseList_rec(head.next)
+    head.next.next = head
+    head.next = None
+    return new_head
+
+# Reverse between positions l and r
+def reverseBetween(head, left, right):
+    dummy = ListNode(0)
+    dummy.next = head
+    prev = dummy
+    for _ in range(left - 1):
+        prev = prev.next
+    cur = prev.next
+    for _ in range(right - left):
+        nxt = cur.next
+        cur.next = nxt.next
+        nxt.next = prev.next
+        prev.next = nxt
+    return dummy.next
+
+# Reverse in k-groups
+def reverseKGroup(head, k):
+    cur = head
+    count = 0
+    while cur and count < k:
+        cur = cur.next
+        count += 1
+    if count < k: return head
+    prev = None
+    cur = head
+    for _ in range(k):
+        nxt = cur.next
+        cur.next = prev
+        prev = cur
+        cur = nxt
+    head.next = reverseKGroup(cur, k)
+    return prev`,
+      practice: [
+        "LeetCode #206 — Reverse Linked List (Easy)",
+        "LeetCode #92 — Reverse Linked List II (Medium)",
+        "LeetCode #25 — Reverse Nodes in k-Group (Hard)"
+      ],
+      tip: "For reversal: prev=None, cur=head, save next, flip link, move both. Repeat this in your head like a mantra."
+    }
+  },
+  {
+    day: 31, label: "Wed", cls: "d2", topic: "Fast & Slow Pointers",
+    tasks: ["Floyd's cycle detection", "Find middle node", "Cycle entry point"],
+    detail: {
+      goal: "Fast & slow pointer is one of the most elegant tricks in all of DSA",
+      code: `class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# Find middle node
+def middleNode(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow  # slow is at middle
+
+# Detect cycle — Floyd's algorithm
+def hasCycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast:
+            return True
+    return False
+
+# Find cycle entry point
+def detectCycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast:
+            # reset slow to head
+            slow = head
+            while slow != fast:
+                slow = slow.next
+                fast = fast.next
+            return slow  # entry point
+    return None
+
+# Check if LL is palindrome using slow/fast
+def isPalindrome(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    # reverse second half
+    prev = None
+    while slow:
+        nxt = slow.next
+        slow.next = prev
+        prev = slow
+        slow = nxt
+    # compare
+    left, right = head, prev
+    while right:
+        if left.val != right.val: return False
+        left = left.next
+        right = right.next
+    return True`,
+      practice: [
+        "LeetCode #876 — Middle of Linked List (Easy)",
+        "LeetCode #141 — Linked List Cycle (Easy)",
+        "LeetCode #142 — Linked List Cycle II (Medium)"
+      ],
+      tip: "Fast pointer moves 2x, slow moves 1x. When fast reaches end, slow is at the middle. This single insight solves 5+ problems."
+    }
+  },
+  {
+    day: 32, label: "Thu", cls: "d2", topic: "Merge & Sort LL",
+    tasks: ["Merge two sorted LLs", "Merge k sorted LLs", "Sort a linked list"],
+    detail: {
+      goal: "Merging is a fundamental operation — appears in merge sort and K-way merge problems",
+      code: `import heapq
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# Merge two sorted linked lists
+def mergeTwoLists(l1, l2):
+    dummy = ListNode(0)
+    cur = dummy
+    while l1 and l2:
+        if l1.val <= l2.val:
+            cur.next = l1
+            l1 = l1.next
+        else:
+            cur.next = l2
+            l2 = l2.next
+        cur = cur.next
+    cur.next = l1 or l2
+    return dummy.next
+
+# Merge k sorted lists — using min heap
+def mergeKLists(lists):
+    heap = []
+    for i, node in enumerate(lists):
+        if node:
+            heapq.heappush(heap, (node.val, i, node))
+    dummy = cur = ListNode(0)
+    while heap:
+        val, i, node = heapq.heappop(heap)
+        cur.next = node
+        cur = cur.next
+        if node.next:
+            heapq.heappush(heap, (node.next.val, i, node.next))
+    return dummy.next
+
+# Sort linked list — merge sort O(n log n)
+def sortList(head):
+    if not head or not head.next:
+        return head
+    # find middle
+    slow, fast = head, head.next
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    mid = slow.next
+    slow.next = None
+    left = sortList(head)
+    right = sortList(mid)
+    return mergeTwoLists(left, right)`,
+      practice: [
+        "LeetCode #21 — Merge Two Sorted Lists (Easy)",
+        "LeetCode #23 — Merge K Sorted Lists (Hard)",
+        "LeetCode #148 — Sort List (Medium)"
+      ],
+      tip: "Always use a dummy node when merging — it removes the need for special-casing the head and makes code cleaner."
+    }
+  },
+  {
+    day: 33, label: "Fri", cls: "d3", topic: "LL Removal Patterns",
+    tasks: ["Remove nth from end", "Remove duplicates", "Delete node without head"],
+    detail: {
+      goal: "Removal patterns use dummy nodes and two-pointer tricks — very common in interviews",
+      code: `class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# Remove nth node from end — one pass
+def removeNthFromEnd(head, n):
+    dummy = ListNode(0)
+    dummy.next = head
+    fast = slow = dummy
+    # move fast n+1 steps ahead
+    for _ in range(n + 1):
+        fast = fast.next
+    while fast:
+        fast = fast.next
+        slow = slow.next
+    slow.next = slow.next.next
+    return dummy.next
+
+# Remove duplicates from sorted LL
+def deleteDuplicates(head):
+    cur = head
+    while cur and cur.next:
+        if cur.val == cur.next.val:
+            cur.next = cur.next.next
+        else:
+            cur = cur.next
+    return head
+
+# Remove all duplicates (keep none)
+def deleteDuplicatesAll(head):
+    dummy = ListNode(0)
+    dummy.next = head
+    prev = dummy
+    cur = head
+    while cur:
+        if cur.next and cur.val == cur.next.val:
+            while cur.next and cur.val == cur.next.val:
+                cur = cur.next
+            prev.next = cur.next
+        else:
+            prev = prev.next
+        cur = cur.next
+    return dummy.next
+
+# Delete node without head reference
+def deleteNode(node):
+    node.val = node.next.val
+    node.next = node.next.next`,
+      practice: [
+        "LeetCode #19 — Remove Nth Node From End (Medium)",
+        "LeetCode #83 — Remove Duplicates from Sorted List (Easy)",
+        "LeetCode #82 — Remove Duplicates II (Medium)"
+      ],
+      tip: "Use a dummy node before head whenever you might delete the head itself. It saves a ton of edge case handling."
+    }
+  },
+  {
+    day: 34, label: "Sat", cls: "d3", topic: "Doubly LL & Advanced",
+    tasks: ["Doubly linked list", "Add two numbers as LL", "Reorder list"],
+    detail: {
+      goal: "Advanced LL problems combine multiple techniques — great interview prep",
+      code: `class DNode:
+    def __init__(self, val=0):
+        self.val = val
+        self.prev = None
+        self.next = None
+
+# Doubly Linked List
+class DoublyLinkedList:
+    def __init__(self):
+        self.head = self.tail = None
+
+    def append(self, val):
+        node = DNode(val)
+        if not self.tail:
+            self.head = self.tail = node
+            return
+        node.prev = self.tail
+        self.tail.next = node
+        self.tail = node
+
+    def delete(self, node):
+        if node.prev: node.prev.next = node.next
+        else: self.head = node.next
+        if node.next: node.next.prev = node.prev
+        else: self.tail = node.prev
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val; self.next = next
+
+# Add two numbers represented as LL
+def addTwoNumbers(l1, l2):
+    dummy = cur = ListNode(0)
+    carry = 0
+    while l1 or l2 or carry:
+        v1 = l1.val if l1 else 0
+        v2 = l2.val if l2 else 0
+        total = v1 + v2 + carry
+        carry = total // 10
+        cur.next = ListNode(total % 10)
+        cur = cur.next
+        if l1: l1 = l1.next
+        if l2: l2 = l2.next
+    return dummy.next
+
+# Reorder list: L0->L1->...->Ln to L0->Ln->L1->Ln-1
+def reorderList(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next; fast = fast.next.next
+    prev, cur = None, slow.next
+    slow.next = None
+    while cur:
+        nxt = cur.next; cur.next = prev
+        prev = cur; cur = nxt
+    first, second = head, prev
+    while second:
+        tmp1, tmp2 = first.next, second.next
+        first.next = second; second.next = tmp1
+        first = tmp1; second = tmp2`,
+      practice: [
+        "LeetCode #2 — Add Two Numbers (Medium)",
+        "LeetCode #143 — Reorder List (Medium)",
+        "LeetCode #61 — Rotate List (Medium)"
+      ],
+      tip: "Reorder List = find middle + reverse second half + merge. It combines 3 techniques in one problem — great practice!"
+    }
+  },
+  {
+    day: 35, label: "Sun", cls: "d4", topic: "Week 5 Revision",
+    tasks: ["Revise all LL patterns", "Timed problem session", "Plan Week 6 (Stacks & Queues)"],
+    detail: {
+      goal: "Solidify all Linked List patterns with timed practice",
+      code: `class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# Pattern 1: Reverse
+def reverseList(head):
+    prev, cur = None, head
+    while cur:
+        nxt = cur.next
+        cur.next = prev
+        prev = cur
+        cur = nxt
+    return prev
+
+# Pattern 2: Fast & Slow pointer
+def middleNode(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow
+
+# Pattern 3: Dummy node + two pointer
+def removeNthFromEnd(head, n):
+    dummy = ListNode(0, head)
+    fast = slow = dummy
+    for _ in range(n + 1): fast = fast.next
+    while fast:
+        fast = fast.next
+        slow = slow.next
+    slow.next = slow.next.next
+    return dummy.next
+
+# Pattern 4: Merge with dummy
+def mergeTwoLists(l1, l2):
+    dummy = cur = ListNode(0)
+    while l1 and l2:
+        if l1.val <= l2.val: cur.next = l1; l1 = l1.next
+        else: cur.next = l2; l2 = l2.next
+        cur = cur.next
+    cur.next = l1 or l2
+    return dummy.next
+
+# Pattern 5: Cycle detection
+def hasCycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next; fast = fast.next.next
+        if slow == fast: return True
+    return False`,
+      practice: [
+        "LeetCode #234 — Palindrome Linked List (Easy)",
+        "LeetCode #160 — Intersection of Two Linked Lists (Easy)",
+        "LeetCode #138 — Copy List with Random Pointer (Medium)"
+      ],
+      tip: "You now know 5 core LL patterns: Reverse, Fast/Slow, Dummy Node, Merge, Cycle Detection. Week 6 starts Stacks & Queues!"
+    }
+  }
+];
+
+const grid = document.getElementById('grid');
+days.forEach(d => {
+  const card = document.createElement('div');
+  card.className = `day-card ${d.cls}`;
+  card.innerHTML = `
+    <div class="day-label">${d.label}</div>
+    <div class="day-num">Day ${d.day}</div>
+    <span class="topic-badge">${d.topic}</span>
+    <div class="tasks">${d.tasks.map(t => `<div class="task">${t}</div>`).join('')}</div>
+  `;
+  card.onclick = () => showDetail(d);
+  grid.appendChild(card);
+});
+
+let currentDay = null;
+function showDetail(d) {
+  if (currentDay === d.day) { closeDetail(); return; }
+  currentDay = d.day;
+  document.getElementById('detail-title').textContent = `Day ${d.day} — ${d.topic}`;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="section-label">Goal</div>
+    <div style="font-size:13px;color:var(--color-text-primary);margin-bottom:8px">${d.detail.goal}</div>
+    <div class="section-label">Code to write today</div>
+    <div class="code-block">${d.detail.code}</div>
+    <div class="section-label">LeetCode practice</div>
+    ${d.detail.practice.map(p => `<div class="task" style="font-size:12px;color:var(--color-text-primary);margin-bottom:4px">${p}</div>`).join('')}
+    <div class="tip">💡 ${d.detail.tip}</div>
+  `;
+  document.getElementById('detail').classList.add('active');
+}
+
+function closeDetail() {
+  currentDay = null;
+  document.getElementById('detail').classList.remove('active');
+}
+</script>

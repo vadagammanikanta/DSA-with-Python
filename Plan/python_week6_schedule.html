@@ -1,0 +1,557 @@
+
+<style>
+  .schedule { padding: 1rem 0; font-family: var(--font-sans); }
+  .header { text-align: center; margin-bottom: 1.5rem; }
+  .header h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin: 0; }
+  .phase-badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: #FBEAF0; color: #72243E; margin-top: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day-card { border-radius: 10px; padding: 10px 8px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); cursor: pointer; transition: box-shadow .15s; }
+  .day-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: var(--color-border-secondary); }
+  .day-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .day-num { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .topic-badge { font-size: 11px; font-weight: 500; padding: 3px 7px; border-radius: 20px; margin-bottom: 5px; display: inline-block; }
+  .tasks { margin-top: 6px; }
+  .task { font-size: 11px; color: var(--color-text-secondary); display: flex; align-items: flex-start; gap: 5px; margin-bottom: 3px; line-height: 1.4; }
+  .task::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; margin-top: 4px; }
+  .detail-panel { margin-top: 16px; border-radius: 12px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); padding: 16px; display: none; }
+  .detail-panel.active { display: block; }
+  .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .detail-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .detail-close { font-size: 12px; color: var(--color-text-tertiary); cursor: pointer; }
+  .code-block { background: var(--color-background-tertiary); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); white-space: pre; overflow-x: auto; margin: 8px 0; }
+  .section-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 10px 0 4px; }
+  .tip { font-size: 12px; color: var(--color-text-secondary); background: var(--color-background-tertiary); border-left: 3px solid #993556; padding: 8px 10px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+
+  .d1 .day-label { color: #993556; } .d1 .topic-badge { background: #FBEAF0; color: #72243E; }
+  .d2 .day-label { color: #993556; } .d2 .topic-badge { background: #FBEAF0; color: #72243E; }
+  .d3 .day-label { color: #185FA5; } .d3 .topic-badge { background: #E6F1FB; color: #0C447C; }
+  .d4 .day-label { color: #185FA5; } .d4 .topic-badge { background: #E6F1FB; color: #0C447C; }
+  .d5 .day-label { color: #3B6D11; } .d5 .topic-badge { background: #EAF3DE; color: #27500A; }
+  .d6 .day-label { color: #3B6D11; } .d6 .topic-badge { background: #EAF3DE; color: #27500A; }
+  .d7 .day-label { color: #854F0B; } .d7 .topic-badge { background: #FAEEDA; color: #633806; }
+
+  @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="schedule">
+  <div class="header">
+    <h2>Week 6 — Stacks &amp; Queues</h2>
+    <div class="phase-badge">Phase 2 continues — monotonic stack week</div>
+    <p style="margin-top:6px">Click any day to see details, code &amp; LeetCode problems</p>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="detail-panel" id="detail">
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title"></div>
+      <div class="detail-close" onclick="closeDetail()">✕ close</div>
+    </div>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+const days = [
+  {
+    day: 36, label: "Mon", cls: "d1", topic: "Stack Basics",
+    tasks: ["Stack using list", "push, pop, peek", "Valid parentheses"],
+    detail: {
+      goal: "Understand stack (LIFO) and solve bracket matching — most common stack problem",
+      code: `# Stack using Python list — LIFO
+stack = []
+stack.append(10)   # push
+stack.append(20)
+stack.append(30)
+print(stack[-1])   # peek → 30
+stack.pop()        # pop → 30
+print(len(stack))  # 2
+
+# Stack class
+class Stack:
+    def __init__(self):
+        self.s = []
+    def push(self, val): self.s.append(val)
+    def pop(self): return self.s.pop() if self.s else None
+    def peek(self): return self.s[-1] if self.s else None
+    def is_empty(self): return len(self.s) == 0
+    def size(self): return len(self.s)
+
+# Valid Parentheses — classic stack problem
+def isValid(s):
+    stack = []
+    mapping = {')': '(', ']': '[', '}': '{'}
+    for ch in s:
+        if ch in mapping:
+            top = stack.pop() if stack else '#'
+            if mapping[ch] != top:
+                return False
+        else:
+            stack.append(ch)
+    return not stack
+
+print(isValid("()[]{}"))   # True
+print(isValid("(]"))       # False
+print(isValid("{[]}"))     # True
+
+# Min Stack — get min in O(1)
+class MinStack:
+    def __init__(self):
+        self.stack = []
+        self.min_stack = []
+    def push(self, val):
+        self.stack.append(val)
+        min_val = min(val, self.min_stack[-1] if self.min_stack else val)
+        self.min_stack.append(min_val)
+    def pop(self):
+        self.stack.pop()
+        self.min_stack.pop()
+    def top(self): return self.stack[-1]
+    def getMin(self): return self.min_stack[-1]`,
+      practice: [
+        "LeetCode #20 — Valid Parentheses (Easy)",
+        "LeetCode #155 — Min Stack (Medium)",
+        "LeetCode #1047 — Remove All Adjacent Duplicates (Easy)"
+      ],
+      tip: "Stack = think LIFO. Whenever you see 'matching pairs' or 'undo last action', reach for a stack immediately."
+    }
+  },
+  {
+    day: 37, label: "Tue", cls: "d1", topic: "Stack Applications",
+    tasks: ["Evaluate expressions", "Decode string", "Daily temperatures"],
+    detail: {
+      goal: "Apply stacks to real problems — expression evaluation and string decoding",
+      code: `# Evaluate Reverse Polish Notation
+def evalRPN(tokens):
+    stack = []
+    ops = {
+        '+': lambda a,b: a+b,
+        '-': lambda a,b: a-b,
+        '*': lambda a,b: a*b,
+        '/': lambda a,b: int(a/b)
+    }
+    for t in tokens:
+        if t in ops:
+            b, a = stack.pop(), stack.pop()
+            stack.append(ops[t](a, b))
+        else:
+            stack.append(int(t))
+    return stack[0]
+
+print(evalRPN(["2","1","+","3","*"]))  # 9
+
+# Decode String: "3[a2[bc]]" → "abcbcabcbc"
+def decodeString(s):
+    stack = []
+    cur_str = ""
+    cur_num = 0
+    for ch in s:
+        if ch.isdigit():
+            cur_num = cur_num * 10 + int(ch)
+        elif ch == '[':
+            stack.append((cur_str, cur_num))
+            cur_str, cur_num = "", 0
+        elif ch == ']':
+            prev_str, num = stack.pop()
+            cur_str = prev_str + num * cur_str
+        else:
+            cur_str += ch
+    return cur_str
+
+print(decodeString("3[a]2[bc]"))    # "aaabcbc"
+print(decodeString("3[a2[bc]]"))    # "abcbcabcbc"
+
+# Daily Temperatures — next greater element
+def dailyTemperatures(temps):
+    res = [0] * len(temps)
+    stack = []  # stores indices
+    for i, t in enumerate(temps):
+        while stack and temps[stack[-1]] < t:
+            idx = stack.pop()
+            res[idx] = i - idx
+        stack.append(i)
+    return res
+
+print(dailyTemperatures([73,74,75,71,69,72,76,73]))
+# [1,1,4,2,1,1,0,0]`,
+      practice: [
+        "LeetCode #150 — Evaluate Reverse Polish Notation (Medium)",
+        "LeetCode #394 — Decode String (Medium)",
+        "LeetCode #739 — Daily Temperatures (Medium)"
+      ],
+      tip: "Decode String is a must-know — it tests stack with both strings and numbers at the same time. Very common in OAs."
+    }
+  },
+  {
+    day: 38, label: "Wed", cls: "d2", topic: "Monotonic Stack",
+    tasks: ["Next greater element", "Next smaller element", "Largest rectangle in histogram"],
+    detail: {
+      goal: "Monotonic stack is the most powerful stack technique — O(n) for next greater/smaller problems",
+      code: `# Next Greater Element I
+def nextGreaterElement(nums1, nums2):
+    nge = {}
+    stack = []
+    for n in nums2:
+        while stack and stack[-1] < n:
+            nge[stack.pop()] = n
+        stack.append(n)
+    return [nge.get(n, -1) for n in nums1]
+
+# Next Greater Element II (circular)
+def nextGreaterElements(nums):
+    n = len(nums)
+    res = [-1] * n
+    stack = []
+    for i in range(2 * n):
+        while stack and nums[stack[-1]] < nums[i % n]:
+            res[stack.pop()] = nums[i % n]
+        if i < n:
+            stack.append(i)
+    return res
+
+print(nextGreaterElements([1,2,1]))  # [2,-1,2]
+
+# Largest Rectangle in Histogram — O(n)
+def largestRectangleArea(heights):
+    stack = []   # monotonic increasing
+    max_area = 0
+    heights.append(0)  # sentinel
+    for i, h in enumerate(heights):
+        while stack and heights[stack[-1]] > h:
+            height = heights[stack.pop()]
+            width = i if not stack else i - stack[-1] - 1
+            max_area = max(max_area, height * width)
+        stack.append(i)
+    return max_area
+
+print(largestRectangleArea([2,1,5,6,2,3]))  # 10
+
+# Trapping Rain Water — O(n) monotonic stack
+def trap(height):
+    stack = []
+    water = 0
+    for i, h in enumerate(height):
+        while stack and height[stack[-1]] < h:
+            bot = stack.pop()
+            if not stack: break
+            left = stack[-1]
+            width = i - left - 1
+            bounded = min(height[left], h) - height[bot]
+            water += width * bounded
+        stack.append(i)
+    return water`,
+      practice: [
+        "LeetCode #496 — Next Greater Element I (Easy)",
+        "LeetCode #84 — Largest Rectangle in Histogram (Hard)",
+        "LeetCode #42 — Trapping Rain Water (Hard)"
+      ],
+      tip: "Monotonic stack maintains increasing or decreasing order. Pop when current element breaks that order — that's the 'next greater' moment."
+    }
+  },
+  {
+    day: 39, label: "Thu", cls: "d2", topic: "Queue Basics",
+    tasks: ["Queue using deque", "Circular queue design", "BFS introduction"],
+    detail: {
+      goal: "Queue (FIFO) is the backbone of BFS — critical for graphs and trees",
+      code: `from collections import deque
+
+# Queue using deque — FIFO
+q = deque()
+q.append(10)      # enqueue right
+q.append(20)
+q.append(30)
+print(q[0])       # peek front → 10
+q.popleft()       # dequeue → 10
+print(len(q))     # 2
+
+# Queue class
+class Queue:
+    def __init__(self):
+        self.q = deque()
+    def enqueue(self, val): self.q.append(val)
+    def dequeue(self): return self.q.popleft() if self.q else None
+    def peek(self): return self.q[0] if self.q else None
+    def is_empty(self): return len(self.q) == 0
+
+# Design Circular Queue
+class MyCircularQueue:
+    def __init__(self, k):
+        self.size = k
+        self.q = []
+    def enQueue(self, val):
+        if len(self.q) == self.size: return False
+        self.q.append(val); return True
+    def deQueue(self):
+        if not self.q: return False
+        self.q.pop(0); return True
+    def Front(self): return self.q[0] if self.q else -1
+    def Rear(self): return self.q[-1] if self.q else -1
+    def isEmpty(self): return len(self.q) == 0
+    def isFull(self): return len(self.q) == self.size
+
+# BFS using Queue — level order traversal
+from collections import deque
+class TreeNode:
+    def __init__(self, val=0):
+        self.val = val; self.left = self.right = None
+
+def levelOrder(root):
+    if not root: return []
+    result, q = [], deque([root])
+    while q:
+        level = []
+        for _ in range(len(q)):
+            node = q.popleft()
+            level.append(node.val)
+            if node.left: q.append(node.left)
+            if node.right: q.append(node.right)
+        result.append(level)
+    return result`,
+      practice: [
+        "LeetCode #232 — Implement Queue using Stacks (Easy)",
+        "LeetCode #225 — Implement Stack using Queues (Easy)",
+        "LeetCode #622 — Design Circular Queue (Medium)"
+      ],
+      tip: "Queue = BFS. Stack = DFS. Remember this pairing — it tells you which data structure to use in graph/tree traversals."
+    }
+  },
+  {
+    day: 40, label: "Fri", cls: "d3", topic: "Deque & Sliding Window",
+    tasks: ["Monotonic deque", "Sliding window maximum", "First negative in window"],
+    detail: {
+      goal: "Monotonic deque solves sliding window maximum in O(n) — a popular hard problem",
+      code: `from collections import deque
+
+# Sliding Window Maximum — O(n) using monotonic deque
+def maxSlidingWindow(nums, k):
+    dq = deque()   # stores indices, decreasing values
+    result = []
+    for i, n in enumerate(nums):
+        # remove elements outside window
+        while dq and dq[0] < i - k + 1:
+            dq.popleft()
+        # remove smaller elements from back
+        while dq and nums[dq[-1]] < n:
+            dq.pop()
+        dq.append(i)
+        if i >= k - 1:
+            result.append(nums[dq[0]])
+    return result
+
+print(maxSlidingWindow([1,3,-1,-3,5,3,6,7], 3))
+# [3,3,5,5,6,7]
+
+# First negative in every window of size k
+def firstNegative(arr, k):
+    dq = deque()
+    result = []
+    for i in range(len(arr)):
+        if arr[i] < 0:
+            dq.append(i)
+        if dq and dq[0] < i - k + 1:
+            dq.popleft()
+        if i >= k - 1:
+            result.append(arr[dq[0]] if dq else 0)
+    return result
+
+# Sliding window using deque — min of window
+def minSlidingWindow(nums, k):
+    dq = deque()   # stores indices, increasing values
+    result = []
+    for i, n in enumerate(nums):
+        while dq and dq[0] < i - k + 1:
+            dq.popleft()
+        while dq and nums[dq[-1]] > n:
+            dq.pop()
+        dq.append(i)
+        if i >= k - 1:
+            result.append(nums[dq[0]])
+    return result
+
+# Jump Game using deque BFS
+def canJump(nums):
+    max_reach = 0
+    for i, n in enumerate(nums):
+        if i > max_reach: return False
+        max_reach = max(max_reach, i + n)
+    return True`,
+      practice: [
+        "LeetCode #239 — Sliding Window Maximum (Hard)",
+        "LeetCode #862 — Shortest Subarray with Sum >= K (Hard)",
+        "LeetCode #1438 — Longest Subarray with Abs Diff <= Limit (Medium)"
+      ],
+      tip: "Monotonic deque = sliding window max/min in O(n). The trick: remove from front if out of window, remove from back if smaller than current."
+    }
+  },
+  {
+    day: 41, label: "Sat", cls: "d3", topic: "Stack + Queue Design",
+    tasks: ["Stack using 2 queues", "Queue using 2 stacks", "Browser history design"],
+    detail: {
+      goal: "Design problems test your understanding of data structure internals — very common in interviews",
+      code: `from collections import deque
+
+# Implement Stack using Queues
+class MyStack:
+    def __init__(self):
+        self.q = deque()
+    def push(self, x):
+        self.q.append(x)
+        for _ in range(len(self.q) - 1):
+            self.q.append(self.q.popleft())
+    def pop(self): return self.q.popleft()
+    def top(self): return self.q[0]
+    def empty(self): return not self.q
+
+# Implement Queue using Stacks
+class MyQueue:
+    def __init__(self):
+        self.in_stack = []
+        self.out_stack = []
+    def push(self, x): self.in_stack.append(x)
+    def pop(self):
+        self._transfer()
+        return self.out_stack.pop()
+    def peek(self):
+        self._transfer()
+        return self.out_stack[-1]
+    def _transfer(self):
+        if not self.out_stack:
+            while self.in_stack:
+                self.out_stack.append(self.in_stack.pop())
+    def empty(self): return not self.in_stack and not self.out_stack
+
+# Design Browser History
+class BrowserHistory:
+    def __init__(self, homepage):
+        self.history = [homepage]
+        self.cur = 0
+    def visit(self, url):
+        self.history = self.history[:self.cur+1]
+        self.history.append(url)
+        self.cur += 1
+    def back(self, steps):
+        self.cur = max(0, self.cur - steps)
+        return self.history[self.cur]
+    def forward(self, steps):
+        self.cur = min(len(self.history)-1, self.cur + steps)
+        return self.history[self.cur]
+
+bh = BrowserHistory("leetcode.com")
+bh.visit("google.com")
+bh.visit("facebook.com")
+print(bh.back(1))     # google.com
+print(bh.forward(1))  # facebook.com`,
+      practice: [
+        "LeetCode #225 — Implement Stack using Queues (Easy)",
+        "LeetCode #232 — Implement Queue using Stacks (Easy)",
+        "LeetCode #1472 — Design Browser History (Medium)"
+      ],
+      tip: "Design problems have no 'right' answer — interviewers want to see HOW you think. Talk through trade-offs out loud."
+    }
+  },
+  {
+    day: 42, label: "Sun", cls: "d4", topic: "Week 6 Revision",
+    tasks: ["Revise all patterns", "Timed problem session", "Plan Week 7 (Recursion & Backtracking)"],
+    detail: {
+      goal: "Consolidate all Stack & Queue patterns before moving to Recursion",
+      code: `from collections import deque
+
+# Pattern 1: Stack — valid parentheses
+def isValid(s):
+    stack = []
+    mapping = {')':'(', ']':'[', '}':'{'}
+    for ch in s:
+        if ch in mapping:
+            if not stack or stack[-1] != mapping[ch]: return False
+            stack.pop()
+        else: stack.append(ch)
+    return not stack
+
+# Pattern 2: Monotonic Stack — next greater
+def nextGreaterElements(nums):
+    n = len(nums)
+    res = [-1] * n
+    stack = []
+    for i in range(2 * n):
+        while stack and nums[stack[-1]] < nums[i % n]:
+            res[stack.pop()] = nums[i % n]
+        if i < n: stack.append(i)
+    return res
+
+# Pattern 3: Min Stack
+class MinStack:
+    def __init__(self): self.s = []; self.m = []
+    def push(self, v):
+        self.s.append(v)
+        self.m.append(min(v, self.m[-1] if self.m else v))
+    def pop(self): self.s.pop(); self.m.pop()
+    def top(self): return self.s[-1]
+    def getMin(self): return self.m[-1]
+
+# Pattern 4: Monotonic Deque — sliding window max
+def maxSlidingWindow(nums, k):
+    dq, res = deque(), []
+    for i, n in enumerate(nums):
+        while dq and dq[0] < i - k + 1: dq.popleft()
+        while dq and nums[dq[-1]] < n: dq.pop()
+        dq.append(i)
+        if i >= k - 1: res.append(nums[dq[0]])
+    return res
+
+# Pattern 5: Queue using 2 Stacks
+class MyQueue:
+    def __init__(self): self.i = []; self.o = []
+    def push(self, x): self.i.append(x)
+    def pop(self):
+        if not self.o:
+            while self.i: self.o.append(self.i.pop())
+        return self.o.pop()
+    def peek(self):
+        if not self.o:
+            while self.i: self.o.append(self.i.pop())
+        return self.o[-1]
+    def empty(self): return not self.i and not self.o`,
+      practice: [
+        "LeetCode #84 — Largest Rectangle in Histogram (Hard)",
+        "LeetCode #239 — Sliding Window Maximum (Hard)",
+        "LeetCode #402 — Remove K Digits (Medium)"
+      ],
+      tip: "You now know 5 Stack & Queue patterns. Week 7 covers Recursion & Backtracking — the gateway to Trees, Graphs, and DP!"
+    }
+  }
+];
+
+const grid = document.getElementById('grid');
+days.forEach(d => {
+  const card = document.createElement('div');
+  card.className = `day-card ${d.cls}`;
+  card.innerHTML = `
+    <div class="day-label">${d.label}</div>
+    <div class="day-num">Day ${d.day}</div>
+    <span class="topic-badge">${d.topic}</span>
+    <div class="tasks">${d.tasks.map(t => `<div class="task">${t}</div>`).join('')}</div>
+  `;
+  card.onclick = () => showDetail(d);
+  grid.appendChild(card);
+});
+
+let currentDay = null;
+function showDetail(d) {
+  if (currentDay === d.day) { closeDetail(); return; }
+  currentDay = d.day;
+  document.getElementById('detail-title').textContent = `Day ${d.day} — ${d.topic}`;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="section-label">Goal</div>
+    <div style="font-size:13px;color:var(--color-text-primary);margin-bottom:8px">${d.detail.goal}</div>
+    <div class="section-label">Code to write today</div>
+    <div class="code-block">${d.detail.code}</div>
+    <div class="section-label">LeetCode practice</div>
+    ${d.detail.practice.map(p => `<div class="task" style="font-size:12px;color:var(--color-text-primary);margin-bottom:4px">${p}</div>`).join('')}
+    <div class="tip">💡 ${d.detail.tip}</div>
+  `;
+  document.getElementById('detail').classList.add('active');
+}
+function closeDetail() {
+  currentDay = null;
+  document.getElementById('detail').classList.remove('active');
+}
+</script>

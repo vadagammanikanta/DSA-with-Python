@@ -1,0 +1,443 @@
+
+<style>
+  .schedule { padding: 1rem 0; font-family: var(--font-sans); }
+  .header { text-align: center; margin-bottom: 1.5rem; }
+  .header h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin: 0; }
+  .phase-badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: #E1F5EE; color: #085041; margin-top: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day-card { border-radius: 10px; padding: 10px 8px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); cursor: pointer; transition: box-shadow .15s; }
+  .day-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: var(--color-border-secondary); }
+  .day-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .day-num { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .topic-badge { font-size: 11px; font-weight: 500; padding: 3px 7px; border-radius: 20px; margin-bottom: 5px; display: inline-block; }
+  .tasks { margin-top: 6px; }
+  .task { font-size: 11px; color: var(--color-text-secondary); display: flex; align-items: flex-start; gap: 5px; margin-bottom: 3px; line-height: 1.4; }
+  .task::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; margin-top: 4px; }
+  .detail-panel { margin-top: 16px; border-radius: 12px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); padding: 16px; display: none; }
+  .detail-panel.active { display: block; }
+  .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .detail-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .detail-close { font-size: 12px; color: var(--color-text-tertiary); cursor: pointer; }
+  .code-block { background: var(--color-background-tertiary); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); white-space: pre; overflow-x: auto; margin: 8px 0; }
+  .section-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 10px 0 4px; }
+  .tip { font-size: 12px; color: var(--color-text-secondary); background: var(--color-background-tertiary); border-left: 3px solid #378ADD; padding: 8px 10px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+  .lc-tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 4px; font-weight: 500; }
+  .easy { background: #EAF3DE; color: #3B6D11; }
+  .medium { background: #FAEEDA; color: #633806; }
+
+  .d1 .day-label { color: #185FA5; } .d1 .topic-badge { background: #E6F1FB; color: #0C447C; }
+  .d2 .day-label { color: #185FA5; } .d2 .topic-badge { background: #E6F1FB; color: #0C447C; }
+  .d3 .day-label { color: #534AB7; } .d3 .topic-badge { background: #EEEDFE; color: #3C3489; }
+  .d4 .day-label { color: #534AB7; } .d4 .topic-badge { background: #EEEDFE; color: #3C3489; }
+  .d5 .day-label { color: #993C1D; } .d5 .topic-badge { background: #FAECE7; color: #712B13; }
+  .d6 .day-label { color: #993C1D; } .d6 .topic-badge { background: #FAECE7; color: #712B13; }
+  .d7 .day-label { color: #0F6E56; } .d7 .topic-badge { background: #E1F5EE; color: #085041; }
+
+  @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="schedule">
+  <div class="header">
+    <h2>Week 3 — Arrays &amp; Strings (DSA Phase 2 Start)</h2>
+    <div class="phase-badge">Phase 2 begins — real DSA topics</div>
+    <p style="margin-top:6px">Click any day to see details, code &amp; LeetCode problems</p>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="detail-panel" id="detail">
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title"></div>
+      <div class="detail-close" onclick="closeDetail()">✕ close</div>
+    </div>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+const days = [
+  {
+    day: 15, label: "Mon", cls: "d1", topic: "Array Basics",
+    tasks: ["Traversal & indexing", "Prefix sum concept", "Kadane's algorithm idea"],
+    detail: {
+      goal: "Master core array operations — foundation of all DSA",
+      code: `# Array traversal
+arr = [2, 4, 6, 8, 10]
+for i in range(len(arr)):
+    print(i, arr[i])
+
+# Two pointer traversal
+l, r = 0, len(arr) - 1
+while l < r:
+    print(arr[l], arr[r])
+    l += 1; r -= 1
+
+# Prefix sum — very common in interviews
+arr = [1, 2, 3, 4, 5]
+prefix = [0] * (len(arr) + 1)
+for i in range(len(arr)):
+    prefix[i+1] = prefix[i] + arr[i]
+# Range sum query in O(1)
+# sum(l..r) = prefix[r+1] - prefix[l]
+print(prefix[4] - prefix[1])  # sum(1..3) = 9
+
+# Kadane's — max subarray sum
+def maxSubArray(nums):
+    cur = best = nums[0]
+    for n in nums[1:]:
+        cur = max(n, cur + n)
+        best = max(best, cur)
+    return best
+
+print(maxSubArray([-2,1,-3,4,-1,2,1,-5,4]))  # 6`,
+      practice: [
+        "LeetCode #53 — Maximum Subarray (Easy)",
+        "LeetCode #303 — Range Sum Query (Easy)",
+        "Find second largest in array without sort"
+      ],
+      tip: "Prefix sum is asked in at least 1 problem in every major interview. Memorize the pattern."
+    }
+  },
+  {
+    day: 16, label: "Tue", cls: "d1", topic: "Two Pointers",
+    tasks: ["Left & right pointers", "Remove duplicates", "Pair with target sum"],
+    detail: {
+      goal: "Two pointer technique — solves O(n²) problems in O(n)",
+      code: `# Two Sum II (sorted array)
+def twoSum(numbers, target):
+    l, r = 0, len(numbers) - 1
+    while l < r:
+        s = numbers[l] + numbers[r]
+        if s == target:
+            return [l+1, r+1]
+        elif s < target:
+            l += 1
+        else:
+            r -= 1
+
+# Remove duplicates from sorted array
+def removeDuplicates(nums):
+    k = 1
+    for i in range(1, len(nums)):
+        if nums[i] != nums[i-1]:
+            nums[k] = nums[i]
+            k += 1
+    return k
+
+# Valid Palindrome (two pointer)
+def isPalindrome(s):
+    s = [c.lower() for c in s if c.isalnum()]
+    l, r = 0, len(s) - 1
+    while l < r:
+        if s[l] != s[r]:
+            return False
+        l += 1; r -= 1
+    return True
+
+print(isPalindrome("A man, a plan, a canal: Panama"))  # True`,
+      practice: [
+        "LeetCode #167 — Two Sum II (Medium)",
+        "LeetCode #26 — Remove Duplicates (Easy)",
+        "LeetCode #125 — Valid Palindrome (Easy)"
+      ],
+      tip: "Whenever you see 'sorted array + find pair', think Two Pointers first. It's almost always the answer."
+    }
+  },
+  {
+    day: 17, label: "Wed", cls: "d2", topic: "Sliding Window",
+    tasks: ["Fixed window size", "Variable window", "Max sum subarray of size k"],
+    detail: {
+      goal: "Sliding window — converts O(n²) brute force to O(n) elegantly",
+      code: `# Fixed window — max sum of size k
+def maxSumSubarray(arr, k):
+    win = sum(arr[:k])
+    best = win
+    for i in range(k, len(arr)):
+        win += arr[i] - arr[i-k]
+        best = max(best, win)
+    return best
+
+print(maxSumSubarray([2,1,5,1,3,2], 3))  # 9
+
+# Variable window — longest substring no repeat
+def lengthOfLongestSubstring(s):
+    seen = {}
+    l = best = 0
+    for r, ch in enumerate(s):
+        if ch in seen and seen[ch] >= l:
+            l = seen[ch] + 1
+        seen[ch] = r
+        best = max(best, r - l + 1)
+    return best
+
+print(lengthOfLongestSubstring("abcabcbb"))  # 3
+
+# Minimum window containing all chars of t
+from collections import Counter
+def minWindow(s, t):
+    need = Counter(t)
+    missing = len(t)
+    l = start = end = 0
+    for r, ch in enumerate(s, 1):
+        if need[ch] > 0:
+            missing -= 1
+        need[ch] -= 1
+        if missing == 0:
+            while need[s[l]] < 0:
+                need[s[l]] += 1
+                l += 1
+            if not end or r - l < end - start:
+                start, end = l, r
+            need[s[l]] += 1
+            missing += 1
+            l += 1
+    return s[start:end]`,
+      practice: [
+        "LeetCode #643 — Max Avg Subarray I (Easy)",
+        "LeetCode #3 — Longest Substring No Repeat (Medium)",
+        "LeetCode #209 — Min Size Subarray Sum (Medium)"
+      ],
+      tip: "Sliding window = expand right pointer, shrink left when condition breaks. That's the whole pattern."
+    }
+  },
+  {
+    day: 18, label: "Thu", cls: "d2", topic: "Sorting & Searching",
+    tasks: ["Built-in sort with key", "Binary search", "bisect module"],
+    detail: {
+      goal: "Sorting and searching are in almost every DSA problem",
+      code: `# Python sort — Timsort O(n log n)
+arr = [3, 1, 4, 1, 5, 9]
+arr.sort()                    # in-place
+s = sorted(arr, reverse=True) # new list
+
+# Sort by custom key
+words = ["banana", "apple", "fig", "cherry"]
+words.sort(key=len)           # by length
+words.sort(key=lambda x: x[-1])  # by last char
+
+# Sort tuples
+pairs = [(1,'b'), (3,'a'), (2,'c')]
+pairs.sort(key=lambda x: x[1])   # by 2nd element
+
+# Binary search — O(log n)
+def binary_search(arr, target):
+    lo, hi = 0, len(arr) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
+
+# bisect module (built-in binary search)
+import bisect
+arr = [1, 3, 5, 7, 9]
+print(bisect.bisect_left(arr, 5))   # 2 (index)
+print(bisect.bisect_right(arr, 5))  # 3
+bisect.insort(arr, 6)               # insert sorted`,
+      practice: [
+        "LeetCode #704 — Binary Search (Easy)",
+        "LeetCode #35 — Search Insert Position (Easy)",
+        "LeetCode #75 — Sort Colors (Medium)"
+      ],
+      tip: "Always ask in interviews: 'Is the array sorted?' If yes, binary search is probably the answer."
+    }
+  },
+  {
+    day: 19, label: "Fri", cls: "d3", topic: "String Patterns",
+    tasks: ["Anagram checks", "Character frequency", "Sliding window on strings"],
+    detail: {
+      goal: "String problems are the most common in online assessments",
+      code: `from collections import Counter, defaultdict
+
+# Anagram check
+def isAnagram(s, t):
+    return Counter(s) == Counter(t)
+
+# Group anagrams together
+def groupAnagrams(strs):
+    d = defaultdict(list)
+    for s in strs:
+        key = tuple(sorted(s))
+        d[key].append(s)
+    return list(d.values())
+
+print(groupAnagrams(["eat","tea","tan","ate","nat","bat"]))
+
+# Find all anagram indices in string
+def findAnagrams(s, p):
+    need = Counter(p)
+    win  = Counter(s[:len(p)])
+    res  = [0] if win == need else []
+    for i in range(len(p), len(s)):
+        win[s[i]] += 1
+        old = s[i - len(p)]
+        win[old] -= 1
+        if win[old] == 0:
+            del win[old]
+        if win == need:
+            res.append(i - len(p) + 1)
+    return res
+
+# Longest palindromic substring
+def longestPalindrome(s):
+    res = ""
+    for i in range(len(s)):
+        for odd, even in [(i,i),(i,i+1)]:
+            l, r = odd, even
+            while l >= 0 and r < len(s) and s[l] == s[r]:
+                if r - l + 1 > len(res):
+                    res = s[l:r+1]
+                l -= 1; r += 1
+    return res`,
+      practice: [
+        "LeetCode #242 — Valid Anagram (Easy)",
+        "LeetCode #49 — Group Anagrams (Medium)",
+        "LeetCode #438 — Find All Anagrams (Medium)"
+      ],
+      tip: "For string problems, Counter is your best friend. It makes frequency checks a one-liner."
+    }
+  },
+  {
+    day: 20, label: "Sat", cls: "d3", topic: "Matrix / 2D Arrays",
+    tasks: ["Row & column traversal", "Diagonal & spiral", "Rotate & transpose"],
+    detail: {
+      goal: "2D arrays appear in graph problems, DP, and image processing questions",
+      code: `# Create and traverse matrix
+matrix = [[1,2,3],[4,5,6],[7,8,9]]
+rows, cols = len(matrix), len(matrix[0])
+
+for r in range(rows):
+    for c in range(cols):
+        print(matrix[r][c], end=" ")
+    print()
+
+# Transpose (rows become cols)
+def transpose(matrix):
+    return [[matrix[r][c] for r in range(rows)]
+             for c in range(cols)]
+
+# Rotate 90 degrees clockwise
+def rotate(matrix):
+    n = len(matrix)
+    # Step 1: transpose
+    for i in range(n):
+        for j in range(i+1, n):
+            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+    # Step 2: reverse each row
+    for row in matrix:
+        row.reverse()
+
+# Spiral order traversal
+def spiralOrder(matrix):
+    res = []
+    while matrix:
+        res += matrix.pop(0)
+        matrix = list(zip(*matrix))[::-1]
+    return res
+
+# Set zeros — if cell is 0, set row & col to 0
+def setZeroes(matrix):
+    rows = {r for r in range(len(matrix)) if 0 in matrix[r]}
+    cols = {c for r in matrix for c,v in enumerate(r) if v==0}
+    for r in rows:
+        matrix[r] = [0]*len(matrix[0])
+    for r in matrix:
+        for c in cols:
+            r[c] = 0`,
+      practice: [
+        "LeetCode #48 — Rotate Image (Medium)",
+        "LeetCode #54 — Spiral Matrix (Medium)",
+        "LeetCode #73 — Set Matrix Zeroes (Medium)"
+      ],
+      tip: "Transpose + reverse = 90° rotation. This trick appears in at least 2–3 top company interviews every year."
+    }
+  },
+  {
+    day: 21, label: "Sun", cls: "d4", topic: "Week 3 Revision",
+    tasks: ["Revise all patterns", "Timed LeetCode session", "Note weak areas"],
+    detail: {
+      goal: "Consolidate all Week 3 patterns with timed practice",
+      code: `# Pattern 1: Prefix Sum
+# LeetCode #560 — Subarray Sum Equals K
+from collections import defaultdict
+def subarraySum(nums, k):
+    count = prefix = 0
+    seen = defaultdict(int)
+    seen[0] = 1
+    for n in nums:
+        prefix += n
+        count += seen[prefix - k]
+        seen[prefix] += 1
+    return count
+
+# Pattern 2: Two Pointer
+# LeetCode #11 — Container With Most Water
+def maxArea(height):
+    l, r = 0, len(height) - 1
+    best = 0
+    while l < r:
+        best = max(best, min(height[l], height[r]) * (r - l))
+        if height[l] < height[r]:
+            l += 1
+        else:
+            r -= 1
+    return best
+
+# Pattern 3: Sliding Window
+# LeetCode #121 — Best Time to Buy & Sell Stock
+def maxProfit(prices):
+    buy = float('inf')
+    profit = 0
+    for p in prices:
+        buy = min(buy, p)
+        profit = max(profit, p - buy)
+    return profit`,
+      practice: [
+        "LeetCode #560 — Subarray Sum Equals K (Medium)",
+        "LeetCode #11 — Container With Most Water (Medium)",
+        "LeetCode #121 — Best Time to Buy Stock (Easy)"
+      ],
+      tip: "After Week 3, you know 4 core patterns: Prefix Sum, Two Pointer, Sliding Window, Binary Search. These alone solve 40% of interview problems!"
+    }
+  }
+];
+
+const grid = document.getElementById('grid');
+days.forEach(d => {
+  const card = document.createElement('div');
+  card.className = `day-card ${d.cls}`;
+  card.innerHTML = `
+    <div class="day-label">${d.label}</div>
+    <div class="day-num">Day ${d.day}</div>
+    <span class="topic-badge">${d.topic}</span>
+    <div class="tasks">${d.tasks.map(t => `<div class="task">${t}</div>`).join('')}</div>
+  `;
+  card.onclick = () => showDetail(d);
+  grid.appendChild(card);
+});
+
+let currentDay = null;
+function showDetail(d) {
+  if (currentDay === d.day) { closeDetail(); return; }
+  currentDay = d.day;
+  document.getElementById('detail-title').textContent = `Day ${d.day} — ${d.topic}`;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="section-label">Goal</div>
+    <div style="font-size:13px;color:var(--color-text-primary);margin-bottom:8px">${d.detail.goal}</div>
+    <div class="section-label">Code to write today</div>
+    <div class="code-block">${d.detail.code}</div>
+    <div class="section-label">LeetCode practice</div>
+    ${d.detail.practice.map(p => `<div class="task" style="font-size:12px;color:var(--color-text-primary);margin-bottom:4px">${p}</div>`).join('')}
+    <div class="tip">💡 ${d.detail.tip}</div>
+  `;
+  document.getElementById('detail').classList.add('active');
+}
+
+function closeDetail() {
+  currentDay = null;
+  document.getElementById('detail').classList.remove('active');
+}
+</script>

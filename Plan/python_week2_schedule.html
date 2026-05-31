@@ -1,0 +1,351 @@
+
+<style>
+  .schedule { padding: 1rem 0; font-family: var(--font-sans); }
+  .header { text-align: center; margin-bottom: 1.5rem; }
+  .header h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin: 0; }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day-card { border-radius: 10px; padding: 10px 8px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); cursor: pointer; transition: box-shadow .15s; }
+  .day-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: var(--color-border-secondary); }
+  .day-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .day-num { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .topic-badge { font-size: 11px; font-weight: 500; padding: 3px 7px; border-radius: 20px; margin-bottom: 5px; display: inline-block; }
+  .tasks { margin-top: 6px; }
+  .task { font-size: 11px; color: var(--color-text-secondary); display: flex; align-items: flex-start; gap: 5px; margin-bottom: 3px; line-height: 1.4; }
+  .task::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; margin-top: 4px; }
+  .detail-panel { margin-top: 16px; border-radius: 12px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); padding: 16px; display: none; }
+  .detail-panel.active { display: block; }
+  .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .detail-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .detail-close { font-size: 12px; color: var(--color-text-tertiary); cursor: pointer; }
+  .code-block { background: var(--color-background-tertiary); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); white-space: pre; overflow-x: auto; margin: 8px 0; }
+  .section-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 10px 0 4px; }
+  .tip { font-size: 12px; color: var(--color-text-secondary); background: var(--color-background-tertiary); border-left: 3px solid #1D9E75; padding: 8px 10px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+
+  .d1 .day-label { color: #993C1D; } .d1 .topic-badge { background: #FAECE7; color: #712B13; }
+  .d2 .day-label { color: #993C1D; } .d2 .topic-badge { background: #FAECE7; color: #712B13; }
+  .d3 .day-label { color: #534AB7; } .d3 .topic-badge { background: #EEEDFE; color: #3C3489; }
+  .d4 .day-label { color: #534AB7; } .d4 .topic-badge { background: #EEEDFE; color: #3C3489; }
+  .d5 .day-label { color: #0F6E56; } .d5 .topic-badge { background: #E1F5EE; color: #085041; }
+  .d6 .day-label { color: #0F6E56; } .d6 .topic-badge { background: #E1F5EE; color: #085041; }
+  .d7 .day-label { color: #185FA5; } .d7 .topic-badge { background: #E6F1FB; color: #0C447C; }
+
+  @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="schedule">
+  <div class="header">
+    <h2>Week 2 — Slightly Advanced Python</h2>
+    <p>Click any day to see details &amp; code examples</p>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="detail-panel" id="detail">
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title"></div>
+      <div class="detail-close" onclick="closeDetail()">✕ close</div>
+    </div>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+const days = [
+  {
+    day: 8, label: "Mon", cls: "d1", topic: "Recursion Basics",
+    tasks: ["Base case & recursive case", "Factorial & Fibonacci", "Call stack concept"],
+    detail: {
+      goal: "Understand how functions call themselves — core to Trees, Graphs, DP",
+      code: `# Factorial
+def factorial(n):
+    if n == 0:       # base case
+        return 1
+    return n * factorial(n - 1)
+
+print(factorial(5))  # 120
+
+# Fibonacci
+def fib(n):
+    if n <= 1:
+        return n
+    return fib(n-1) + fib(n-2)
+
+print(fib(7))  # 13
+
+# Sum of list using recursion
+def rec_sum(arr):
+    if not arr:
+        return 0
+    return arr[0] + rec_sum(arr[1:])
+
+print(rec_sum([1, 2, 3, 4]))  # 10`,
+      practice: ["Write recursive power(base, exp)", "Count digits in a number recursively", "Print numbers 10 to 1 using recursion"],
+      tip: "Every recursion MUST have a base case — otherwise it runs forever and crashes (RecursionError)."
+    }
+  },
+  {
+    day: 9, label: "Tue", cls: "d1", topic: "Recursion Advanced",
+    tasks: ["Reverse string recursively", "Check palindrome", "Binary search recursive"],
+    detail: {
+      goal: "Apply recursion to real DSA problems",
+      code: `# Reverse string
+def reverse(s):
+    if len(s) <= 1:
+        return s
+    return reverse(s[1:]) + s[0]
+
+print(reverse("hello"))  # "olleh"
+
+# Check palindrome
+def is_palindrome(s):
+    if len(s) <= 1:
+        return True
+    if s[0] != s[-1]:
+        return False
+    return is_palindrome(s[1:-1])
+
+print(is_palindrome("racecar"))  # True
+
+# Binary search (recursive)
+def binary_search(arr, target, lo, hi):
+    if lo > hi:
+        return -1
+    mid = (lo + hi) // 2
+    if arr[mid] == target:
+        return mid
+    elif arr[mid] < target:
+        return binary_search(arr, target, mid+1, hi)
+    else:
+        return binary_search(arr, target, lo, mid-1)`,
+      practice: ["LeetCode #206 — Reverse Linked List (concept)", "Write recursive flatten for nested list", "Sum of all digits recursively"],
+      tip: "Recursion = solve a smaller version of the same problem. Draw the call tree on paper first."
+    }
+  },
+  {
+    day: 10, label: "Wed", cls: "d2", topic: "List Comprehensions",
+    tasks: ["Basic comprehension syntax", "Conditional filtering", "Nested comprehensions"],
+    detail: {
+      goal: "Write cleaner, faster Python — used heavily in DSA solutions",
+      code: `# Basic
+squares = [x**2 for x in range(10)]
+print(squares)  # [0,1,4,9,16,25,36,49,64,81]
+
+# With condition (filter)
+evens = [x for x in range(20) if x % 2 == 0]
+print(evens)  # [0,2,4,6,8,10,12,14,16,18]
+
+# Transform + filter
+result = [x**2 for x in range(10) if x % 2 != 0]
+
+# Dict comprehension
+freq = {ch: s.count(ch) for ch in set(s)}
+
+# Flatten 2D list
+matrix = [[1,2,3],[4,5,6],[7,8,9]]
+flat = [val for row in matrix for val in row]
+print(flat)  # [1,2,3,4,5,6,7,8,9]
+
+# Set comprehension
+unique_sq = {x**2 for x in [-2,-1,0,1,2]}
+print(unique_sq)  # {0,1,4}`,
+      practice: ["Get all vowels from a string using comprehension", "Square only odd numbers from a list", "Build a dict of word lengths from a sentence"],
+      tip: "List comprehensions are 30–50% faster than for loops in Python. Use them whenever you can."
+    }
+  },
+  {
+    day: 11, label: "Thu", cls: "d2", topic: "String Methods",
+    tasks: ["split, join, strip", "replace, find, count", "String formatting"],
+    detail: {
+      goal: "String manipulation — appears in almost every DSA problem",
+      code: `s = "  Hello World  "
+
+# Basic methods
+print(s.strip())          # "Hello World"
+print(s.lower())          # "  hello world  "
+print(s.upper())          # "  HELLO WORLD  "
+
+# Split & Join
+words = "a,b,c,d".split(",")  # ['a','b','c','d']
+joined = "-".join(words)       # "a-b-c-d"
+
+# Find & Replace
+s = "banana"
+print(s.count("a"))       # 3
+print(s.find("n"))        # 2 (first index)
+print(s.replace("a","o")) # "bonono"
+
+# Check
+print("abc123".isalnum())  # True
+print("   ".isspace())     # True
+print("Hello".startswith("He"))  # True
+
+# f-string formatting
+name, score = "Ravi", 95
+print(f"{name} scored {score}/100")`,
+      practice: ["LeetCode #125 — Valid Palindrome", "Count vowels and consonants in a string", "Reverse words in a sentence"],
+      tip: "s[::-1] is the fastest way to reverse a string in Python. Remember it for interviews!"
+    }
+  },
+  {
+    day: 12, label: "Fri", cls: "d3", topic: "OOP Basics",
+    tasks: ["class & __init__", "Methods & self", "Build a Node class"],
+    detail: {
+      goal: "OOP is how you build Linked Lists, Trees, Graphs in Python",
+      code: `# Basic class
+class Student:
+    def __init__(self, name, marks):
+        self.name = name
+        self.marks = marks
+
+    def grade(self):
+        if self.marks >= 90:
+            return "A"
+        elif self.marks >= 75:
+            return "B"
+        return "C"
+
+    def __str__(self):
+        return f"{self.name}: {self.marks}"
+
+s1 = Student("Ravi", 92)
+print(s1.grade())   # A
+print(s1)           # Ravi: 92
+
+# Node class — used in Linked List & Trees
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None   # pointer to next node
+
+# Create linked nodes manually
+n1 = Node(10)
+n2 = Node(20)
+n3 = Node(30)
+n1.next = n2
+n2.next = n3
+
+# Traverse
+cur = n1
+while cur:
+    print(cur.data)
+    cur = cur.next`,
+      practice: ["Build a Stack class using list", "Build a BankAccount class with deposit/withdraw", "Traverse a manually built linked list"],
+      tip: "The Node class is the building block for Linked Lists, Trees, and Graphs. Master it now!"
+    }
+  },
+  {
+    day: 13, label: "Sat", cls: "d3", topic: "Collections Module",
+    tasks: ["defaultdict", "Counter", "deque"],
+    detail: {
+      goal: "Python's secret DSA weapons — saves you hours in interviews",
+      code: `from collections import defaultdict, Counter, deque
+
+# defaultdict — no KeyError ever
+freq = defaultdict(int)
+for ch in "mississippi":
+    freq[ch] += 1
+print(dict(freq))
+# {'m':1,'i':4,'s':4,'p':2}
+
+# Counter — frequency in ONE line
+cnt = Counter("mississippi")
+print(cnt.most_common(2))
+# [('i',4),('s',4)]
+
+words = ["apple","banana","apple","cherry"]
+wc = Counter(words)
+print(wc["apple"])   # 2
+
+# deque — fast queue / double-ended
+dq = deque()
+dq.append(1)        # add right
+dq.appendleft(0)    # add left
+dq.pop()            # remove right
+dq.popleft()        # remove left O(1)
+
+# deque as sliding window
+from collections import deque
+dq = deque([1,2,3])
+dq.append(4)
+dq.popleft()        # [2,3,4]`,
+      practice: ["Find most frequent element in a list", "Check if two strings are anagrams using Counter", "Implement a Queue using deque"],
+      tip: "Counter and defaultdict together can solve 30% of LeetCode Easy/Medium problems. Learn them well!"
+    }
+  },
+  {
+    day: 14, label: "Sun", cls: "d4", topic: "Revision + Problems",
+    tasks: ["Revise Week 1 & 2", "Solve 3 LeetCode problems", "Plan Phase 2 start"],
+    detail: {
+      goal: "Lock in everything from both weeks before moving to DSA topics",
+      code: `# LeetCode #242 — Valid Anagram
+from collections import Counter
+def isAnagram(s, t):
+    return Counter(s) == Counter(t)
+
+# LeetCode #217 — Contains Duplicate
+def containsDuplicate(nums):
+    return len(nums) != len(set(nums))
+
+# LeetCode #383 — Ransom Note
+from collections import Counter
+def canConstruct(ransomNote, magazine):
+    mag = Counter(magazine)
+    for ch in ransomNote:
+        if mag[ch] == 0:
+            return False
+        mag[ch] -= 1
+    return True
+
+# LeetCode #20 — Valid Parentheses
+def isValid(s):
+    stack = []
+    mapping = {')':'(', ']':'[', '}':'{'}
+    for ch in s:
+        if ch in mapping:
+            top = stack.pop() if stack else '#'
+            if mapping[ch] != top:
+                return False
+        else:
+            stack.append(ch)
+    return not stack`,
+      practice: ["Valid Anagram (#242)", "Contains Duplicate (#217)", "Valid Parentheses (#20)"],
+      tip: "You've completed Phase 1! You now know enough Python to start Arrays & Strings in Phase 2."
+    }
+  }
+];
+
+const grid = document.getElementById('grid');
+days.forEach(d => {
+  const card = document.createElement('div');
+  card.className = `day-card ${d.cls}`;
+  card.innerHTML = `
+    <div class="day-label">${d.label}</div>
+    <div class="day-num">Day ${d.day}</div>
+    <span class="topic-badge">${d.topic}</span>
+    <div class="tasks">${d.tasks.map(t => `<div class="task">${t}</div>`).join('')}</div>
+  `;
+  card.onclick = () => showDetail(d);
+  grid.appendChild(card);
+});
+
+let currentDay = null;
+function showDetail(d) {
+  if (currentDay === d.day) { closeDetail(); return; }
+  currentDay = d.day;
+  document.getElementById('detail-title').textContent = `Day ${d.day} — ${d.topic}`;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="section-label">Goal</div>
+    <div style="font-size:13px;color:var(--color-text-primary);margin-bottom:8px">${d.detail.goal}</div>
+    <div class="section-label">Code to write today</div>
+    <div class="code-block">${d.detail.code}</div>
+    <div class="section-label">Practice exercises</div>
+    ${d.detail.practice.map(p => `<div class="task" style="font-size:12px;color:var(--color-text-primary);margin-bottom:4px">${p}</div>`).join('')}
+    <div class="tip">💡 ${d.detail.tip}</div>
+  `;
+  document.getElementById('detail').classList.add('active');
+}
+
+function closeDetail() {
+  currentDay = null;
+  document.getElementById('detail').classList.remove('active');
+}
+</script>
