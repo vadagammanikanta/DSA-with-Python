@@ -1,0 +1,3305 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); padding: 1rem; }
+  .header { text-align: center; margin-bottom: 1.2rem; }
+  .header h2 { font-size: 17px; font-weight: 600; color: var(--color-text-primary); }
+  .header p { font-size: 12px; color: var(--color-text-secondary); margin-top: 3px; }
+
+  .week-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; justify-content: center; }
+  .week-tab { font-size: 11px; font-weight: 500; padding: 5px 11px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--color-border-secondary); color: var(--color-text-secondary); background: var(--color-background-secondary); transition: all .15s; }
+  .week-tab.active { color: #fff; border-color: transparent; }
+  .week-tab:hover { opacity: 0.85; }
+
+  .week-header { border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; }
+  .week-title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); }
+  .week-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+
+  .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-bottom: 12px; }
+  .day-card { border-radius: 9px; padding: 9px 7px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); cursor: pointer; transition: box-shadow .13s; }
+  .day-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.09); }
+  .day-card.selected { box-shadow: 0 0 0 2px currentColor; }
+  .dlabel { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+  .dnum { font-size: 18px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px; }
+  .dtopic { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 12px; margin-bottom: 5px; display: inline-block; }
+  .dtask { font-size: 10px; color: var(--color-text-secondary); display: flex; gap: 4px; margin-bottom: 2px; line-height: 1.35; }
+  .dtask::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; margin-top: 4px; }
+
+  .detail { border-radius: 11px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); padding: 14px; display: none; }
+  .detail.show { display: block; }
+  .det-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .det-title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); }
+  .det-close { font-size: 11px; color: var(--color-text-tertiary); cursor: pointer; padding: 2px 6px; }
+  .slabel { font-size: 11px; font-weight: 600; color: var(--color-text-secondary); margin: 9px 0 3px; text-transform: uppercase; letter-spacing: .04em; }
+  .code { background: var(--color-background-tertiary); border-radius: 7px; padding: 11px; font-family: var(--font-mono); font-size: 11px; color: var(--color-text-primary); white-space: pre; overflow-x: auto; margin: 6px 0; line-height: 1.5; }
+  .tip { font-size: 11px; color: var(--color-text-secondary); background: var(--color-background-tertiary); border-left: 3px solid #7F77DD; padding: 7px 10px; border-radius: 0 6px 6px 0; margin-top: 8px; line-height: 1.5; }
+  .lc-item { font-size: 11px; color: var(--color-text-primary); display: flex; gap: 5px; margin-bottom: 3px; }
+  .lc-item::before { content: '▸'; color: var(--color-text-tertiary); flex-shrink: 0; }
+
+  @media(max-width:580px){ .day-grid{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h2>DSA Roadmap — Weeks 8 to 16</h2>
+  <p>Select a week, then click any day for full code + LeetCode problems</p>
+</div>
+
+<div class="week-tabs" id="tabs"></div>
+<div id="week-header" class="week-header"></div>
+<div class="day-grid" id="daygrid"></div>
+<div class="detail" id="detail">
+  <div class="det-header">
+    <div class="det-title" id="det-title"></div>
+    <div class="det-close" onclick="closeDetail()">✕ close</div>
+  </div>
+  <div id="det-body"></div>
+</div>
+
+<script>
+const WEEKS = [
+  {
+    num: 8, label: "W8", title: "Binary Search",
+    sub: "Deceptively tricky — master lo/hi/mid patterns",
+    color: "#185FA5", bg: "#E6F1FB", textDark: "#0C447C",
+    days: [
+      { day:50, label:"Mon", topic:"BS Basics", tasks:["lo, hi, mid template","Search in sorted array","Off-by-one errors"],
+        goal:"Master the 3 binary search templates — most devs get these wrong",
+        code:`# Template 1 — exact match
+def binarySearch(nums, target):
+    lo, hi = 0, len(nums) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if nums[mid] == target: return mid
+        elif nums[mid] < target: lo = mid + 1
+        else: hi = mid - 1
+    return -1
+
+# Template 2 — leftmost position
+def searchLeft(nums, target):
+    lo, hi = 0, len(nums)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if nums[mid] < target: lo = mid + 1
+        else: hi = mid
+    return lo
+
+# Template 3 — rightmost position
+def searchRight(nums, target):
+    lo, hi = 0, len(nums)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if nums[mid] <= target: lo = mid + 1
+        else: hi = mid
+    return lo - 1
+
+# Search Insert Position
+def searchInsert(nums, target):
+    lo, hi = 0, len(nums)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if nums[mid] < target: lo = mid + 1
+        else: hi = mid
+    return lo`,
+        practice:["LeetCode #704 — Binary Search (Easy)","LeetCode #35 — Search Insert Position (Easy)","LeetCode #374 — Guess Number Higher or Lower (Easy)"],
+        tip:"Three templates: lo<=hi (exact), lo<hi leftmost, lo<hi rightmost. Pick based on what you need."
+      },
+      { day:51, label:"Tue", topic:"BS on Answers", tasks:["Binary search on value range","Min max problems","Capacity problems"],
+        goal:"Binary search doesn't just work on arrays — search on answer space for optimization problems",
+        code:`# Koko Eating Bananas — search on speed
+def minEatingSpeed(piles, h):
+    import math
+    def canFinish(speed):
+        return sum(math.ceil(p/speed) for p in piles) <= h
+
+    lo, hi = 1, max(piles)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if canFinish(mid): hi = mid
+        else: lo = mid + 1
+    return lo
+
+# Minimum days to make bouquets
+def minDays(bloomDay, m, k):
+    def possible(day):
+        bouquets = flowers = 0
+        for b in bloomDay:
+            if b <= day: flowers += 1
+            else: flowers = 0
+            if flowers == k: bouquets += 1; flowers = 0
+        return bouquets >= m
+
+    if m * k > len(bloomDay): return -1
+    lo, hi = min(bloomDay), max(bloomDay)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if possible(mid): hi = mid
+        else: lo = mid + 1
+    return lo
+
+# Split array largest sum
+def splitArray(nums, k):
+    def canSplit(limit):
+        parts = sums = 0
+        for n in nums:
+            if sums + n > limit: parts += 1; sums = 0
+            sums += n
+        return parts + 1 <= k
+    lo, hi = max(nums), sum(nums)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if canSplit(mid): hi = mid
+        else: lo = mid + 1
+    return lo`,
+        practice:["LeetCode #875 — Koko Eating Bananas (Medium)","LeetCode #1011 — Capacity to Ship Packages (Medium)","LeetCode #410 — Split Array Largest Sum (Hard)"],
+        tip:"'Binary search on the answer' pattern: find min/max value X such that condition(X) is true. Works on any monotonic condition."
+      },
+      { day:52, label:"Wed", topic:"BS on Rotated", tasks:["Find pivot in rotated array","Search in rotated array","Find min in rotated"],
+        goal:"Rotated sorted array is a classic — tests whether you truly understand binary search",
+        code:`# Find minimum in rotated sorted array
+def findMin(nums):
+    lo, hi = 0, len(nums) - 1
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if nums[mid] > nums[hi]: lo = mid + 1
+        else: hi = mid
+    return nums[lo]
+
+# Search in rotated sorted array
+def search(nums, target):
+    lo, hi = 0, len(nums) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if nums[mid] == target: return mid
+        # left half is sorted
+        if nums[lo] <= nums[mid]:
+            if nums[lo] <= target < nums[mid]:
+                hi = mid - 1
+            else:
+                lo = mid + 1
+        # right half is sorted
+        else:
+            if nums[mid] < target <= nums[hi]:
+                lo = mid + 1
+            else:
+                hi = mid - 1
+    return -1
+
+# Search in rotated with duplicates
+def searchII(nums, target):
+    lo, hi = 0, len(nums) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if nums[mid] == target: return True
+        if nums[lo] == nums[mid] == nums[hi]:
+            lo += 1; hi -= 1
+        elif nums[lo] <= nums[mid]:
+            if nums[lo] <= target < nums[mid]: hi = mid - 1
+            else: lo = mid + 1
+        else:
+            if nums[mid] < target <= nums[hi]: lo = mid + 1
+            else: hi = mid - 1
+    return False`,
+        practice:["LeetCode #153 — Find Min in Rotated Array (Medium)","LeetCode #33 — Search in Rotated Array (Medium)","LeetCode #81 — Search in Rotated Array II (Medium)"],
+        tip:"Key insight: in a rotated array, one half is always sorted. Check which half, then decide where target must be."
+      },
+      { day:53, label:"Thu", topic:"BS Advanced", tasks:["Find peak element","Median of two sorted arrays","Search 2D matrix"],
+        goal:"Advanced binary search — these are common in top product company interviews",
+        code:`# Find Peak Element — O(log n)
+def findPeakElement(nums):
+    lo, hi = 0, len(nums) - 1
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if nums[mid] > nums[mid+1]: hi = mid
+        else: lo = mid + 1
+    return lo
+
+# Search 2D Matrix
+def searchMatrix(matrix, target):
+    rows, cols = len(matrix), len(matrix[0])
+    lo, hi = 0, rows * cols - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        val = matrix[mid // cols][mid % cols]
+        if val == target: return True
+        elif val < target: lo = mid + 1
+        else: hi = mid - 1
+    return False
+
+# Search 2D Matrix II (not fully sorted)
+def searchMatrixII(matrix, target):
+    r, c = 0, len(matrix[0]) - 1
+    while r < len(matrix) and c >= 0:
+        if matrix[r][c] == target: return True
+        elif matrix[r][c] > target: c -= 1
+        else: r += 1
+    return False
+
+# Median of Two Sorted Arrays — O(log(min(m,n)))
+def findMedianSortedArrays(nums1, nums2):
+    if len(nums1) > len(nums2):
+        nums1, nums2 = nums2, nums1
+    m, n = len(nums1), len(nums2)
+    lo, hi = 0, m
+    while lo <= hi:
+        i = (lo + hi) // 2
+        j = (m + n + 1) // 2 - i
+        maxL1 = float('-inf') if i==0 else nums1[i-1]
+        minR1 = float('inf') if i==m else nums1[i]
+        maxL2 = float('-inf') if j==0 else nums2[j-1]
+        minR2 = float('inf') if j==n else nums2[j]
+        if maxL1 <= minR2 and maxL2 <= minR1:
+            if (m+n)%2: return max(maxL1,maxL2)
+            return (max(maxL1,maxL2)+min(minR1,minR2))/2
+        elif maxL1 > minR2: hi = i - 1
+        else: lo = i + 1`,
+        practice:["LeetCode #162 — Find Peak Element (Medium)","LeetCode #74 — Search 2D Matrix (Medium)","LeetCode #4 — Median of Two Sorted Arrays (Hard)"],
+        tip:"Median of Two Arrays is one of the hardest binary search problems. Understand the partition concept — it's pure logic."
+      },
+      { day:54, label:"Fri", topic:"bisect Module", tasks:["bisect_left & right","insort usage","Practical applications"],
+        goal:"Python's bisect module gives you binary search in one line — use it in interviews",
+        code:`import bisect
+
+arr = [1, 3, 5, 7, 9, 11]
+
+# bisect_left — leftmost position to insert
+print(bisect.bisect_left(arr, 5))   # 2 (at index 2)
+print(bisect.bisect_left(arr, 4))   # 2 (would insert at 2)
+
+# bisect_right — rightmost position to insert
+print(bisect.bisect_right(arr, 5))  # 3 (after existing 5)
+
+# insort — insert and keep sorted
+bisect.insort(arr, 6)
+print(arr)  # [1,3,5,6,7,9,11]
+
+# Count elements in range [lo, hi]
+def countRange(arr, lo, hi):
+    return bisect.bisect_right(arr,hi) - bisect.bisect_left(arr,lo)
+
+print(countRange([1,2,3,4,5], 2, 4))  # 3
+
+# Find closest element
+def closestElement(arr, target):
+    idx = bisect.bisect_left(arr, target)
+    candidates = []
+    if idx < len(arr): candidates.append(arr[idx])
+    if idx > 0: candidates.append(arr[idx-1])
+    return min(candidates, key=lambda x: abs(x-target))
+
+# H-Index using bisect
+def hIndex(citations):
+    citations.sort()
+    n = len(citations)
+    for i, c in enumerate(citations):
+        if c >= n - i: return n - i
+    return 0`,
+        practice:["LeetCode #278 — First Bad Version (Easy)","LeetCode #34 — First and Last Position (Medium)","LeetCode #275 — H-Index II (Medium)"],
+        tip:"In interviews, you can use bisect.bisect_left() directly — it signals Python fluency and saves coding time."
+      },
+      { day:55, label:"Sat", topic:"BS Mixed Problems", tasks:["Aggressive cows","Book allocation","Painter partition"],
+        goal:"Apply binary search on answer to classic allocation problems — common in OAs",
+        code:`# Aggressive Cows — maximize min distance
+def aggressiveCows(stalls, cows):
+    stalls.sort()
+    def canPlace(min_dist):
+        count, last = 1, stalls[0]
+        for s in stalls[1:]:
+            if s - last >= min_dist:
+                count += 1; last = s
+        return count >= cows
+    lo, hi = 1, stalls[-1] - stalls[0]
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        if canPlace(mid): lo = mid
+        else: hi = mid - 1
+    return lo
+
+# Book Allocation — minimize max pages
+def allocateBooks(pages, students):
+    def canAllocate(max_pages):
+        count = sums = 0
+        for p in pages:
+            if p > max_pages: return False
+            if sums + p > max_pages: count += 1; sums = 0
+            sums += p
+        return count + 1 <= students
+    lo, hi = max(pages), sum(pages)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if canAllocate(mid): hi = mid
+        else: lo = mid + 1
+    return lo
+
+# Square root without sqrt
+def mySqrt(x):
+    if x < 2: return x
+    lo, hi = 1, x // 2
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        sq = mid * mid
+        if sq == x: return mid
+        elif sq < x: lo = mid + 1
+        else: hi = mid - 1
+    return hi`,
+        practice:["LeetCode #69 — Sqrt(x) (Easy)","LeetCode #1482 — Min Days to Make Bouquets (Medium)","LeetCode #774 — Minimize Max Distance to Gas Station (Hard)"],
+        tip:"Aggressive Cows / Book Allocation are the most popular OA problems in Indian product companies (Amazon, Flipkart, Walmart)."
+      },
+      { day:56, label:"Sun", topic:"Week 8 Revision", tasks:["All BS patterns","Timed session","Plan Week 9 Trees"],
+        goal:"Consolidate all binary search patterns before Trees",
+        code:`# All 4 Binary Search Patterns
+
+# 1. Classic search
+def bs(nums, t):
+    lo,hi=0,len(nums)-1
+    while lo<=hi:
+        mid=(lo+hi)//2
+        if nums[mid]==t: return mid
+        elif nums[mid]<t: lo=mid+1
+        else: hi=mid-1
+    return -1
+
+# 2. Leftmost / first occurrence
+def first(nums,t):
+    lo,hi=0,len(nums)
+    while lo<hi:
+        mid=(lo+hi)//2
+        if nums[mid]<t: lo=mid+1
+        else: hi=mid
+    return lo
+
+# 3. Search on answer space
+def bsAnswer(lo, hi, condition):
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if condition(mid): hi = mid
+        else: lo = mid + 1
+    return lo
+
+# 4. Rotated array
+def searchRotated(nums,t):
+    lo,hi=0,len(nums)-1
+    while lo<=hi:
+        mid=(lo+hi)//2
+        if nums[mid]==t: return mid
+        if nums[lo]<=nums[mid]:
+            if nums[lo]<=t<nums[mid]: hi=mid-1
+            else: lo=mid+1
+        else:
+            if nums[mid]<t<=nums[hi]: lo=mid+1
+            else: hi=mid-1
+    return -1`,
+        practice:["LeetCode #153 — Find Min Rotated (Medium)","LeetCode #875 — Koko Eating Bananas (Medium)","LeetCode #4 — Median Two Sorted Arrays (Hard)"],
+        tip:"Week 8 done! Binary Search is now your superpower. Week 9 starts Trees — the most important topic for interviews!"
+      }
+    ]
+  },
+  {
+    num: 9, label: "W9", title: "Trees & BST",
+    sub: "Most important interview topic — master DFS & BFS on trees",
+    color: "#0F6E56", bg: "#E1F5EE", textDark: "#085041",
+    days: [
+      { day:57, label:"Mon", topic:"Tree Basics", tasks:["TreeNode class","Inorder/Preorder/Postorder","Level order BFS"],
+        goal:"Build and traverse binary trees — the foundation for all tree problems",
+        code:`from collections import deque
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+# Build tree from list
+def buildTree(vals):
+    if not vals: return None
+    root = TreeNode(vals[0])
+    q = deque([root])
+    i = 1
+    while q and i < len(vals):
+        node = q.popleft()
+        if i < len(vals) and vals[i] is not None:
+            node.left = TreeNode(vals[i]); q.append(node.left)
+        i += 1
+        if i < len(vals) and vals[i] is not None:
+            node.right = TreeNode(vals[i]); q.append(node.right)
+        i += 1
+    return root
+
+# Inorder: Left → Root → Right
+def inorder(root):
+    if not root: return []
+    return inorder(root.left) + [root.val] + inorder(root.right)
+
+# Preorder: Root → Left → Right
+def preorder(root):
+    if not root: return []
+    return [root.val] + preorder(root.left) + preorder(root.right)
+
+# Postorder: Left → Right → Root
+def postorder(root):
+    if not root: return []
+    return postorder(root.left) + postorder(root.right) + [root.val]
+
+# Level order BFS
+def levelOrder(root):
+    if not root: return []
+    result, q = [], deque([root])
+    while q:
+        level = []
+        for _ in range(len(q)):
+            node = q.popleft()
+            level.append(node.val)
+            if node.left: q.append(node.left)
+            if node.right: q.append(node.right)
+        result.append(level)
+    return result`,
+        practice:["LeetCode #144 — Binary Tree Preorder (Easy)","LeetCode #94 — Binary Tree Inorder (Easy)","LeetCode #102 — Level Order Traversal (Medium)"],
+        tip:"Inorder of BST = sorted array. This single fact solves dozens of BST problems instantly."
+      },
+      { day:58, label:"Tue", topic:"Tree DFS Patterns", tasks:["Max depth","Diameter","Path sum"],
+        goal:"DFS on trees — solve height, depth, path problems recursively",
+        code:`class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val=val; self.left=left; self.right=right
+
+# Max depth
+def maxDepth(root):
+    if not root: return 0
+    return 1 + max(maxDepth(root.left), maxDepth(root.right))
+
+# Diameter of binary tree
+def diameterOfBinaryTree(root):
+    self_diameter = [0]
+    def depth(node):
+        if not node: return 0
+        l, r = depth(node.left), depth(node.right)
+        self_diameter[0] = max(self_diameter[0], l + r)
+        return 1 + max(l, r)
+    depth(root)
+    return self_diameter[0]
+
+# Path sum — does path root to leaf sum to target
+def hasPathSum(root, target):
+    if not root: return False
+    if not root.left and not root.right:
+        return root.val == target
+    return (hasPathSum(root.left, target-root.val) or
+            hasPathSum(root.right, target-root.val))
+
+# All root-to-leaf paths
+def binaryTreePaths(root):
+    if not root: return []
+    if not root.left and not root.right:
+        return [str(root.val)]
+    paths = []
+    for p in binaryTreePaths(root.left)+binaryTreePaths(root.right):
+        paths.append(str(root.val)+"->"+p)
+    return paths
+
+# Max path sum (any path)
+def maxPathSum(root):
+    res = [float('-inf')]
+    def dfs(node):
+        if not node: return 0
+        l = max(dfs(node.left), 0)
+        r = max(dfs(node.right), 0)
+        res[0] = max(res[0], node.val + l + r)
+        return node.val + max(l, r)
+    dfs(root)
+    return res[0]`,
+        practice:["LeetCode #104 — Max Depth Binary Tree (Easy)","LeetCode #543 — Diameter of Binary Tree (Easy)","LeetCode #124 — Binary Tree Max Path Sum (Hard)"],
+        tip:"Most tree problems follow the pattern: solve for left subtree, solve for right, combine at root. This is the DFS template."
+      },
+      { day:59, label:"Wed", topic:"BST Operations", tasks:["Insert & delete in BST","Search in BST","Validate BST"],
+        goal:"BST properties make insert/search/delete O(log n) — understand why",
+        code:`class TreeNode:
+    def __init__(self,val=0,left=None,right=None):
+        self.val=val;self.left=left;self.right=right
+
+# Search in BST
+def searchBST(root, val):
+    if not root or root.val == val: return root
+    if val < root.val: return searchBST(root.left, val)
+    return searchBST(root.right, val)
+
+# Insert into BST
+def insertIntoBST(root, val):
+    if not root: return TreeNode(val)
+    if val < root.val: root.left = insertIntoBST(root.left, val)
+    else: root.right = insertIntoBST(root.right, val)
+    return root
+
+# Delete from BST
+def deleteNode(root, key):
+    if not root: return None
+    if key < root.val: root.left = deleteNode(root.left, key)
+    elif key > root.val: root.right = deleteNode(root.right, key)
+    else:
+        if not root.left: return root.right
+        if not root.right: return root.left
+        # find inorder successor (min of right subtree)
+        cur = root.right
+        while cur.left: cur = cur.left
+        root.val = cur.val
+        root.right = deleteNode(root.right, cur.val)
+    return root
+
+# Validate BST
+def isValidBST(root, lo=float('-inf'), hi=float('inf')):
+    if not root: return True
+    if not (lo < root.val < hi): return False
+    return (isValidBST(root.left, lo, root.val) and
+            isValidBST(root.right, root.val, hi))
+
+# Kth smallest in BST
+def kthSmallest(root, k):
+    stack = []
+    while True:
+        while root: stack.append(root); root=root.left
+        root = stack.pop(); k -= 1
+        if k == 0: return root.val
+        root = root.right`,
+        practice:["LeetCode #700 — Search in BST (Easy)","LeetCode #98 — Validate Binary Search Tree (Medium)","LeetCode #450 — Delete Node in BST (Medium)"],
+        tip:"BST invariant: ALL left descendants < node < ALL right descendants. Test this globally, not just parent-child."
+      },
+      { day:60, label:"Thu", topic:"Tree BFS Patterns", tasks:["Zigzag level order","Right side view","Cousins in tree"],
+        goal:"BFS patterns on trees — level-by-level processing using queues",
+        code:`from collections import deque
+
+class TreeNode:
+    def __init__(self,val=0,left=None,right=None):
+        self.val=val;self.left=left;self.right=right
+
+# Zigzag level order
+def zigzagLevelOrder(root):
+    if not root: return []
+    result, q, left_to_right = [], deque([root]), True
+    while q:
+        level = []
+        for _ in range(len(q)):
+            node = q.popleft()
+            level.append(node.val)
+            if node.left: q.append(node.left)
+            if node.right: q.append(node.right)
+        result.append(level if left_to_right else level[::-1])
+        left_to_right = not left_to_right
+    return result
+
+# Right side view
+def rightSideView(root):
+    if not root: return []
+    result, q = [], deque([root])
+    while q:
+        for i in range(len(q)):
+            node = q.popleft()
+            if i == len(q): result.append(node.val)  # last in level
+            if node.left: q.append(node.left)
+            if node.right: q.append(node.right)
+        result.append(node.val)
+    return result
+
+# Average of levels
+def averageOfLevels(root):
+    result, q = [], deque([root])
+    while q:
+        total, count = 0, len(q)
+        for _ in range(count):
+            node = q.popleft()
+            total += node.val
+            if node.left: q.append(node.left)
+            if node.right: q.append(node.right)
+        result.append(total / count)
+    return result
+
+# Symmetric tree
+def isSymmetric(root):
+    def mirror(l, r):
+        if not l and not r: return True
+        if not l or not r: return False
+        return l.val==r.val and mirror(l.left,r.right) and mirror(l.right,r.left)
+    return mirror(root.left, root.right)`,
+        practice:["LeetCode #103 — Zigzag Level Order (Medium)","LeetCode #199 — Binary Tree Right Side View (Medium)","LeetCode #101 — Symmetric Tree (Easy)"],
+        tip:"Right side view = last node at each BFS level. Process all nodes at a level, keep track of the last one seen."
+      },
+      { day:61, label:"Fri", topic:"Tree Construction", tasks:["Build from inorder+preorder","Serialize & deserialize","Clone tree"],
+        goal:"Reconstructing trees from traversals — tests deep understanding of tree structure",
+        code:`from collections import deque
+
+class TreeNode:
+    def __init__(self,val=0,left=None,right=None):
+        self.val=val;self.left=left;self.right=right
+
+# Build tree from preorder + inorder
+def buildFromPreIn(preorder, inorder):
+    if not inorder: return None
+    root = TreeNode(preorder[0])
+    mid = inorder.index(preorder[0])
+    root.left = buildFromPreIn(preorder[1:mid+1], inorder[:mid])
+    root.right = buildFromPreIn(preorder[mid+1:], inorder[mid+1:])
+    return root
+
+# Build tree from inorder + postorder
+def buildFromInPost(inorder, postorder):
+    if not inorder: return None
+    root = TreeNode(postorder[-1])
+    mid = inorder.index(postorder[-1])
+    root.left = buildFromInPost(inorder[:mid], postorder[:mid])
+    root.right = buildFromInPost(inorder[mid+1:], postorder[mid:-1])
+    return root
+
+# Serialize and Deserialize
+class Codec:
+    def serialize(self, root):
+        if not root: return 'null'
+        return str(root.val)+','+self.serialize(root.left)+','+self.serialize(root.right)
+
+    def deserialize(self, data):
+        vals = iter(data.split(','))
+        def build():
+            val = next(vals)
+            if val == 'null': return None
+            node = TreeNode(int(val))
+            node.left = build()
+            node.right = build()
+            return node
+        return build()
+
+# Lowest Common Ancestor
+def lowestCommonAncestor(root, p, q):
+    if not root or root == p or root == q: return root
+    left = lowestCommonAncestor(root.left, p, q)
+    right = lowestCommonAncestor(root.right, p, q)
+    return root if left and right else left or right`,
+        practice:["LeetCode #105 — Construct from Preorder+Inorder (Medium)","LeetCode #297 — Serialize & Deserialize (Hard)","LeetCode #236 — Lowest Common Ancestor (Medium)"],
+        tip:"LCA: if p and q are in different subtrees of root, root IS the LCA. If both in same subtree, recurse into that subtree."
+      },
+      { day:62, label:"Sat", topic:"Advanced Trees", tasks:["Flatten tree to LL","Count good nodes","Invert binary tree"],
+        goal:"Advanced tree problems combining multiple concepts",
+        code:`class TreeNode:
+    def __init__(self,val=0,left=None,right=None):
+        self.val=val;self.left=left;self.right=right
+
+# Invert binary tree
+def invertTree(root):
+    if not root: return None
+    root.left, root.right = invertTree(root.right), invertTree(root.left)
+    return root
+
+# Flatten to linked list (preorder)
+def flatten(root):
+    def dfs(node):
+        if not node: return None
+        left_tail = dfs(node.left)
+        right_tail = dfs(node.right)
+        if node.left:
+            left_tail.right = node.right
+            node.right = node.left
+            node.left = None
+        return right_tail or left_tail or node
+    dfs(root)
+
+# Count good nodes (>= all ancestors)
+def goodNodes(root):
+    def dfs(node, max_so_far):
+        if not node: return 0
+        good = 1 if node.val >= max_so_far else 0
+        m = max(max_so_far, node.val)
+        return good + dfs(node.left,m) + dfs(node.right,m)
+    return dfs(root, float('-inf'))
+
+# Balanced binary tree
+def isBalanced(root):
+    def height(node):
+        if not node: return 0
+        l, r = height(node.left), height(node.right)
+        if l==-1 or r==-1 or abs(l-r)>1: return -1
+        return 1 + max(l, r)
+    return height(root) != -1
+
+# Sum of left leaves
+def sumOfLeftLeaves(root):
+    def dfs(node, is_left):
+        if not node: return 0
+        if not node.left and not node.right:
+            return node.val if is_left else 0
+        return dfs(node.left,True) + dfs(node.right,False)
+    return dfs(root, False)`,
+        practice:["LeetCode #226 — Invert Binary Tree (Easy)","LeetCode #114 — Flatten Tree to LL (Medium)","LeetCode #1448 — Count Good Nodes (Medium)"],
+        tip:"Flatten to LL: process recursively, connect left tail to right, move left subtree to right, clear left. Draw it out first!"
+      },
+      { day:63, label:"Sun", topic:"Week 9 Revision", tasks:["All tree patterns","Timed session","Plan Week 10 Heaps"],
+        goal:"Solidify all tree patterns — most commonly tested topic in product interviews",
+        code:`# 5 Core Tree Patterns
+
+# 1. DFS — height/depth
+def maxDepth(root):
+    if not root: return 0
+    return 1 + max(maxDepth(root.left), maxDepth(root.right))
+
+# 2. DFS — path problems
+def hasPathSum(root, t):
+    if not root: return False
+    if not root.left and not root.right: return root.val==t
+    return hasPathSum(root.left,t-root.val) or hasPathSum(root.right,t-root.val)
+
+# 3. BFS — level order
+from collections import deque
+def levelOrder(root):
+    if not root: return []
+    res,q=[],deque([root])
+    while q:
+        lvl=[]
+        for _ in range(len(q)):
+            n=q.popleft(); lvl.append(n.val)
+            if n.left: q.append(n.left)
+            if n.right: q.append(n.right)
+        res.append(lvl)
+    return res
+
+# 4. BST validate
+def isValidBST(root,lo=float('-inf'),hi=float('inf')):
+    if not root: return True
+    if not lo<root.val<hi: return False
+    return isValidBST(root.left,lo,root.val) and isValidBST(root.right,root.val,hi)
+
+# 5. LCA
+def lca(root,p,q):
+    if not root or root==p or root==q: return root
+    l=lca(root.left,p,q); r=lca(root.right,p,q)
+    return root if l and r else l or r`,
+        practice:["LeetCode #124 — Max Path Sum (Hard)","LeetCode #297 — Serialize Deserialize (Hard)","LeetCode #236 — Lowest Common Ancestor (Medium)"],
+        tip:"Trees done! You now know the 5 core patterns. Week 10: Heaps — the data structure behind top-K and median problems."
+      }
+    ]
+  },
+  {
+    num: 10, label: "W10", title: "Heaps & Priority Queue",
+    sub: "Top-K, median, scheduling — heapq is your weapon",
+    color: "#993C1D", bg: "#FAECE7", textDark: "#712B13",
+    days: [
+      { day:64, label:"Mon", topic:"Heap Basics", tasks:["Min heap with heapq","Max heap trick","K largest/smallest"],
+        goal:"Understand heaps and how Python's heapq works — only min heap natively",
+        code:`import heapq
+
+# Min heap — default in Python
+heap = []
+heapq.heappush(heap, 5)
+heapq.heappush(heap, 2)
+heapq.heappush(heap, 8)
+print(heapq.heappop(heap))  # 2 (min)
+print(heap[0])               # peek min
+
+# Max heap trick — negate values
+max_heap = []
+heapq.heappush(max_heap, -5)
+heapq.heappush(max_heap, -2)
+heapq.heappush(max_heap, -8)
+print(-heapq.heappop(max_heap))  # 8 (max)
+
+# heapify — O(n)
+arr = [3,1,4,1,5,9,2,6]
+heapq.heapify(arr)
+print(arr[0])  # 1
+
+# K largest elements
+def kLargest(nums, k):
+    return heapq.nlargest(k, nums)
+
+# K smallest elements
+def kSmallest(nums, k):
+    return heapq.nsmallest(k, nums)
+
+# Top K frequent
+from collections import Counter
+def topKFrequent(nums, k):
+    freq = Counter(nums)
+    return heapq.nlargest(k, freq.keys(), key=freq.get)
+
+# Heap with tuples (priority, value)
+tasks = []
+heapq.heappush(tasks, (1, "low priority task"))
+heapq.heappush(tasks, (3, "high priority task"))
+heapq.heappush(tasks, (2, "medium task"))
+print(heapq.heappop(tasks))  # (1, 'low priority task')`,
+        practice:["LeetCode #215 — Kth Largest Element (Medium)","LeetCode #347 — Top K Frequent Elements (Medium)","LeetCode #703 — Kth Largest in Stream (Easy)"],
+        tip:"Python only has min heap. For max heap, push negative values. For custom priority, push (priority, value) tuples."
+      },
+      { day:65, label:"Tue", topic:"Heap Patterns", tasks:["Merge K sorted lists","K closest points","Task scheduler"],
+        goal:"Apply heaps to real interview problems — K-way merge and scheduling",
+        code:`import heapq
+from collections import Counter
+
+# Merge K Sorted Lists
+class ListNode:
+    def __init__(self,val=0,next=None): self.val=val;self.next=next
+    def __lt__(self,other): return self.val < other.val
+
+def mergeKLists(lists):
+    heap = []
+    for i,node in enumerate(lists):
+        if node: heapq.heappush(heap, (node.val,i,node))
+    dummy = cur = ListNode(0)
+    while heap:
+        val,i,node = heapq.heappop(heap)
+        cur.next = node; cur = cur.next
+        if node.next: heapq.heappush(heap,(node.next.val,i,node.next))
+    return dummy.next
+
+# K Closest Points to Origin
+def kClosest(points, k):
+    return heapq.nsmallest(k, points, key=lambda p: p[0]**2+p[1]**2)
+
+# Task Scheduler — minimum intervals
+def leastInterval(tasks, n):
+    freq = Counter(tasks)
+    max_heap = [-f for f in freq.values()]
+    heapq.heapify(max_heap)
+    time = 0
+    queue = []  # (finish_time, count)
+    while max_heap or queue:
+        time += 1
+        if max_heap:
+            cnt = 1 + heapq.heappop(max_heap)
+            if cnt: queue.append((time+n, cnt))
+        if queue and queue[0][0] == time:
+            heapq.heappush(max_heap, queue.pop(0)[1])
+    return time
+
+# Reorganize String — no two adjacent same
+def reorganizeString(s):
+    freq = Counter(s)
+    heap = [(-f,ch) for ch,f in freq.items()]
+    heapq.heapify(heap)
+    result = []
+    while len(heap) > 1:
+        f1,c1 = heapq.heappop(heap)
+        f2,c2 = heapq.heappop(heap)
+        result.extend([c1,c2])
+        if f1+1: heapq.heappush(heap,(f1+1,c1))
+        if f2+1: heapq.heappush(heap,(f2+1,c2))
+    if heap:
+        f,c = heap[0]
+        if -f > 1: return ""
+        result.append(c)
+    return "".join(result)`,
+        practice:["LeetCode #23 — Merge K Sorted Lists (Hard)","LeetCode #973 — K Closest Points to Origin (Medium)","LeetCode #621 — Task Scheduler (Medium)"],
+        tip:"K-way merge is the most powerful heap pattern. Always push (value, index, node) tuples to handle tie-breaking."
+      },
+      { day:66, label:"Wed", topic:"Median Finder", tasks:["Two heaps technique","Find median stream","Sliding window median"],
+        goal:"Two heaps pattern — find median dynamically — a very common hard interview problem",
+        code:`import heapq
+
+# Find Median from Data Stream
+class MedianFinder:
+    def __init__(self):
+        self.small = []   # max heap (negate) — left half
+        self.large = []   # min heap — right half
+
+    def addNum(self, num):
+        heapq.heappush(self.small, -num)
+        # balance: move max of small to large
+        heapq.heappush(self.large, -heapq.heappop(self.small))
+        # ensure small has >= elements
+        if len(self.large) > len(self.small):
+            heapq.heappush(self.small, -heapq.heappop(self.large))
+
+    def findMedian(self):
+        if len(self.small) > len(self.large):
+            return -self.small[0]
+        return (-self.small[0] + self.large[0]) / 2
+
+mf = MedianFinder()
+mf.addNum(1); mf.addNum(2)
+print(mf.findMedian())  # 1.5
+mf.addNum(3)
+print(mf.findMedian())  # 2.0
+
+# IPO — maximize capital
+def findMaximizedCapital(k, w, profits, capital):
+    available = []
+    projects = sorted(zip(capital, profits))
+    i = 0
+    for _ in range(k):
+        while i < len(projects) and projects[i][0] <= w:
+            heapq.heappush(available, -projects[i][1])
+            i += 1
+        if not available: break
+        w += -heapq.heappop(available)
+    return w`,
+        practice:["LeetCode #295 — Find Median from Data Stream (Hard)","LeetCode #502 — IPO (Hard)","LeetCode #480 — Sliding Window Median (Hard)"],
+        tip:"Two heaps: small (max heap) holds lower half, large (min heap) holds upper half. Median = average of tops or top of larger half."
+      },
+      { day:67, label:"Thu", topic:"Heap Design", tasks:["Twitter timeline","Meeting rooms","Car pooling"],
+        goal:"Apply heap to system design style problems — scheduling and resource allocation",
+        code:`import heapq
+from collections import defaultdict
+
+# Meeting Rooms II — min rooms needed
+def minMeetingRooms(intervals):
+    intervals.sort()
+    heap = []  # end times
+    for start, end in intervals:
+        if heap and heap[0] <= start:
+            heapq.heappop(heap)
+        heapq.heappush(heap, end)
+    return len(heap)
+
+# Car Pooling
+def carPooling(trips, capacity):
+    events = []
+    for passengers, start, end in trips:
+        events.append((start, passengers))
+        events.append((end, -passengers))
+    events.sort()
+    current = 0
+    for _, change in events:
+        current += change
+        if current > capacity: return False
+    return True
+
+# Design Twitter
+class Twitter:
+    def __init__(self):
+        self.tweets = defaultdict(list)
+        self.following = defaultdict(set)
+        self.time = 0
+
+    def postTweet(self, userId, tweetId):
+        self.tweets[userId].append((self.time, tweetId))
+        self.time -= 1
+
+    def getNewsFeed(self, userId):
+        heap = []
+        users = self.following[userId] | {userId}
+        for u in users:
+            if self.tweets[u]:
+                t, tid = self.tweets[u][-1]
+                heap.append((t, tid, u, len(self.tweets[u])-1))
+        heapq.heapify(heap)
+        result = []
+        while heap and len(result) < 10:
+            t, tid, u, idx = heapq.heappop(heap)
+            result.append(tid)
+            if idx > 0:
+                t2,tid2 = self.tweets[u][idx-1]
+                heapq.heappush(heap,(t2,tid2,u,idx-1))
+        return result
+
+    def follow(self,f,e): self.following[f].add(e)
+    def unfollow(self,f,e): self.following[f].discard(e)`,
+        practice:["LeetCode #253 — Meeting Rooms II (Medium)","LeetCode #1094 — Car Pooling (Medium)","LeetCode #355 — Design Twitter (Medium)"],
+        tip:"Meeting Rooms II: sort by start, use min heap of end times. If earliest end <= current start, reuse that room."
+      },
+      { day:68, label:"Fri", topic:"Heap + Greedy", tasks:["Minimum cost to connect ropes","Huffman encoding concept","Jump Game VI"],
+        goal:"Combine heap with greedy strategy — powerful for optimization problems",
+        code:`import heapq
+
+# Minimum cost to connect ropes
+def connectRopes(ropes):
+    heapq.heapify(ropes)
+    total_cost = 0
+    while len(ropes) > 1:
+        r1 = heapq.heappop(ropes)
+        r2 = heapq.heappop(ropes)
+        cost = r1 + r2
+        total_cost += cost
+        heapq.heappush(ropes, cost)
+    return total_cost
+
+print(connectRopes([4, 3, 2, 6]))  # 29
+
+# Reduce Array Size to Half
+from collections import Counter
+def minSetSize(arr):
+    freq = sorted(Counter(arr).values(), reverse=True)
+    removed = count = 0
+    for f in freq:
+        removed += f; count += 1
+        if removed >= len(arr) // 2:
+            return count
+    return count
+
+# Jump Game VI — DP + heap
+from collections import deque
+def maxResult(nums, k):
+    dq = deque()
+    dp = [float('-inf')] * len(nums)
+    dp[0] = nums[0]
+    dq.append(0)
+    for i in range(1, len(nums)):
+        while dq and dq[0] < i - k: dq.popleft()
+        dp[i] = nums[i] + dp[dq[0]]
+        while dq and dp[dq[-1]] <= dp[i]: dq.pop()
+        dq.append(i)
+    return dp[-1]
+
+# Furthest Building
+def furthestBuilding(heights, bricks, ladders):
+    heap = []  # min heap of ladder jumps
+    for i in range(len(heights)-1):
+        diff = heights[i+1] - heights[i]
+        if diff <= 0: continue
+        heapq.heappush(heap, diff)
+        if len(heap) > ladders:
+            bricks -= heapq.heappop(heap)
+        if bricks < 0: return i
+    return len(heights)-1`,
+        practice:["LeetCode #1167 — Minimum Cost Connect Sticks (Medium)","LeetCode #1642 — Furthest Building (Medium)","LeetCode #1696 — Jump Game VI (Medium)"],
+        tip:"Greedy + Heap: always process the cheapest/smallest option first. This pattern optimizes cost step by step."
+      },
+      { day:69, label:"Sat", topic:"Heap Mixed", tasks:["Kth largest stream","Ugly numbers","Super ugly numbers"],
+        goal:"Classic heap problems that appear frequently in online assessments",
+        code:`import heapq
+
+# Kth Largest in Stream
+class KthLargest:
+    def __init__(self, k, nums):
+        self.k = k
+        self.heap = []
+        for n in nums: self.add(n)
+
+    def add(self, val):
+        heapq.heappush(self.heap, val)
+        if len(self.heap) > self.k:
+            heapq.heappop(self.heap)
+        return self.heap[0]
+
+kl = KthLargest(3,[4,5,8,2])
+print(kl.add(3))  # 4
+print(kl.add(5))  # 5
+
+# Ugly Number II — only factors 2,3,5
+def nthUglyNumber(n):
+    heap = [1]
+    seen = {1}
+    val = 1
+    for _ in range(n):
+        val = heapq.heappop(heap)
+        for factor in [2,3,5]:
+            nxt = val * factor
+            if nxt not in seen:
+                seen.add(nxt)
+                heapq.heappush(heap, nxt)
+    return val
+
+# Super Ugly Number
+def nthSuperUglyNumber(n, primes):
+    heap = [1]
+    seen = {1}
+    val = 1
+    for _ in range(n):
+        val = heapq.heappop(heap)
+        for p in primes:
+            nxt = val * p
+            if nxt not in seen:
+                seen.add(nxt); heapq.heappush(heap, nxt)
+    return val
+
+# Find K pairs with smallest sums
+def kSmallestPairs(nums1, nums2, k):
+    heap = [(nums1[0]+nums2[0], 0, 0)]
+    result = []
+    while heap and len(result) < k:
+        s, i, j = heapq.heappop(heap)
+        result.append([nums1[i], nums2[j]])
+        if j+1 < len(nums2): heapq.heappush(heap,(nums1[i]+nums2[j+1],i,j+1))
+        if j==0 and i+1<len(nums1): heapq.heappush(heap,(nums1[i+1]+nums2[j],i+1,j))
+    return result`,
+        practice:["LeetCode #703 — Kth Largest in Stream (Easy)","LeetCode #264 — Ugly Number II (Medium)","LeetCode #373 — Find K Pairs Smallest Sums (Medium)"],
+        tip:"Kth Largest Stream: maintain a min heap of size K. The top is always the Kth largest seen so far."
+      },
+      { day:70, label:"Sun", topic:"Week 10 Revision", tasks:["All heap patterns","Timed session","Plan Week 11 Graphs"],
+        goal:"Consolidate all heap patterns before tackling Graphs",
+        code:`import heapq
+from collections import Counter
+
+# Pattern 1: Top K
+def topK(nums, k):
+    return heapq.nlargest(k, Counter(nums).keys(), key=Counter(nums).get)
+
+# Pattern 2: K-way merge
+def kthSmallestMatrix(matrix, k):
+    n = len(matrix)
+    heap = [(matrix[0][0], 0, 0)]
+    for _ in range(k-1):
+        val,r,c = heapq.heappop(heap)
+        if c+1<n: heapq.heappush(heap,(matrix[r][c+1],r,c+1))
+        if c==0 and r+1<n: heapq.heappush(heap,(matrix[r+1][0],r+1,0))
+    return heapq.heappop(heap)[0]
+
+# Pattern 3: Two heaps median
+class MedianFinder:
+    def __init__(self): self.lo=[]; self.hi=[]
+    def addNum(self,n):
+        heapq.heappush(self.lo,-n)
+        heapq.heappush(self.hi,-heapq.heappop(self.lo))
+        if len(self.hi)>len(self.lo):
+            heapq.heappush(self.lo,-heapq.heappop(self.hi))
+    def findMedian(self):
+        if len(self.lo)>len(self.hi): return -self.lo[0]
+        return (-self.lo[0]+self.hi[0])/2
+
+# Pattern 4: Scheduling
+def minMeetingRooms(intervals):
+    intervals.sort()
+    heap=[]
+    for s,e in intervals:
+        if heap and heap[0]<=s: heapq.heappop(heap)
+        heapq.heappush(heap,e)
+    return len(heap)`,
+        practice:["LeetCode #295 — Find Median from Stream (Hard)","LeetCode #23 — Merge K Sorted Lists (Hard)","LeetCode #253 — Meeting Rooms II (Medium)"],
+        tip:"Heaps done! Week 11 is Graphs — the most comprehensive topic. BFS, DFS, Dijkstra, Union Find all coming up!"
+      }
+    ]
+  },
+  {
+    num: 11, label: "W11", title: "Graphs (BFS & DFS)",
+    sub: "Most comprehensive topic — islands, shortest path, union find",
+    color: "#534AB7", bg: "#EEEDFE", textDark: "#3C3489",
+    days: [
+      { day:71, label:"Mon", topic:"Graph Basics", tasks:["Adjacency list/matrix","BFS traversal","DFS traversal"],
+        goal:"Build and traverse graphs — understand adjacency list representation",
+        code:`from collections import defaultdict, deque
+
+# Build graph
+def buildGraph(edges, directed=False):
+    graph = defaultdict(list)
+    for u, v in edges:
+        graph[u].append(v)
+        if not directed: graph[v].append(u)
+    return graph
+
+# BFS — level by level
+def bfs(graph, start):
+    visited = {start}
+    queue = deque([start])
+    result = []
+    while queue:
+        node = queue.popleft()
+        result.append(node)
+        for nei in graph[node]:
+            if nei not in visited:
+                visited.add(nei)
+                queue.append(nei)
+    return result
+
+# DFS — recursive
+def dfs(graph, node, visited=None):
+    if visited is None: visited = set()
+    visited.add(node)
+    result = [node]
+    for nei in graph[node]:
+        if nei not in visited:
+            result.extend(dfs(graph, nei, visited))
+    return result
+
+# DFS — iterative
+def dfs_iter(graph, start):
+    visited = {start}
+    stack = [start]
+    result = []
+    while stack:
+        node = stack.pop()
+        result.append(node)
+        for nei in graph[node]:
+            if nei not in visited:
+                visited.add(nei)
+                stack.append(nei)
+    return result
+
+# Number of connected components
+def countComponents(n, edges):
+    graph = defaultdict(list)
+    for u,v in edges:
+        graph[u].append(v); graph[v].append(u)
+    visited = set()
+    def dfs(node):
+        if node in visited: return
+        visited.add(node)
+        for nei in graph[node]: dfs(nei)
+    count = 0
+    for i in range(n):
+        if i not in visited: dfs(i); count += 1
+    return count`,
+        practice:["LeetCode #200 — Number of Islands (Medium)","LeetCode #133 — Clone Graph (Medium)","LeetCode #695 — Max Area of Island (Medium)"],
+        tip:"Always mark nodes visited BEFORE adding to queue (BFS) or at start of DFS — prevents infinite loops in cyclic graphs."
+      },
+      { day:72, label:"Tue", topic:"Grid Graphs", tasks:["Number of islands","Surrounded regions","Pacific Atlantic waterflow"],
+        goal:"Grid problems are just graphs with implicit edges to 4 neighbors",
+        code:`# Number of Islands
+def numIslands(grid):
+    rows,cols=len(grid),len(grid[0])
+    count=0
+    def dfs(r,c):
+        if r<0 or r>=rows or c<0 or c>=cols or grid[r][c]!='1': return
+        grid[r][c]='0'  # mark visited
+        dfs(r+1,c);dfs(r-1,c);dfs(r,c+1);dfs(r,c-1)
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c]=='1': dfs(r,c); count+=1
+    return count
+
+# Surrounded Regions — flip O, not touching border
+def solve(board):
+    rows,cols=len(board),len(board[0])
+    def dfs(r,c):
+        if r<0 or r>=rows or c<0 or c>=cols or board[r][c]!='O': return
+        board[r][c]='S'  # safe
+        dfs(r+1,c);dfs(r-1,c);dfs(r,c+1);dfs(r,c-1)
+    # mark border-connected O's as safe
+    for r in range(rows):
+        for c in range(cols):
+            if (r in [0,rows-1] or c in [0,cols-1]) and board[r][c]=='O':
+                dfs(r,c)
+    # flip
+    for r in range(rows):
+        for c in range(cols):
+            if board[r][c]=='O': board[r][c]='X'
+            elif board[r][c]=='S': board[r][c]='O'
+
+# Pacific Atlantic Water Flow
+def pacificAtlantic(heights):
+    rows,cols=len(heights),len(heights[0])
+    pac,atl=set(),set()
+    def dfs(r,c,visited,prev_h):
+        if (r,c) in visited or r<0 or r>=rows or c<0 or c>=cols: return
+        if heights[r][c]<prev_h: return
+        visited.add((r,c))
+        for dr,dc in [(1,0),(-1,0),(0,1),(0,-1)]:
+            dfs(r+dr,c+dc,visited,heights[r][c])
+    for r in range(rows):
+        dfs(r,0,pac,heights[r][0])
+        dfs(r,cols-1,atl,heights[r][cols-1])
+    for c in range(cols):
+        dfs(0,c,pac,heights[0][c])
+        dfs(rows-1,c,atl,heights[rows-1][c])
+    return [[r,c] for r in range(rows) for c in range(cols) if (r,c) in pac and (r,c) in atl]`,
+        practice:["LeetCode #200 — Number of Islands (Medium)","LeetCode #130 — Surrounded Regions (Medium)","LeetCode #417 — Pacific Atlantic (Medium)"],
+        tip:"For grid problems, reverse the direction of DFS/BFS when starting from boundaries — it's cleaner than checking boundary conditions inside."
+      },
+      { day:73, label:"Wed", topic:"Topological Sort", tasks:["Course schedule","Kahn's algorithm","Cycle detection"],
+        goal:"Topological sort orders nodes of a DAG — critical for dependency problems",
+        code:`from collections import defaultdict, deque
+
+# Course Schedule — detect cycle
+def canFinish(numCourses, prerequisites):
+    graph = defaultdict(list)
+    for a,b in prerequisites: graph[b].append(a)
+    # 0=unvisited, 1=visiting, 2=done
+    state = [0] * numCourses
+    def dfs(node):
+        if state[node] == 1: return False  # cycle!
+        if state[node] == 2: return True
+        state[node] = 1
+        for nei in graph[node]:
+            if not dfs(nei): return False
+        state[node] = 2
+        return True
+    return all(dfs(i) for i in range(numCourses))
+
+# Topological Sort — Kahn's BFS algorithm
+def topoSort(n, edges):
+    graph = defaultdict(list)
+    indegree = [0] * n
+    for u,v in edges:
+        graph[u].append(v); indegree[v] += 1
+    queue = deque([i for i in range(n) if indegree[i]==0])
+    order = []
+    while queue:
+        node = queue.popleft(); order.append(node)
+        for nei in graph[node]:
+            indegree[nei] -= 1
+            if indegree[nei] == 0: queue.append(nei)
+    return order if len(order)==n else []  # empty if cycle
+
+# Course Schedule II — return order
+def findOrder(numCourses, prerequisites):
+    graph = defaultdict(list)
+    indegree = [0]*numCourses
+    for a,b in prerequisites:
+        graph[b].append(a); indegree[a]+=1
+    q = deque([i for i in range(numCourses) if indegree[i]==0])
+    order = []
+    while q:
+        node=q.popleft(); order.append(node)
+        for nei in graph[node]:
+            indegree[nei]-=1
+            if indegree[nei]==0: q.append(nei)
+    return order if len(order)==numCourses else []`,
+        practice:["LeetCode #207 — Course Schedule (Medium)","LeetCode #210 — Course Schedule II (Medium)","LeetCode #269 — Alien Dictionary (Hard)"],
+        tip:"Topological sort only works on DAGs (no cycles). If output length < n, a cycle exists. Kahn's BFS is easier to implement than DFS."
+      },
+      { day:74, label:"Thu", topic:"Union Find", tasks:["DSU implementation","Find & union with path compression","Redundant connection"],
+        goal:"Union Find (Disjoint Set Union) — O(α) operations for connectivity problems",
+        code:`# Union Find — with path compression + union by rank
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
+        self.components = n
+
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])  # path compression
+        return self.parent[x]
+
+    def union(self, x, y):
+        px, py = self.find(x), self.find(y)
+        if px == py: return False  # already connected
+        # union by rank
+        if self.rank[px] < self.rank[py]: px,py=py,px
+        self.parent[py] = px
+        if self.rank[px]==self.rank[py]: self.rank[px]+=1
+        self.components -= 1
+        return True
+
+    def connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+# Redundant Connection — find the extra edge
+def findRedundantConnection(edges):
+    uf = UnionFind(len(edges)+1)
+    for u,v in edges:
+        if not uf.union(u,v): return [u,v]
+
+# Number of Provinces
+def findCircleNum(isConnected):
+    n = len(isConnected)
+    uf = UnionFind(n)
+    for i in range(n):
+        for j in range(i+1,n):
+            if isConnected[i][j]: uf.union(i,j)
+    return uf.components
+
+# Accounts Merge
+from collections import defaultdict
+def accountsMerge(accounts):
+    uf = UnionFind(len(accounts))
+    email_to_id = {}
+    for i,acc in enumerate(accounts):
+        for email in acc[1:]:
+            if email in email_to_id: uf.union(i,email_to_id[email])
+            else: email_to_id[email]=i
+    groups = defaultdict(set)
+    for email,id in email_to_id.items():
+        groups[uf.find(id)].add(email)
+    return [[accounts[i][0]]+sorted(emails) for i,emails in groups.items()]`,
+        practice:["LeetCode #684 — Redundant Connection (Medium)","LeetCode #547 — Number of Provinces (Medium)","LeetCode #721 — Accounts Merge (Medium)"],
+        tip:"Path compression makes find() nearly O(1). Always implement both path compression AND union by rank for optimal performance."
+      },
+      { day:75, label:"Fri", topic:"Shortest Path", tasks:["BFS shortest path","Dijkstra's algorithm","Bellman-Ford concept"],
+        goal:"Shortest path algorithms — BFS for unweighted, Dijkstra for weighted graphs",
+        code:`from collections import deque
+import heapq
+
+# BFS — shortest path in unweighted graph
+def shortestPath(graph, start, end):
+    queue = deque([(start, [start])])
+    visited = {start}
+    while queue:
+        node, path = queue.popleft()
+        if node == end: return path
+        for nei in graph[node]:
+            if nei not in visited:
+                visited.add(nei)
+                queue.append((nei, path+[nei]))
+    return []
+
+# Dijkstra — shortest path in weighted graph O((V+E) log V)
+def dijkstra(graph, start):
+    dist = {node: float('inf') for node in graph}
+    dist[start] = 0
+    heap = [(0, start)]
+    while heap:
+        d, node = heapq.heappop(heap)
+        if d > dist[node]: continue
+        for nei, weight in graph[node]:
+            new_dist = dist[node] + weight
+            if new_dist < dist[nei]:
+                dist[nei] = new_dist
+                heapq.heappush(heap, (new_dist, nei))
+    return dist
+
+# Network Delay Time (Dijkstra)
+def networkDelayTime(times, n, k):
+    graph = defaultdict(list)
+    for u,v,w in times: graph[u].append((v,w))
+    dist = {i:float('inf') for i in range(1,n+1)}
+    dist[k] = 0
+    heap = [(0,k)]
+    while heap:
+        d,u = heapq.heappop(heap)
+        if d>dist[u]: continue
+        for v,w in graph[u]:
+            if dist[u]+w < dist[v]:
+                dist[v]=dist[u]+w
+                heapq.heappush(heap,(dist[v],v))
+    ans = max(dist.values())
+    return ans if ans < float('inf') else -1`,
+        practice:["LeetCode #743 — Network Delay Time (Medium)","LeetCode #1091 — Shortest Path in Binary Matrix (Medium)","LeetCode #787 — Cheapest Flights within K Stops (Medium)"],
+        tip:"Dijkstra won't work with negative weights. Use Bellman-Ford instead. For unweighted graphs, plain BFS is faster than Dijkstra."
+      },
+      { day:76, label:"Sat", topic:"Advanced Graphs", tasks:["Bipartite check","Critical connections","Word ladder"],
+        goal:"Advanced graph problems combining multiple traversal techniques",
+        code:`from collections import defaultdict, deque
+
+# Bipartite Check — 2-colorable
+def isBipartite(graph):
+    color = {}
+    for start in range(len(graph)):
+        if start in color: continue
+        queue = deque([start])
+        color[start] = 0
+        while queue:
+            node = queue.popleft()
+            for nei in graph[node]:
+                if nei not in color:
+                    color[nei] = 1 - color[node]
+                    queue.append(nei)
+                elif color[nei] == color[node]:
+                    return False
+    return True
+
+# Critical Connections (Bridges) — Tarjan's
+def criticalConnections(n, connections):
+    graph = defaultdict(list)
+    for u,v in connections:
+        graph[u].append(v); graph[v].append(u)
+    disc=low=[-1]*n; timer=[0]; res=[]
+    def dfs(u,parent):
+        disc[u]=low[u]=timer[0]; timer[0]+=1
+        for v in graph[u]:
+            if disc[v]==-1:
+                dfs(v,u)
+                low[u]=min(low[u],low[v])
+                if low[v]>disc[u]: res.append([u,v])
+            elif v!=parent: low[u]=min(low[u],disc[v])
+    dfs(0,-1); return res
+
+# Word Ladder — min transformations
+def ladderLength(beginWord, endWord, wordList):
+    wordSet = set(wordList)
+    if endWord not in wordSet: return 0
+    queue = deque([(beginWord, 1)])
+    while queue:
+        word, steps = queue.popleft()
+        for i in range(len(word)):
+            for c in 'abcdefghijklmnopqrstuvwxyz':
+                nw = word[:i]+c+word[i+1:]
+                if nw == endWord: return steps+1
+                if nw in wordSet:
+                    wordSet.remove(nw)
+                    queue.append((nw,steps+1))
+    return 0`,
+        practice:["LeetCode #785 — Is Graph Bipartite (Medium)","LeetCode #1192 — Critical Connections (Hard)","LeetCode #127 — Word Ladder (Hard)"],
+        tip:"Word Ladder is BFS where each state is a word. Remove words from wordSet once visited to avoid revisiting — don't use a separate visited set."
+      },
+      { day:77, label:"Sun", topic:"Week 11 Revision", tasks:["All graph patterns","Timed session","Plan Week 12 DP"],
+        goal:"Consolidate all graph patterns — the most comprehensive DSA topic",
+        code:`from collections import defaultdict, deque
+import heapq
+
+# 5 Core Graph Patterns
+
+# 1. BFS — shortest path / level order
+def bfsShortestPath(graph, start, end):
+    q,vis=deque([(start,0)]),{start}
+    while q:
+        node,d=q.popleft()
+        if node==end: return d
+        for nei in graph[node]:
+            if nei not in vis: vis.add(nei); q.append((nei,d+1))
+    return -1
+
+# 2. DFS — connected components
+def dfs(graph, node, visited):
+    visited.add(node)
+    for nei in graph[node]:
+        if nei not in visited: dfs(graph,nei,visited)
+
+# 3. Topological Sort (Kahn's)
+def topoSort(n,edges):
+    g=defaultdict(list); ind=[0]*n
+    for u,v in edges: g[u].append(v); ind[v]+=1
+    q=deque([i for i in range(n) if ind[i]==0]); res=[]
+    while q:
+        node=q.popleft(); res.append(node)
+        for nei in g[node]:
+            ind[nei]-=1
+            if ind[nei]==0: q.append(nei)
+    return res if len(res)==n else []
+
+# 4. Union Find
+class UF:
+    def __init__(self,n): self.p=list(range(n))
+    def find(self,x):
+        if self.p[x]!=x: self.p[x]=self.find(self.p[x])
+        return self.p[x]
+    def union(self,x,y):
+        px,py=self.find(x),self.find(y)
+        if px==py: return False
+        self.p[py]=px; return True
+
+# 5. Dijkstra
+def dijkstra(graph,src):
+    dist={v:float('inf') for v in graph}; dist[src]=0
+    h=[(0,src)]
+    while h:
+        d,u=heapq.heappop(h)
+        if d>dist[u]: continue
+        for v,w in graph[u]:
+            if dist[u]+w<dist[v]: dist[v]=dist[u]+w; heapq.heappush(h,(dist[v],v))
+    return dist`,
+        practice:["LeetCode #207 — Course Schedule (Medium)","LeetCode #743 — Network Delay Time (Medium)","LeetCode #127 — Word Ladder (Hard)"],
+        tip:"Graphs done! 5 patterns mastered: BFS, DFS, Topo Sort, Union Find, Dijkstra. Week 12 starts DP — the hardest and most rewarding topic!"
+      }
+    ]
+  },
+  {
+    num: 12, label: "W12", title: "Dynamic Programming I",
+    sub: "1D DP — memoization, tabulation, classic patterns",
+    color: "#854F0B", bg: "#FAEEDA", textDark: "#633806",
+    days: [
+      { day:78, label:"Mon", topic:"DP Intro", tasks:["Memoization vs tabulation","Fibonacci DP","Climbing stairs"],
+        goal:"Understand the two approaches to DP — top-down (memo) and bottom-up (tabulation)",
+        code:`from functools import lru_cache
+
+# DP = Recursion + Memoization OR Tabulation
+
+# Fibonacci — 3 approaches
+# Naive O(2^n)
+def fib_naive(n): return n if n<=1 else fib_naive(n-1)+fib_naive(n-2)
+
+# Top-down — memoization O(n)
+@lru_cache(maxsize=None)
+def fib_memo(n): return n if n<=1 else fib_memo(n-1)+fib_memo(n-2)
+
+# Bottom-up — tabulation O(n)
+def fib_tab(n):
+    if n<=1: return n
+    dp = [0]*(n+1); dp[1]=1
+    for i in range(2,n+1): dp[i]=dp[i-1]+dp[i-2]
+    return dp[n]
+
+# Space-optimized O(1) space
+def fib_opt(n):
+    a,b=0,1
+    for _ in range(n): a,b=b,a+b
+    return a
+
+# Climbing Stairs — 1 or 2 steps
+def climbStairs(n):
+    if n<=2: return n
+    a,b=1,2
+    for _ in range(3,n+1): a,b=b,a+b
+    return b
+
+# House Robber — no adjacent houses
+def rob(nums):
+    prev2=prev=0
+    for n in nums:
+        prev2,prev=prev,max(prev,prev2+n)
+    return prev
+
+print(rob([2,7,9,3,1]))  # 12`,
+        practice:["LeetCode #70 — Climbing Stairs (Easy)","LeetCode #198 — House Robber (Medium)","LeetCode #213 — House Robber II (Medium)"],
+        tip:"3 steps to solve any DP: 1) Define dp[i] clearly 2) Find recurrence relation 3) Set base cases. Do this on paper first!"
+      },
+      { day:79, label:"Tue", topic:"1D DP Patterns", tasks:["Min cost climbing","Jump game","Decode ways"],
+        goal:"Apply 1D DP to optimization and counting problems",
+        code:`# Min Cost Climbing Stairs
+def minCostClimbingStairs(cost):
+    n = len(cost)
+    dp = [0] * (n+1)
+    for i in range(2, n+1):
+        dp[i] = min(dp[i-1]+cost[i-1], dp[i-2]+cost[i-2])
+    return dp[n]
+
+# Jump Game — can reach end?
+def canJump(nums):
+    max_reach = 0
+    for i, n in enumerate(nums):
+        if i > max_reach: return False
+        max_reach = max(max_reach, i+n)
+    return True
+
+# Jump Game II — min jumps
+def jump(nums):
+    jumps = cur_end = cur_far = 0
+    for i in range(len(nums)-1):
+        cur_far = max(cur_far, i+nums[i])
+        if i == cur_end:
+            jumps += 1
+            cur_end = cur_far
+    return jumps
+
+# Decode Ways — how many ways to decode
+def numDecodings(s):
+    if not s or s[0]=='0': return 0
+    n = len(s)
+    dp = [0]*(n+1)
+    dp[0]=dp[1]=1
+    for i in range(2,n+1):
+        one = int(s[i-1])
+        two = int(s[i-2:i])
+        if one != 0: dp[i] += dp[i-1]
+        if 10 <= two <= 26: dp[i] += dp[i-2]
+    return dp[n]
+
+print(numDecodings("226"))  # 3`,
+        practice:["LeetCode #746 — Min Cost Climbing Stairs (Easy)","LeetCode #55 — Jump Game (Medium)","LeetCode #91 — Decode Ways (Medium)"],
+        tip:"Decode Ways is a classic DP that trips people up. Key: '0' can only be decoded as part of '10' or '20', never alone."
+      },
+      { day:80, label:"Wed", topic:"Knapsack Pattern", tasks:["0/1 Knapsack","Subset sum","Partition equal subset"],
+        goal:"Knapsack is one of the most important DP patterns — used in 10+ interview problems",
+        code:`# 0/1 Knapsack — max value within capacity
+def knapsack(weights, values, capacity):
+    n = len(weights)
+    dp = [[0]*(capacity+1) for _ in range(n+1)]
+    for i in range(1,n+1):
+        for w in range(capacity+1):
+            dp[i][w] = dp[i-1][w]  # don't take item i
+            if weights[i-1] <= w:  # take item i
+                dp[i][w] = max(dp[i][w], dp[i-1][w-weights[i-1]]+values[i-1])
+    return dp[n][capacity]
+
+# Space optimized knapsack
+def knapsack_opt(weights, values, capacity):
+    dp = [0]*(capacity+1)
+    for i in range(len(weights)):
+        for w in range(capacity, weights[i]-1, -1):
+            dp[w] = max(dp[w], dp[w-weights[i]]+values[i])
+    return dp[capacity]
+
+# Subset Sum — can we make target sum
+def canPartition(nums):
+    total = sum(nums)
+    if total % 2: return False
+    target = total // 2
+    dp = {0}
+    for n in nums:
+        dp |= {s+n for s in dp}
+        if target in dp: return True
+    return target in dp
+
+# Partition Equal Subset Sum
+def canPartitionTabulation(nums):
+    total = sum(nums)
+    if total % 2: return False
+    target = total // 2
+    dp = [False]*(target+1); dp[0]=True
+    for n in nums:
+        for j in range(target, n-1, -1):
+            dp[j] = dp[j] or dp[j-n]
+    return dp[target]`,
+        practice:["LeetCode #416 — Partition Equal Subset Sum (Medium)","LeetCode #494 — Target Sum (Medium)","LeetCode #474 — Ones and Zeroes (Medium)"],
+        tip:"Knapsack DP: iterate items outer, capacity inner. MUST go backwards in space-optimized version to avoid using same item twice."
+      },
+      { day:81, label:"Thu", topic:"String DP", tasks:["Longest common subsequence","Edit distance","Longest palindromic subsequence"],
+        goal:"2D DP on strings — LCS and edit distance are the most asked string DP problems",
+        code:`# Longest Common Subsequence
+def longestCommonSubsequence(text1, text2):
+    m, n = len(text1), len(text2)
+    dp = [[0]*(n+1) for _ in range(m+1)]
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            if text1[i-1]==text2[j-1]: dp[i][j]=dp[i-1][j-1]+1
+            else: dp[i][j]=max(dp[i-1][j],dp[i][j-1])
+    return dp[m][n]
+
+print(longestCommonSubsequence("abcde","ace"))  # 3
+
+# Edit Distance — min operations
+def minDistance(word1, word2):
+    m, n = len(word1), len(word2)
+    dp = [[0]*(n+1) for _ in range(m+1)]
+    for i in range(m+1): dp[i][0]=i
+    for j in range(n+1): dp[0][j]=j
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            if word1[i-1]==word2[j-1]: dp[i][j]=dp[i-1][j-1]
+            else: dp[i][j]=1+min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1])
+    return dp[m][n]
+
+# Longest Palindromic Subsequence
+def longestPalindromeSubseq(s):
+    return longestCommonSubsequence(s, s[::-1])
+
+# Distinct Subsequences
+def numDistinct(s, t):
+    m, n = len(s), len(t)
+    dp = [[0]*(n+1) for _ in range(m+1)]
+    for i in range(m+1): dp[i][0]=1
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            dp[i][j]=dp[i-1][j]
+            if s[i-1]==t[j-1]: dp[i][j]+=dp[i-1][j-1]
+    return dp[m][n]`,
+        practice:["LeetCode #1143 — Longest Common Subsequence (Medium)","LeetCode #72 — Edit Distance (Hard)","LeetCode #516 — Longest Palindromic Subsequence (Medium)"],
+        tip:"LCS recurrence: if chars match, dp[i][j]=dp[i-1][j-1]+1. If not, take max of skip either char. This pattern appears in 5+ problems."
+      },
+      { day:82, label:"Fri", topic:"Matrix DP", tasks:["Unique paths","Min path sum","Maximal square"],
+        goal:"2D DP on grids — each cell depends on neighbors above and to the left",
+        code:`# Unique Paths — count paths in grid
+def uniquePaths(m, n):
+    dp = [[1]*n for _ in range(m)]
+    for i in range(1,m):
+        for j in range(1,n):
+            dp[i][j]=dp[i-1][j]+dp[i][j-1]
+    return dp[m-1][n-1]
+
+# Unique Paths II — with obstacles
+def uniquePathsWithObstacles(grid):
+    m,n=len(grid),len(grid[0])
+    dp=[[0]*n for _ in range(m)]
+    dp[0][0]=1 if grid[0][0]==0 else 0
+    for i in range(1,m): dp[i][0]=dp[i-1][0] if grid[i][0]==0 else 0
+    for j in range(1,n): dp[0][j]=dp[0][j-1] if grid[0][j]==0 else 0
+    for i in range(1,m):
+        for j in range(1,n):
+            dp[i][j]=0 if grid[i][j]==1 else dp[i-1][j]+dp[i][j-1]
+    return dp[m-1][n-1]
+
+# Minimum Path Sum
+def minPathSum(grid):
+    m,n=len(grid),len(grid[0])
+    dp=[[0]*n for _ in range(m)]
+    dp[0][0]=grid[0][0]
+    for i in range(1,m): dp[i][0]=dp[i-1][0]+grid[i][0]
+    for j in range(1,n): dp[0][j]=dp[0][j-1]+grid[0][j]
+    for i in range(1,m):
+        for j in range(1,n): dp[i][j]=grid[i][j]+min(dp[i-1][j],dp[i][j-1])
+    return dp[m-1][n-1]
+
+# Maximal Square
+def maximalSquare(matrix):
+    m,n=len(matrix),len(matrix[0])
+    dp=[[0]*n for _ in range(m)]; best=0
+    for i in range(m):
+        for j in range(n):
+            if matrix[i][j]=='1':
+                dp[i][j]=1 if i==0 or j==0 else min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1])+1
+                best=max(best,dp[i][j])
+    return best*best`,
+        practice:["LeetCode #62 — Unique Paths (Medium)","LeetCode #64 — Minimum Path Sum (Medium)","LeetCode #221 — Maximal Square (Medium)"],
+        tip:"Grid DP: dp[i][j] usually depends on dp[i-1][j], dp[i][j-1], or dp[i-1][j-1]. Draw the dependency arrow first."
+      },
+      { day:83, label:"Sat", topic:"Stock Problems", tasks:["Buy sell stock I-IV","With cooldown","With transaction fee"],
+        goal:"Stock problems form a complete DP family — master all 6 variations",
+        code:`# I — One transaction
+def maxProfit1(prices):
+    buy,profit=float('inf'),0
+    for p in prices: buy=min(buy,p); profit=max(profit,p-buy)
+    return profit
+
+# II — Unlimited transactions
+def maxProfit2(prices):
+    return sum(max(prices[i]-prices[i-1],0) for i in range(1,len(prices)))
+
+# III — At most 2 transactions
+def maxProfit3(prices):
+    b1=b2=float('inf'); p1=p2=0
+    for p in prices:
+        b1=min(b1,p); p1=max(p1,p-b1)
+        b2=min(b2,p-p1); p2=max(p2,p-b2)
+    return p2
+
+# IV — At most k transactions
+def maxProfit4(k, prices):
+    n=len(prices)
+    if k>=n//2: return sum(max(prices[i]-prices[i-1],0) for i in range(1,n))
+    buy=[float('inf')]*k; profit=[0]*k
+    for p in prices:
+        for i in range(k):
+            buy[i]=min(buy[i],p-(profit[i-1] if i else 0))
+            profit[i]=max(profit[i],p-buy[i])
+    return profit[-1]
+
+# With cooldown (1 day wait after sell)
+def maxProfitCooldown(prices):
+    hold=float('-inf'); sold=rest=0
+    for p in prices:
+        prev_sold=sold
+        hold=max(hold,rest-p)
+        sold=hold+p
+        rest=max(rest,prev_sold)
+    return max(sold,rest)
+
+# With transaction fee
+def maxProfitFee(prices, fee):
+    hold=float('-inf'); cash=0
+    for p in prices:
+        hold=max(hold,cash-p)
+        cash=max(cash,hold+p-fee)
+    return cash`,
+        practice:["LeetCode #121 — Best Time Buy Sell Stock (Easy)","LeetCode #123 — Best Time III (Hard)","LeetCode #309 — Best Time with Cooldown (Medium)"],
+        tip:"Stock DP state: hold (own stock) and cash (no stock). For each price, update both states. This pattern works for all 6 variations!"
+      },
+      { day:84, label:"Sun", topic:"Week 12 Revision", tasks:["All 1D DP patterns","Timed session","Plan Week 13 DP2"],
+        goal:"Solidify all 1D DP patterns before tackling advanced 2D DP",
+        code:`from functools import lru_cache
+
+# 5 Core DP Patterns from Week 12
+
+# 1. Linear DP (house robber)
+def rob(nums):
+    a=b=0
+    for n in nums: a,b=b,max(b,a+n)
+    return b
+
+# 2. Knapsack (subset sum)
+def canPartition(nums):
+    t=sum(nums)
+    if t%2: return False
+    t//=2; dp={0}
+    for n in nums: dp|={s+n for s in dp}
+    return t in dp
+
+# 3. LCS pattern
+def lcs(s1,s2):
+    m,n=len(s1),len(s2)
+    dp=[[0]*(n+1) for _ in range(m+1)]
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            dp[i][j]=dp[i-1][j-1]+1 if s1[i-1]==s2[j-1] else max(dp[i-1][j],dp[i][j-1])
+    return dp[m][n]
+
+# 4. Grid DP
+def uniquePaths(m,n):
+    dp=[[1]*n for _ in range(m)]
+    for i in range(1,m):
+        for j in range(1,n): dp[i][j]=dp[i-1][j]+dp[i][j-1]
+    return dp[m-1][n-1]
+
+# 5. Stock DP
+def maxProfit(prices):
+    buy,sell=float('inf'),0
+    for p in prices: buy=min(buy,p); sell=max(sell,p-buy)
+    return sell`,
+        practice:["LeetCode #1143 — Longest Common Subsequence (Medium)","LeetCode #416 — Partition Equal Subset Sum (Medium)","LeetCode #123 — Best Time III (Hard)"],
+        tip:"Week 12 done! You've learned 1D DP patterns. Week 13 covers interval DP, DP on trees, and the hardest DP problems!"
+      }
+    ]
+  },
+  {
+    num: 13, label: "W13", title: "Dynamic Programming II",
+    sub: "Interval DP, DP on trees, hardest DP patterns",
+    color: "#534AB7", bg: "#EEEDFE", textDark: "#3C3489",
+    days: [
+      { day:85, label:"Mon", topic:"Interval DP", tasks:["Burst balloons","Palindrome partition II","Matrix chain"],
+        goal:"Interval DP solves problems where you pick from a range — hard but powerful",
+        code:`# Burst Balloons — interval DP
+def maxCoins(nums):
+    nums = [1] + nums + [1]
+    n = len(nums)
+    dp = [[0]*n for _ in range(n)]
+    for length in range(2, n):
+        for left in range(0, n-length):
+            right = left + length
+            for k in range(left+1, right):
+                dp[left][right] = max(
+                    dp[left][right],
+                    nums[left]*nums[k]*nums[right] + dp[left][k] + dp[k][right]
+                )
+    return dp[0][n-1]
+
+# Minimum Cost to Cut a Stick
+def minCost(n, cuts):
+    cuts = [0] + sorted(cuts) + [n]
+    m = len(cuts)
+    dp = [[0]*m for _ in range(m)]
+    for length in range(2, m):
+        for l in range(0, m-length):
+            r = l + length
+            dp[l][r] = float('inf')
+            for k in range(l+1, r):
+                dp[l][r] = min(dp[l][r], cuts[r]-cuts[l]+dp[l][k]+dp[k][r])
+    return dp[0][m-1]
+
+# Palindrome Partitioning II — min cuts
+def minCut(s):
+    n = len(s)
+    is_pal = [[False]*n for _ in range(n)]
+    for i in range(n): is_pal[i][i]=True
+    for l in range(2,n+1):
+        for i in range(n-l+1):
+            j=i+l-1
+            is_pal[i][j]=(s[i]==s[j]) and (l==2 or is_pal[i+1][j-1])
+    dp=[float('inf')]*n; dp[0]=0
+    for i in range(1,n):
+        if is_pal[0][i]: dp[i]=0; continue
+        for j in range(1,i+1):
+            if is_pal[j][i]: dp[i]=min(dp[i],dp[j-1]+1)
+    return dp[n-1]`,
+        practice:["LeetCode #312 — Burst Balloons (Hard)","LeetCode #1547 — Min Cost to Cut Stick (Hard)","LeetCode #132 — Palindrome Partitioning II (Hard)"],
+        tip:"Interval DP template: for length in 2..n, for left in 0..n-length, right=left+length, for k in left+1..right. Always O(n³)."
+      },
+      { day:86, label:"Tue", topic:"DP on Trees", tasks:["House robber III","Diameter DP","Binary tree cameras"],
+        goal:"DP on trees — each node returns state information up to parent",
+        code:`class TreeNode:
+    def __init__(self,val=0,left=None,right=None):
+        self.val=val;self.left=left;self.right=right
+
+# House Robber III — trees
+def rob(root):
+    def dfs(node):
+        if not node: return 0,0  # (rob, skip)
+        lr,ls = dfs(node.left)
+        rr,rs = dfs(node.right)
+        rob = node.val + ls + rs
+        skip = max(lr,ls) + max(rr,rs)
+        return rob, skip
+    return max(dfs(root))
+
+# Binary Tree Cameras — min cameras to monitor all
+def minCameraCover(root):
+    cameras = [0]
+    UNCOVERED, COVERED, HAS_CAMERA = 0, 1, 2
+
+    def dfs(node):
+        if not node: return COVERED
+        l, r = dfs(node.left), dfs(node.right)
+        if l == UNCOVERED or r == UNCOVERED:
+            cameras[0] += 1
+            return HAS_CAMERA
+        if l == HAS_CAMERA or r == HAS_CAMERA:
+            return COVERED
+        return UNCOVERED
+
+    if dfs(root) == UNCOVERED:
+        cameras[0] += 1
+    return cameras[0]
+
+# Longest Path in Tree
+def longestPath(root):
+    ans = [0]
+    def dfs(node):
+        if not node: return 0
+        l,r = dfs(node.left), dfs(node.right)
+        ans[0] = max(ans[0], l+r)
+        return 1 + max(l,r)
+    dfs(root)
+    return ans[0]
+
+# Count nodes with even valued grandparent
+def sumEvenGrandparent(root):
+    def dfs(node,parent,grandparent):
+        if not node: return 0
+        res = node.val if grandparent and grandparent.val%2==0 else 0
+        return res+dfs(node.left,node,parent)+dfs(node.right,node,parent)
+    return dfs(root,None,None)`,
+        practice:["LeetCode #337 — House Robber III (Medium)","LeetCode #968 — Binary Tree Cameras (Hard)","LeetCode #543 — Diameter of Binary Tree (Easy)"],
+        tip:"Tree DP: each node returns multiple values (e.g., rob/skip, covered/uncovered). Process children first, combine at current node."
+      },
+      { day:87, label:"Wed", topic:"DP Hard Problems", tasks:["Longest increasing subsequence","Russian doll envelopes","Number of LIS"],
+        goal:"LIS and its variants — O(n log n) solution using binary search + DP",
+        code:`import bisect
+
+# Longest Increasing Subsequence — O(n²)
+def lisDP(nums):
+    n=len(nums); dp=[1]*n
+    for i in range(1,n):
+        for j in range(i):
+            if nums[j]<nums[i]: dp[i]=max(dp[i],dp[j]+1)
+    return max(dp)
+
+# LIS — O(n log n) with binary search
+def lis(nums):
+    tails = []
+    for n in nums:
+        idx = bisect.bisect_left(tails, n)
+        if idx == len(tails): tails.append(n)
+        else: tails[idx] = n
+    return len(tails)
+
+print(lis([10,9,2,5,3,7,101,18]))  # 4
+
+# Russian Doll Envelopes — 2D LIS
+def maxEnvelopes(envelopes):
+    envelopes.sort(key=lambda x: (x[0], -x[1]))
+    return lis([h for _,h in envelopes])
+
+# Number of Longest Increasing Subsequences
+def findNumberOfLIS(nums):
+    n=len(nums)
+    dp=[1]*n; cnt=[1]*n
+    for i in range(1,n):
+        for j in range(i):
+            if nums[j]<nums[i]:
+                if dp[j]+1>dp[i]: dp[i]=dp[j]+1; cnt[i]=cnt[j]
+                elif dp[j]+1==dp[i]: cnt[i]+=cnt[j]
+    max_len=max(dp)
+    return sum(cnt[i] for i in range(n) if dp[i]==max_len)
+
+# Longest Bitonic Subsequence
+def longestBitonicSubsequence(nums):
+    n=len(nums)
+    inc=[1]*n; dec=[1]*n
+    for i in range(1,n):
+        for j in range(i):
+            if nums[j]<nums[i]: inc[i]=max(inc[i],inc[j]+1)
+    for i in range(n-2,-1,-1):
+        for j in range(n-1,i,-1):
+            if nums[j]<nums[i]: dec[i]=max(dec[i],dec[j]+1)
+    return max(inc[i]+dec[i]-1 for i in range(n))`,
+        practice:["LeetCode #300 — Longest Increasing Subsequence (Medium)","LeetCode #354 — Russian Doll Envelopes (Hard)","LeetCode #673 — Number of LIS (Medium)"],
+        tip:"LIS O(n log n): maintain 'tails' array where tails[i] = smallest tail of all IS of length i+1. Binary search to find insert position."
+      },
+      { day:88, label:"Thu", topic:"DP Strings Hard", tasks:["Regular expression matching","Wildcard matching","Interleaving string"],
+        goal:"Hard string DP problems — direct pattern from FAANG interview rounds",
+        code:`# Regular Expression Matching
+def isMatch(s, p):
+    m,n=len(s),len(p)
+    dp=[[False]*(n+1) for _ in range(m+1)]
+    dp[0][0]=True
+    for j in range(1,n+1):
+        if p[j-1]=='*': dp[0][j]=dp[0][j-2]
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            if p[j-1] in {s[i-1],'.'}:
+                dp[i][j]=dp[i-1][j-1]
+            elif p[j-1]=='*':
+                dp[i][j]=dp[i][j-2]  # zero occurrences
+                if p[j-2] in {s[i-1],'.'}:
+                    dp[i][j]=dp[i][j] or dp[i-1][j]
+    return dp[m][n]
+
+# Wildcard Matching
+def isMatchWild(s, p):
+    m,n=len(s),len(p)
+    dp=[[False]*(n+1) for _ in range(m+1)]
+    dp[0][0]=True
+    for j in range(1,n+1): dp[0][j]=dp[0][j-1] and p[j-1]=='*'
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            if p[j-1]=='*': dp[i][j]=dp[i-1][j] or dp[i][j-1]
+            elif p[j-1]=='?' or p[j-1]==s[i-1]: dp[i][j]=dp[i-1][j-1]
+    return dp[m][n]
+
+# Interleaving String
+def isInterleave(s1, s2, s3):
+    m,n=len(s1),len(s2)
+    if m+n!=len(s3): return False
+    dp=[[False]*(n+1) for _ in range(m+1)]
+    dp[0][0]=True
+    for i in range(1,m+1): dp[i][0]=dp[i-1][0] and s1[i-1]==s3[i-1]
+    for j in range(1,n+1): dp[0][j]=dp[0][j-1] and s2[j-1]==s3[j-1]
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            dp[i][j]=(dp[i-1][j] and s1[i-1]==s3[i+j-1]) or \
+                     (dp[i][j-1] and s2[j-1]==s3[i+j-1])
+    return dp[m][n]`,
+        practice:["LeetCode #10 — Regular Expression Matching (Hard)","LeetCode #44 — Wildcard Matching (Hard)","LeetCode #97 — Interleaving String (Medium)"],
+        tip:"Regex DP: '*' means zero or more of PREVIOUS char. For zero occurrences: dp[i][j]=dp[i][j-2]. For more: dp[i][j]=dp[i-1][j]."
+      },
+      { day:89, label:"Fri", topic:"DP Optimization", tasks:["Matrix chain multiplication","Optimal BST","DP + BFS combo"],
+        goal:"DP optimization techniques — reduce O(n³) to O(n²) using divide and conquer",
+        code:`from functools import lru_cache
+
+# Coin Change — min coins
+def coinChange(coins, amount):
+    dp=[float('inf')]*(amount+1); dp[0]=0
+    for coin in coins:
+        for a in range(coin,amount+1):
+            dp[a]=min(dp[a],dp[a-coin]+1)
+    return dp[amount] if dp[amount]!=float('inf') else -1
+
+# Coin Change II — count ways
+def change(amount, coins):
+    dp=[0]*(amount+1); dp[0]=1
+    for coin in coins:
+        for a in range(coin,amount+1): dp[a]+=dp[a-coin]
+    return dp[amount]
+
+# Perfect Squares — min squares that sum to n
+def numSquares(n):
+    dp=[float('inf')]*(n+1); dp[0]=0
+    for i in range(1,n+1):
+        j=1
+        while j*j<=i:
+            dp[i]=min(dp[i],dp[i-j*j]+1)
+            j+=1
+    return dp[n]
+
+# Word Break
+def wordBreak(s, wordDict):
+    words=set(wordDict)
+    dp=[False]*(len(s)+1); dp[0]=True
+    for i in range(1,len(s)+1):
+        for j in range(i):
+            if dp[j] and s[j:i] in words: dp[i]=True; break
+    return dp[len(s)]
+
+# Word Break II — return all ways
+@lru_cache(maxsize=None)
+def wordBreakII(s,wordDict):
+    if not s: return [""]
+    words=set(wordDict); res=[]
+    for i in range(1,len(s)+1):
+        if s[:i] in words:
+            for rest in wordBreakII(s[i:],wordDict):
+                res.append(s[:i]+(" "+rest if rest else ""))
+    return res`,
+        practice:["LeetCode #322 — Coin Change (Medium)","LeetCode #279 — Perfect Squares (Medium)","LeetCode #139 — Word Break (Medium)"],
+        tip:"Coin Change is the canonical unbounded knapsack. Iterate coins outer, amount inner, go FORWARD (unlike 0/1 knapsack which goes backward)."
+      },
+      { day:90, label:"Sat", topic:"DP State Design", tasks:["Paint house","Paint fence","Strange printer"],
+        goal:"State design is the hardest part of DP — practice defining dp[i] correctly",
+        code:`# Paint House — 3 colors, no adjacent same
+def minCostPaintHouse(costs):
+    for i in range(1,len(costs)):
+        costs[i][0]+=min(costs[i-1][1],costs[i-1][2])
+        costs[i][1]+=min(costs[i-1][0],costs[i-1][2])
+        costs[i][2]+=min(costs[i-1][0],costs[i-1][1])
+    return min(costs[-1])
+
+# Paint Fence — k colors, no 3 same adjacent
+def numWays(n, k):
+    if n==0: return 0
+    if n==1: return k
+    same=k; diff=k*(k-1)
+    for _ in range(2,n):
+        same,diff=diff,(same+diff)*(k-1)
+    return same+diff
+
+# Strange Printer — min turns to print string
+def strangePrinter(s):
+    n=len(s)
+    dp=[[0]*n for _ in range(n)]
+    for i in range(n): dp[i][i]=1
+    for length in range(2,n+1):
+        for i in range(n-length+1):
+            j=i+length-1
+            dp[i][j]=dp[i+1][j]+1
+            for k in range(i+1,j+1):
+                if s[k]==s[i]:
+                    dp[i][j]=min(dp[i][j],dp[i+1][k]+dp[k][j] if k<j else dp[i+1][k])
+    return dp[0][n-1]
+
+# Minimum Falling Path Sum
+def minFallingPathSum(matrix):
+    for i in range(1,len(matrix)):
+        for j in range(len(matrix[0])):
+            best=matrix[i-1][j]
+            if j>0: best=min(best,matrix[i-1][j-1])
+            if j<len(matrix[0])-1: best=min(best,matrix[i-1][j+1])
+            matrix[i][j]+=best
+    return min(matrix[-1])`,
+        practice:["LeetCode #256 — Paint House (Medium)","LeetCode #276 — Paint Fence (Medium)","LeetCode #664 — Strange Printer (Hard)"],
+        tip:"For hard DP, spend 15 mins defining states before coding. Wrong state definition = you'll never get the right answer no matter how you code."
+      },
+      { day:91, label:"Sun", topic:"Week 13 Revision", tasks:["All DP patterns","Timed session","Plan Week 14 Tries"],
+        goal:"Consolidate all DP patterns — the hardest and most rewarding topic is now yours",
+        code:`from functools import lru_cache
+import bisect
+
+# All Major DP Patterns
+
+# 1. Linear DP
+def rob(nums): a=b=0; [exec("a,b=b,max(b,a+n)") for n in nums]; return b
+
+# 2. Knapsack
+def coinChange(coins,amount):
+    dp=[float('inf')]*(amount+1); dp[0]=0
+    for c in coins:
+        for a in range(c,amount+1): dp[a]=min(dp[a],dp[a-c]+1)
+    return dp[amount] if dp[amount]!=float('inf') else -1
+
+# 3. LCS / Edit Distance
+def lcs(s1,s2):
+    m,n=len(s1),len(s2); dp=[[0]*(n+1) for _ in range(m+1)]
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            dp[i][j]=dp[i-1][j-1]+1 if s1[i-1]==s2[j-1] else max(dp[i-1][j],dp[i][j-1])
+    return dp[m][n]
+
+# 4. LIS — O(n log n)
+def lis(nums):
+    tails=[]
+    for n in nums:
+        i=bisect.bisect_left(tails,n)
+        if i==len(tails): tails.append(n)
+        else: tails[i]=n
+    return len(tails)
+
+# 5. Interval DP
+def minCost(n,cuts):
+    cuts=[0]+sorted(cuts)+[n]; m=len(cuts)
+    dp=[[0]*m for _ in range(m)]
+    for l in range(2,m):
+        for i in range(m-l):
+            j=i+l; dp[i][j]=float('inf')
+            for k in range(i+1,j): dp[i][j]=min(dp[i][j],cuts[j]-cuts[i]+dp[i][k]+dp[k][j])
+    return dp[0][m-1]`,
+        practice:["LeetCode #312 — Burst Balloons (Hard)","LeetCode #10 — Regular Expression Matching (Hard)","LeetCode #300 — LIS (Medium)"],
+        tip:"DP mastered! You now know 5 DP families. Week 14 is Tries — a specialized tree for string search problems!"
+      }
+    ]
+  },
+  {
+    num: 14, label: "W14", title: "Tries & Advanced DS",
+    sub: "Trie, segment tree, sparse table — string search mastery",
+    color: "#185FA5", bg: "#E6F1FB", textDark: "#0C447C",
+    days: [
+      { day:92, label:"Mon", topic:"Trie Basics", tasks:["Build a Trie","Insert & search","StartsWith prefix"],
+        goal:"Trie is a tree for string prefix operations — O(L) insert/search where L=word length",
+        code:`# Trie Node
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+
+# Trie
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        node = self.root
+        for ch in word:
+            if ch not in node.children:
+                node.children[ch] = TrieNode()
+            node = node.children[ch]
+        node.is_end = True
+
+    def search(self, word):
+        node = self.root
+        for ch in word:
+            if ch not in node.children: return False
+            node = node.children[ch]
+        return node.is_end
+
+    def startsWith(self, prefix):
+        node = self.root
+        for ch in prefix:
+            if ch not in node.children: return False
+            node = node.children[ch]
+        return True
+
+    def delete(self, word):
+        def _delete(node, word, depth):
+            if not node: return False
+            if depth == len(word):
+                if node.is_end: node.is_end = False
+                return len(node.children) == 0
+            ch = word[depth]
+            if ch not in node.children: return False
+            if _delete(node.children[ch], word, depth+1):
+                del node.children[ch]
+                return not node.is_end and len(node.children)==0
+            return False
+        _delete(self.root, word, 0)
+
+t = Trie()
+t.insert("apple"); t.insert("app")
+print(t.search("app"))        # True
+print(t.startsWith("app"))    # True
+print(t.search("ap"))         # False`,
+        practice:["LeetCode #208 — Implement Trie (Medium)","LeetCode #211 — Design Add Search Words (Medium)","LeetCode #648 — Replace Words (Medium)"],
+        tip:"Trie insert/search is O(L) where L=word length — much faster than HashMap for prefix queries which would need O(L*n) comparison."
+      },
+      { day:93, label:"Tue", topic:"Trie Advanced", tasks:["Word search II","Map sum pairs","Auto complete system"],
+        goal:"Advanced Trie problems — combining DFS backtracking with Trie",
+        code:`# Word Search II — find all words in board
+class TrieNode:
+    def __init__(self):
+        self.children={}; self.word=None
+
+class Solution:
+    def findWords(self, board, words):
+        root=TrieNode()
+        for w in words:
+            node=root
+            for ch in w:
+                if ch not in node.children: node.children[ch]=TrieNode()
+                node=node.children[ch]
+            node.word=w
+
+        rows,cols=len(board),len(board[0])
+        result=[]
+
+        def dfs(node,r,c):
+            if r<0 or r>=rows or c<0 or c>=cols: return
+            ch=board[r][c]
+            if ch not in node.children: return
+            nxt=node.children[ch]
+            if nxt.word: result.append(nxt.word); nxt.word=None
+            board[r][c]='#'
+            dfs(nxt,r+1,c);dfs(nxt,r-1,c);dfs(nxt,r,c+1);dfs(nxt,r,c-1)
+            board[r][c]=ch
+            if not nxt.children: del node.children[ch]
+
+        for r in range(rows):
+            for c in range(cols): dfs(root,r,c)
+        return result
+
+# Map Sum — prefix sum on Trie
+class MapSum:
+    def __init__(self): self.trie={}; self.map={}
+    def insert(self,key,val):
+        delta=val-self.map.get(key,0); self.map[key]=val
+        node=self.trie
+        for ch in key:
+            if ch not in node: node[ch]={}
+            node=node[ch]
+            node['$']=node.get('$',0)+delta
+    def sum(self,prefix):
+        node=self.trie
+        for ch in prefix:
+            if ch not in node: return 0
+            node=node[ch]
+        return node.get('$',0)`,
+        practice:["LeetCode #212 — Word Search II (Hard)","LeetCode #677 — Map Sum Pairs (Medium)","LeetCode #642 — Design Search Autocomplete (Hard)"],
+        tip:"Word Search II builds a Trie of all words, then DFS the board. Much faster than calling Word Search I for each word separately."
+      },
+      { day:94, label:"Wed", topic:"Segment Tree", tasks:["Build segment tree","Range sum query","Range update"],
+        goal:"Segment tree answers range queries in O(log n) — used in advanced OA problems",
+        code:`# Segment Tree — range sum query & point update
+class SegmentTree:
+    def __init__(self, nums):
+        self.n = len(nums)
+        self.tree = [0] * (4 * self.n)
+        self._build(nums, 0, 0, self.n-1)
+
+    def _build(self, nums, node, start, end):
+        if start == end:
+            self.tree[node] = nums[start]
+        else:
+            mid = (start+end)//2
+            self._build(nums, 2*node+1, start, mid)
+            self._build(nums, 2*node+2, mid+1, end)
+            self.tree[node] = self.tree[2*node+1]+self.tree[2*node+2]
+
+    def update(self, idx, val, node=0, start=0, end=None):
+        if end is None: end=self.n-1
+        if start==end: self.tree[node]=val; return
+        mid=(start+end)//2
+        if idx<=mid: self.update(idx,val,2*node+1,start,mid)
+        else: self.update(idx,val,2*node+2,mid+1,end)
+        self.tree[node]=self.tree[2*node+1]+self.tree[2*node+2]
+
+    def query(self, l, r, node=0, start=0, end=None):
+        if end is None: end=self.n-1
+        if r<start or end<l: return 0
+        if l<=start and end<=r: return self.tree[node]
+        mid=(start+end)//2
+        return self.query(l,r,2*node+1,start,mid)+self.query(l,r,2*node+2,mid+1,end)
+
+st = SegmentTree([1,3,5,7,9,11])
+print(st.query(0,2))   # 9
+st.update(1,2)
+print(st.query(0,2))   # 8`,
+        practice:["LeetCode #307 — Range Sum Query Mutable (Medium)","LeetCode #315 — Count Smaller Numbers After Self (Hard)","LeetCode #327 — Count of Range Sum (Hard)"],
+        tip:"Segment tree: build O(n), query O(log n), update O(log n). Use when you need both range queries AND updates — BIT is simpler but less flexible."
+      },
+      { day:95, label:"Thu", topic:"Binary Indexed Tree", tasks:["Fenwick tree basics","Prefix sum with updates","Count inversions"],
+        goal:"BIT (Fenwick Tree) is simpler than segment tree for prefix sum with updates",
+        code:`# Binary Indexed Tree (Fenwick Tree)
+class BIT:
+    def __init__(self, n):
+        self.n = n
+        self.tree = [0] * (n+1)
+
+    def update(self, i, delta):
+        while i <= self.n:
+            self.tree[i] += delta
+            i += i & (-i)  # add last set bit
+
+    def query(self, i):
+        total = 0
+        while i > 0:
+            total += self.tree[i]
+            i -= i & (-i)  # remove last set bit
+        return total
+
+    def range_query(self, l, r):
+        return self.query(r) - self.query(l-1)
+
+# Count inversions using BIT
+def countInversions(arr):
+    n = len(arr)
+    # coordinate compression
+    sorted_arr = sorted(set(arr))
+    rank = {v:i+1 for i,v in enumerate(sorted_arr)}
+    bit = BIT(n)
+    inversions = 0
+    for i in range(n-1,-1,-1):
+        inversions += bit.query(rank[arr[i]]-1)
+        bit.update(rank[arr[i]],1)
+    return inversions
+
+# Range Sum Query (LeetCode 307 with BIT)
+class NumArray:
+    def __init__(self,nums):
+        self.n=len(nums); self.bit=[0]*(self.n+1); self.nums=[0]*self.n
+        for i,v in enumerate(nums): self.update(i,v)
+    def update(self,i,val):
+        delta=val-self.nums[i]; self.nums[i]=val; i+=1
+        while i<=self.n: self.bit[i]+=delta; i+=i&(-i)
+    def sumRange(self,l,r):
+        def q(i):
+            s=0
+            while i>0: s+=self.bit[i]; i-=i&(-i)
+            return s
+        return q(r+1)-q(l)`,
+        practice:["LeetCode #307 — Range Sum Query Mutable (Medium)","LeetCode #315 — Count Smaller Numbers (Hard)","LeetCode #493 — Reverse Pairs (Hard)"],
+        tip:"BIT update: go up by adding LSB (i += i & -i). BIT query: go down by removing LSB (i -= i & -i). Two lines are the whole algorithm!"
+      },
+      { day:96, label:"Fri", topic:"Monotonic + Advanced", tasks:["Sparse table for RMQ","Monotonic stack review","Jump pointers"],
+        goal:"Advanced data structures for competitive programming and hard OA problems",
+        code:`# Sparse Table — Range Minimum Query O(1) after O(n log n) build
+import math
+
+class SparseTable:
+    def __init__(self, arr):
+        n = len(arr)
+        k = int(math.log2(n)) + 1
+        self.table = [[float('inf')]*n for _ in range(k)]
+        self.table[0] = arr[:]
+        j = 1
+        while (1 << j) <= n:
+            i = 0
+            while i + (1<<j) - 1 < n:
+                self.table[j][i] = min(self.table[j-1][i], self.table[j-1][i+(1<<(j-1))])
+                i += 1
+            j += 1
+
+    def query(self, l, r):
+        k = int(math.log2(r-l+1))
+        return min(self.table[k][l], self.table[k][r-(1<<k)+1])
+
+st = SparseTable([2,4,3,1,6,7,8,9,1,7])
+print(st.query(0,4))  # 1
+
+# Monotonic Stack — remove k digits to get smallest number
+def removeKdigits(num, k):
+    stack = []
+    for d in num:
+        while k and stack and stack[-1] > d:
+            stack.pop(); k -= 1
+        stack.append(d)
+    final = stack[:-k] if k else stack
+    return "".join(final).lstrip('0') or "0"
+
+# Largest Rectangle in Histogram (revisit with full solution)
+def largestRectangle(heights):
+    stack=[]; max_area=0; heights.append(0)
+    for i,h in enumerate(heights):
+        while stack and heights[stack[-1]]>h:
+            height=heights[stack.pop()]
+            width=i if not stack else i-stack[-1]-1
+            max_area=max(max_area,height*width)
+        stack.append(i)
+    return max_area`,
+        practice:["LeetCode #402 — Remove K Digits (Medium)","LeetCode #84 — Largest Rectangle (Hard)","LeetCode #85 — Maximal Rectangle (Hard)"],
+        tip:"Sparse Table is ideal when you need many range min/max queries with no updates — preprocessing O(n log n), each query O(1)."
+      },
+      { day:97, label:"Sat", topic:"Mixed Hard Problems", tasks:["Design in-memory FS","LRU + LFU","Skip list concept"],
+        goal:"System design style problems using advanced data structures",
+        code:`from collections import defaultdict, OrderedDict
+import heapq
+
+# LFU Cache — evict least frequently used
+class LFUCache:
+    def __init__(self, capacity):
+        self.cap=capacity; self.min_freq=0
+        self.key_val={}; self.key_freq={}
+        self.freq_keys=defaultdict(OrderedDict)
+
+    def _update(self,key):
+        f=self.key_freq[key]
+        del self.freq_keys[f][key]
+        if not self.freq_keys[f] and f==self.min_freq:
+            self.min_freq+=1
+        self.key_freq[key]=f+1
+        self.freq_keys[f+1][key]=None
+
+    def get(self,key):
+        if key not in self.key_val: return -1
+        self._update(key); return self.key_val[key]
+
+    def put(self,key,value):
+        if not self.cap: return
+        if key in self.key_val:
+            self.key_val[key]=value; self._update(key); return
+        if len(self.key_val)==self.cap:
+            evict,_=self.freq_keys[self.min_freq].popitem(last=False)
+            del self.key_val[evict]; del self.key_freq[evict]
+        self.key_val[key]=value; self.key_freq[key]=1
+        self.freq_keys[1][key]=None; self.min_freq=1
+
+# In-Memory File System
+class FileSystem:
+    def __init__(self): self.root=defaultdict(dict)
+    def _navigate(self,path):
+        if path=='/': return self.root
+        node=self.root
+        for p in path.split('/')[1:]: node=node.setdefault(p,{})
+        return node
+    def ls(self,path):
+        node=self._navigate(path)
+        return sorted(node.keys()) if isinstance(node,dict) else [path.split('/')[-1]]
+    def mkdir(self,path): self._navigate(path)
+    def addContentToFile(self,path,content):
+        parts=path.split('/'); fn=parts[-1]
+        node=self._navigate('/'.join(parts[:-1]))
+        node[fn]=node.get(fn,'')+content
+    def readContentFromFile(self,path):
+        parts=path.split('/'); fn=parts[-1]
+        return self._navigate('/'.join(parts[:-1]))[fn]`,
+        practice:["LeetCode #460 — LFU Cache (Hard)","LeetCode #588 — Design In-Memory File System (Hard)","LeetCode #716 — Max Stack (Hard)"],
+        tip:"LFU Cache needs 3 hash maps: key→value, key→freq, freq→OrderedDict of keys. The OrderedDict gives O(1) LRU eviction within same frequency."
+      },
+      { day:98, label:"Sun", topic:"Week 14 Revision", tasks:["Trie patterns","Segment tree","Plan Week 15 Greedy"],
+        goal:"Solidify Trie and advanced DS before Greedy algorithms",
+        code:`# Trie — compact implementation
+class Trie:
+    def __init__(self): self.t={}
+    def insert(self,w):
+        node=self.t
+        for c in w: node=node.setdefault(c,{})
+        node['#']=True
+    def search(self,w):
+        node=self.t
+        for c in w:
+            if c not in node: return False
+            node=node[c]
+        return '#' in node
+    def startsWith(self,p):
+        node=self.t
+        for c in p:
+            if c not in node: return False
+            node=node[c]
+        return True
+
+# BIT — compact implementation
+class BIT:
+    def __init__(self,n): self.t=[0]*(n+1); self.n=n
+    def update(self,i,d):
+        while i<=self.n: self.t[i]+=d; i+=i&(-i)
+    def query(self,i):
+        s=0
+        while i>0: s+=self.t[i]; i-=i&(-i)
+        return s
+
+# LRU Cache
+class LRU:
+    def __init__(self,cap): self.cap=cap; self.c=OrderedDict()
+    def get(self,k):
+        if k not in self.c: return -1
+        self.c.move_to_end(k); return self.c[k]
+    def put(self,k,v):
+        if k in self.c: self.c.move_to_end(k)
+        self.c[k]=v
+        if len(self.c)>self.cap: self.c.popitem(last=False)`,
+        practice:["LeetCode #212 — Word Search II (Hard)","LeetCode #460 — LFU Cache (Hard)","LeetCode #307 — Range Sum Query Mutable (Medium)"],
+        tip:"Week 14 done! Advanced data structures mastered. Week 15 is Greedy — the most elegant algorithms in DSA!"
+      }
+    ]
+  },
+  {
+    num: 15, label: "W15", title: "Greedy Algorithms",
+    sub: "Make the locally optimal choice at each step",
+    color: "#3B6D11", bg: "#EAF3DE", textDark: "#27500A",
+    days: [
+      { day:99, label:"Mon", topic:"Greedy Basics", tasks:["Activity selection","Interval scheduling","Fractional knapsack"],
+        goal:"Greedy algorithms always pick the locally optimal choice — prove it works for each problem",
+        code:`# Activity Selection — max non-overlapping activities
+def maxActivities(activities):
+    activities.sort(key=lambda x: x[1])  # sort by end time
+    count = 1
+    last_end = activities[0][1]
+    for start, end in activities[1:]:
+        if start >= last_end:
+            count += 1
+            last_end = end
+    return count
+
+# Merge Intervals
+def merge(intervals):
+    intervals.sort(key=lambda x: x[0])
+    merged = [intervals[0]]
+    for start, end in intervals[1:]:
+        if start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    return merged
+
+# Non-overlapping intervals — min removals
+def eraseOverlapIntervals(intervals):
+    intervals.sort(key=lambda x: x[1])
+    count = 0; last_end = float('-inf')
+    for start, end in intervals:
+        if start >= last_end: last_end = end
+        else: count += 1
+    return count
+
+# Insert interval
+def insert(intervals, newInterval):
+    res=[]; i=0; n=len(intervals)
+    while i<n and intervals[i][1]<newInterval[0]:
+        res.append(intervals[i]); i+=1
+    while i<n and intervals[i][0]<=newInterval[1]:
+        newInterval[0]=min(newInterval[0],intervals[i][0])
+        newInterval[1]=max(newInterval[1],intervals[i][1]); i+=1
+    res.append(newInterval)
+    while i<n: res.append(intervals[i]); i+=1
+    return res`,
+        practice:["LeetCode #56 — Merge Intervals (Medium)","LeetCode #435 — Non-overlapping Intervals (Medium)","LeetCode #57 — Insert Interval (Medium)"],
+        tip:"Interval problems: sort by END time for scheduling/selection, sort by START time for merging. This choice determines the greedy strategy."
+      },
+      { day:100, label:"Tue", topic:"Greedy on Arrays", tasks:["Gas station","Jump game II","Candy distribution"],
+        goal:"Apply greedy thinking to optimization problems on arrays",
+        code:`# Gas Station — circular route
+def canCompleteCircuit(gas, cost):
+    total = tank = start = 0
+    for i in range(len(gas)):
+        net = gas[i] - cost[i]
+        total += net; tank += net
+        if tank < 0: start = i+1; tank = 0
+    return start if total >= 0 else -1
+
+# Jump Game II — min jumps
+def jump(nums):
+    jumps = cur_end = cur_far = 0
+    for i in range(len(nums)-1):
+        cur_far = max(cur_far, i+nums[i])
+        if i == cur_end: jumps+=1; cur_end=cur_far
+    return jumps
+
+# Candy — min candies, higher rating gets more
+def candy(ratings):
+    n=len(ratings); candies=[1]*n
+    for i in range(1,n):
+        if ratings[i]>ratings[i-1]: candies[i]=candies[i-1]+1
+    for i in range(n-2,-1,-1):
+        if ratings[i]>ratings[i+1]: candies[i]=max(candies[i],candies[i+1]+1)
+    return sum(candies)
+
+# Partition Labels
+def partitionLabels(s):
+    last={ch:i for i,ch in enumerate(s)}
+    result=[]; start=end=0
+    for i,ch in enumerate(s):
+        end=max(end,last[ch])
+        if i==end: result.append(end-start+1); start=i+1
+    return result
+
+print(partitionLabels("ababcbacadefegdehijhklij"))
+# [9, 7, 8]`,
+        practice:["LeetCode #134 — Gas Station (Medium)","LeetCode #45 — Jump Game II (Medium)","LeetCode #135 — Candy (Hard)"],
+        tip:"Gas Station greedy insight: if tank goes negative at position i, start can't be anywhere before i+1. Total sum tells if solution exists."
+      },
+      { day:101, label:"Wed", topic:"Greedy + Heap", tasks:["Meeting rooms","Reorganize string","Course schedule greedy"],
+        goal:"Combine greedy strategy with heap for scheduling and resource problems",
+        code:`import heapq
+from collections import Counter
+
+# Minimum number of platforms (trains)
+def minPlatforms(arrivals, departures):
+    arrivals.sort(); departures.sort()
+    platforms = max_platforms = 0
+    i = j = 0
+    while i < len(arrivals):
+        if arrivals[i] <= departures[j]:
+            platforms += 1; i += 1
+        else:
+            platforms -= 1; j += 1
+        max_platforms = max(max_platforms, platforms)
+    return max_platforms
+
+# Reorganize String — no two adjacent same
+def reorganizeString(s):
+    freq=Counter(s)
+    heap=[(-f,ch) for ch,f in freq.items()]
+    heapq.heapify(heap)
+    result=[]
+    while len(heap)>1:
+        f1,c1=heapq.heappop(heap)
+        f2,c2=heapq.heappop(heap)
+        result+=[c1,c2]
+        if f1+1: heapq.heappush(heap,(f1+1,c1))
+        if f2+1: heapq.heappush(heap,(f2+1,c2))
+    if heap:
+        f,c=heap[0]
+        if -f>1: return ""
+        result.append(c)
+    return "".join(result)
+
+# Maximum number of events attended
+def maxEvents(events):
+    events.sort()
+    heap=[]; i=day=attended=0
+    while i<len(events) or heap:
+        if not heap: day=events[i][0]
+        while i<len(events) and events[i][0]<=day:
+            heapq.heappush(heap,events[i][1]); i+=1
+        heapq.heappop(heap); attended+=1; day+=1
+        while heap and heap[0]<day: heapq.heappop(heap)
+    return attended`,
+        practice:["LeetCode #1353 — Maximum Number of Events (Medium)","LeetCode #767 — Reorganize String (Medium)","LeetCode #1094 — Car Pooling (Medium)"],
+        tip:"Greedy + Heap: use heap to always process the 'best' available option. Combine with sorting by start/end time for scheduling problems."
+      },
+      { day:102, label:"Thu", topic:"String Greedy", tasks:["Remove duplicate letters","Largest number","Smallest string after removals"],
+        goal:"Greedy on strings — lexicographic ordering and character manipulation",
+        code:`# Remove Duplicate Letters — smallest lexicographic result
+def removeDuplicateLetters(s):
+    last={c:i for i,c in enumerate(s)}
+    stack=[]; seen=set()
+    for i,c in enumerate(s):
+        if c in seen: continue
+        while stack and c<stack[-1] and last[stack[-1]]>i:
+            seen.discard(stack.pop())
+        stack.append(c); seen.add(c)
+    return "".join(stack)
+
+print(removeDuplicateLetters("bcabc"))  # "abc"
+
+# Largest Number
+def largestNumber(nums):
+    from functools import cmp_to_key
+    def compare(a,b):
+        if a+b>b+a: return -1
+        elif a+b<b+a: return 1
+        return 0
+    nums=sorted(map(str,nums),key=cmp_to_key(compare))
+    return "0" if nums[0]=="0" else "".join(nums)
+
+print(largestNumber([3,30,34,5,9]))  # "9534330"
+
+# Minimum number of arrows to burst balloons
+def findMinArrowShots(points):
+    points.sort(key=lambda x:x[1])
+    arrows=1; end=points[0][1]
+    for start,fin in points[1:]:
+        if start>end: arrows+=1; end=fin
+    return arrows
+
+# Break a Palindrome — greedy
+def breakPalindrome(palindrome):
+    n=len(palindrome)
+    if n==1: return ""
+    s=list(palindrome)
+    for i in range(n//2):
+        if s[i]!='a': s[i]='a'; return "".join(s)
+    s[-1]='b'; return "".join(s)`,
+        practice:["LeetCode #316 — Remove Duplicate Letters (Medium)","LeetCode #179 — Largest Number (Medium)","LeetCode #452 — Minimum Arrows Burst Balloons (Medium)"],
+        tip:"Remove Duplicate Letters uses monotonic stack with greedy: pop larger chars from stack only if they appear later in the string."
+      },
+      { day:103, label:"Fri", topic:"Greedy Math", tasks:["Minimum operations","Boats to save people","Two city scheduling"],
+        goal:"Greedy combined with math — sort then make optimal local decisions",
+        code:`# Boats to Save People — two pointer greedy
+def numRescueBoats(people, limit):
+    people.sort()
+    l, r = 0, len(people)-1
+    boats = 0
+    while l <= r:
+        if people[l]+people[r] <= limit: l+=1
+        r -= 1; boats += 1
+    return boats
+
+# Two City Scheduling — send n to city A, n to city B
+def twoCitySchedCost(costs):
+    costs.sort(key=lambda x: x[0]-x[1])
+    n=len(costs)//2
+    return sum(c[0] for c in costs[:n])+sum(c[1] for c in costs[n:])
+
+# Minimum Cost to Move Chips
+def minCostToMoveChips(position):
+    even=sum(1 for p in position if p%2==0)
+    return min(even,len(position)-even)
+
+# Lemonade Change
+def lemonadeChange(bills):
+    five=ten=0
+    for b in bills:
+        if b==5: five+=1
+        elif b==10:
+            if not five: return False
+            five-=1; ten+=1
+        else:
+            if ten and five: ten-=1; five-=1
+            elif five>=3: five-=3
+            else: return False
+    return True
+
+# Assign Cookies — greedily satisfy children
+def findContentChildren(g, s):
+    g.sort(); s.sort()
+    i=j=0
+    while i<len(g) and j<len(s):
+        if s[j]>=g[i]: i+=1
+        j+=1
+    return i`,
+        practice:["LeetCode #881 — Boats to Save People (Medium)","LeetCode #1029 — Two City Scheduling (Medium)","LeetCode #860 — Lemonade Change (Easy)"],
+        tip:"Two City Scheduling: sort by (costA - costB). Send people with biggest saving to city A first. Classic greedy exchange argument."
+      },
+      { day:104, label:"Sat", topic:"Hard Greedy", tasks:["Jump game III & IV","Minimum taps for garden","Video stitching"],
+        goal:"Hard greedy problems combining multiple techniques",
+        code:`from collections import defaultdict, deque
+
+# Jump Game III — can reach 0 value
+def canReach(arr, start):
+    n=len(arr); visited=set()
+    queue=deque([start])
+    while queue:
+        i=queue.popleft()
+        if arr[i]==0: return True
+        if i in visited: continue
+        visited.add(i)
+        if i+arr[i]<n: queue.append(i+arr[i])
+        if i-arr[i]>=0: queue.append(i-arr[i])
+    return False
+
+# Minimum Taps to Open Garden
+def minTaps(n, ranges):
+    # convert to intervals
+    intervals=[]
+    for i,r in enumerate(ranges):
+        intervals.append((max(0,i-r), min(n,i+r)))
+    intervals.sort()
+    taps=end=max_end=0; i=0
+    while end<n:
+        while i<len(intervals) and intervals[i][0]<=end:
+            max_end=max(max_end,intervals[i][1]); i+=1
+        if max_end==end: return -1
+        end=max_end; taps+=1
+    return taps
+
+# Video Stitching
+def videoStitching(clips, time):
+    clips.sort()
+    tapes=end=max_end=0; i=0
+    while end<time:
+        while i<len(clips) and clips[i][0]<=end:
+            max_end=max(max_end,clips[i][1]); i+=1
+        if max_end==end: return -1
+        end=max_end; tapes+=1
+    return tapes
+
+print(videoStitching([[0,2],[4,6],[8,10],[1,9],[1,5],[5,9]],10))  # 3`,
+        practice:["LeetCode #1326 — Minimum Taps to Open Garden (Hard)","LeetCode #1024 — Video Stitching (Medium)","LeetCode #1014 — Best Sightseeing Pair (Medium)"],
+        tip:"Taps/Stitching greedy: at each step, among all intervals starting within current reach, jump to the one that extends furthest. Classic greedy jump."
+      },
+      { day:105, label:"Sun", topic:"Week 15 Revision", tasks:["All greedy patterns","Plan Week 16 Mock","Final review"],
+        goal:"Solidify all greedy patterns and prepare for final mock interview week",
+        code:`import heapq
+from collections import Counter
+
+# 5 Core Greedy Patterns
+
+# 1. Interval scheduling
+def maxNonOverlap(intervals):
+    intervals.sort(key=lambda x:x[1])
+    count=1; end=intervals[0][1]
+    for s,e in intervals[1:]:
+        if s>=end: count+=1; end=e
+    return count
+
+# 2. Two pointer greedy
+def boats(people,limit):
+    people.sort(); l,r=0,len(people)-1; b=0
+    while l<=r:
+        if people[l]+people[r]<=limit: l+=1
+        r-=1; b+=1
+    return b
+
+# 3. Greedy + Heap
+def reorganize(s):
+    heap=[(-f,c) for c,f in Counter(s).items()]; heapq.heapify(heap)
+    res=[]
+    while len(heap)>1:
+        f1,c1=heapq.heappop(heap); f2,c2=heapq.heappop(heap)
+        res+=[c1,c2]
+        if f1+1: heapq.heappush(heap,(f1+1,c1))
+        if f2+1: heapq.heappush(heap,(f2+1,c2))
+    if heap:
+        f,c=heap[0]
+        if -f>1: return ""
+        res.append(c)
+    return "".join(res)
+
+# 4. Greedy jump (intervals/taps)
+def minJumps(clips,T):
+    clips.sort(); tapes=end=mx=0; i=0
+    while end<T:
+        while i<len(clips) and clips[i][0]<=end: mx=max(mx,clips[i][1]); i+=1
+        if mx==end: return -1
+        end=mx; tapes+=1
+    return tapes
+
+# 5. Monotonic stack greedy
+def removeKdigits(num,k):
+    stack=[]
+    for d in num:
+        while k and stack and stack[-1]>d: stack.pop(); k-=1
+        stack.append(d)
+    return "".join(stack[:-k] if k else stack).lstrip('0') or "0"`,
+        practice:["LeetCode #135 — Candy (Hard)","LeetCode #316 — Remove Duplicate Letters (Medium)","LeetCode #1326 — Min Taps Open Garden (Hard)"],
+        tip:"Greedy mastered! Week 16 is all mock interviews. Treat each session like a real interview — 45 mins, think aloud, optimize after working solution."
+      }
+    ]
+  },
+  {
+    num: 16, label: "W16", title: "Mock Interviews",
+    sub: "Full interview simulations — easy → medium → hard daily",
+    color: "#993C1D", bg: "#FAECE7", textDark: "#712B13",
+    days: [
+      { day:106, label:"Mon", topic:"Arrays & Strings Mock", tasks:["Timed: 3 problems 90 mins","Easy+Medium+Hard","Self review"],
+        goal:"Simulate real interview conditions — think aloud, optimize, handle edge cases",
+        code:`# Problem 1 — Easy (15 mins)
+# LeetCode #121 Best Time to Buy Stock
+def maxProfit(prices):
+    buy,profit=float('inf'),0
+    for p in prices: buy=min(buy,p); profit=max(profit,p-buy)
+    return profit
+
+# Problem 2 — Medium (30 mins)
+# LeetCode #15 Three Sum
+def threeSum(nums):
+    nums.sort(); result=[]
+    for i,n in enumerate(nums):
+        if i>0 and n==nums[i-1]: continue
+        l,r=i+1,len(nums)-1
+        while l<r:
+            s=n+nums[l]+nums[r]
+            if s==0: result.append([n,nums[l],nums[r]]); l+=1; r-=1
+            while l<r and nums[l]==nums[l-1]: l+=1
+            while l<r and nums[r]==nums[r+1]: r-=1
+            if s>0: r-=1
+            elif s<0: l+=1
+    return result
+
+# Problem 3 — Hard (45 mins)
+# LeetCode #42 Trapping Rain Water
+def trap(height):
+    l,r=0,len(height)-1; lmax=rmax=water=0
+    while l<r:
+        if height[l]<height[r]:
+            lmax=max(lmax,height[l]); water+=lmax-height[l]; l+=1
+        else:
+            rmax=max(rmax,height[r]); water+=rmax-height[r]; r-=1
+    return water`,
+        practice:["LeetCode #121 — Best Time Buy Stock (Easy)","LeetCode #15 — 3Sum (Medium)","LeetCode #42 — Trapping Rain Water (Hard)"],
+        tip:"Interview tip: always clarify constraints first (size, range, duplicates). Then brute force → optimize. Never jump to optimal without explanation."
+      },
+      { day:107, label:"Tue", topic:"Trees & Graphs Mock", tasks:["Timed: 3 problems 90 mins","BFS+DFS mix","Explain approach"],
+        goal:"Practice explaining tree and graph approaches clearly before coding",
+        code:`from collections import deque
+
+# Problem 1 — Easy (15 mins)
+# LeetCode #226 Invert Binary Tree
+def invertTree(root):
+    if not root: return None
+    root.left,root.right=invertTree(root.right),invertTree(root.left)
+    return root
+
+# Problem 2 — Medium (30 mins)
+# LeetCode #994 Rotting Oranges
+def orangesRotting(grid):
+    rows,cols=len(grid),len(grid[0])
+    queue=deque(); fresh=0
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c]==2: queue.append((r,c,0))
+            elif grid[r][c]==1: fresh+=1
+    minutes=0
+    while queue:
+        r,c,t=queue.popleft()
+        for dr,dc in [(1,0),(-1,0),(0,1),(0,-1)]:
+            nr,nc=r+dr,c+dc
+            if 0<=nr<rows and 0<=nc<cols and grid[nr][nc]==1:
+                grid[nr][nc]=2; fresh-=1; minutes=t+1
+                queue.append((nr,nc,t+1))
+    return minutes if fresh==0 else -1
+
+# Problem 3 — Hard (45 mins)
+# LeetCode #124 Binary Tree Maximum Path Sum
+def maxPathSum(root):
+    res=[float('-inf')]
+    def dfs(node):
+        if not node: return 0
+        l=max(dfs(node.left),0); r=max(dfs(node.right),0)
+        res[0]=max(res[0],node.val+l+r)
+        return node.val+max(l,r)
+    dfs(root); return res[0]`,
+        practice:["LeetCode #226 — Invert Binary Tree (Easy)","LeetCode #994 — Rotting Oranges (Medium)","LeetCode #124 — Max Path Sum (Hard)"],
+        tip:"Trees: state which traversal you're using (DFS/BFS) and why before coding. Graphs: always mention visited set to prevent cycles."
+      },
+      { day:108, label:"Wed", topic:"DP Mock", tasks:["Timed: 3 DP problems","Identify pattern first","Space optimization"],
+        goal:"DP under interview pressure — identify the pattern quickly and code cleanly",
+        code:`# Problem 1 — Easy/Medium (20 mins)
+# LeetCode #198 House Robber
+def rob(nums):
+    prev2=prev=0
+    for n in nums: prev2,prev=prev,max(prev,prev2+n)
+    return prev
+
+# Problem 2 — Medium (30 mins)
+# LeetCode #322 Coin Change
+def coinChange(coins,amount):
+    dp=[float('inf')]*(amount+1); dp[0]=0
+    for coin in coins:
+        for a in range(coin,amount+1): dp[a]=min(dp[a],dp[a-coin]+1)
+    return dp[amount] if dp[amount]!=float('inf') else -1
+
+# Problem 3 — Hard (40 mins)
+# LeetCode #312 Burst Balloons
+def maxCoins(nums):
+    nums=[1]+nums+[1]; n=len(nums)
+    dp=[[0]*n for _ in range(n)]
+    for l in range(2,n):
+        for left in range(0,n-l):
+            right=left+l
+            for k in range(left+1,right):
+                dp[left][right]=max(dp[left][right],
+                    nums[left]*nums[k]*nums[right]+dp[left][k]+dp[k][right])
+    return dp[0][n-1]
+
+# After solving, always ask:
+# 1. Can I reduce space? (2D → 1D, O(n) → O(1))
+# 2. What if input size was 10x larger?
+# 3. What are the edge cases?`,
+        practice:["LeetCode #198 — House Robber (Medium)","LeetCode #322 — Coin Change (Medium)","LeetCode #312 — Burst Balloons (Hard)"],
+        tip:"DP in interviews: say 'I'll use dynamic programming' then define dp[i] OUT LOUD before touching the keyboard. This shows structured thinking."
+      },
+      { day:109, label:"Thu", topic:"Mixed Topics Mock", tasks:["Random topic mix","1 from each category","Full 90 min session"],
+        goal:"Random mix simulates real OA conditions — you don't know what's coming",
+        code:`# Simulate full OA — pick one from each category
+
+# Linked List — Medium
+def addTwoNumbers(l1,l2):
+    dummy=cur=ListNode(0); carry=0
+    while l1 or l2 or carry:
+        v1=l1.val if l1 else 0; v2=l2.val if l2 else 0
+        total=v1+v2+carry; carry=total//10
+        cur.next=ListNode(total%10); cur=cur.next
+        if l1: l1=l1.next
+        if l2: l2=l2.next
+    return dummy.next
+
+# Stack — Medium
+def dailyTemperatures(temps):
+    res=[0]*len(temps); stack=[]
+    for i,t in enumerate(temps):
+        while stack and temps[stack[-1]]<t:
+            idx=stack.pop(); res[idx]=i-idx
+        stack.append(i)
+    return res
+
+# Backtracking — Medium
+def generateParenthesis(n):
+    res=[]
+    def bt(s,o,c):
+        if len(s)==2*n: res.append(s); return
+        if o<n: bt(s+'(',o+1,c)
+        if c<o: bt(s+')',o,c+1)
+    bt('',0,0); return res
+
+# Graph — Hard
+def findOrder(numCourses,prerequisites):
+    from collections import defaultdict,deque
+    g=defaultdict(list); ind=[0]*numCourses
+    for a,b in prerequisites: g[b].append(a); ind[a]+=1
+    q=deque([i for i in range(numCourses) if ind[i]==0]); order=[]
+    while q:
+        node=q.popleft(); order.append(node)
+        for nei in g[node]:
+            ind[nei]-=1
+            if ind[nei]==0: q.append(nei)
+    return order if len(order)==numCourses else []`,
+        practice:["LeetCode #2 — Add Two Numbers (Medium)","LeetCode #210 — Course Schedule II (Medium)","LeetCode #239 — Sliding Window Max (Hard)"],
+        tip:"Mixed OA tip: read all problems first, sort by difficulty, solve easiest first to bank marks. Never spend more than 35 mins on one hard problem."
+      },
+      { day:110, label:"Fri", topic:"System Design Basics", tasks:["Design URL shortener","LRU + LFU cache","Rate limiter design"],
+        goal:"Light system design — expected for 2+ years experience or campus top roles",
+        code:`# URL Shortener — design concepts
+# Components:
+# 1. Hash function: MD5/SHA256, take first 6 chars
+# 2. Storage: HashMap (short → long)
+# 3. Collision handling: regenerate hash
+
+import hashlib, random, string
+
+class URLShortener:
+    def __init__(self):
+        self.url_map={}; self.rev_map={}
+
+    def encode(self, longURL):
+        if longURL in self.rev_map: return self.rev_map[longURL]
+        key=''.join(random.choices(string.ascii_letters+string.digits,k=6))
+        while key in self.url_map: key=''.join(random.choices(string.ascii_letters+string.digits,k=6))
+        self.url_map[key]=longURL; self.rev_map[longURL]=key
+        return "http://tinyurl.com/"+key
+
+    def decode(self, shortURL):
+        return self.url_map[shortURL.replace("http://tinyurl.com/","")]
+
+# Rate Limiter — sliding window
+from collections import deque; import time
+
+class RateLimiter:
+    def __init__(self, max_requests, window_secs):
+        self.max=max_requests; self.window=window_secs
+        self.requests=defaultdict(deque)
+
+    def is_allowed(self, user_id):
+        now=time.time(); dq=self.requests[user_id]
+        while dq and dq[0]<now-self.window: dq.popleft()
+        if len(dq)<self.max: dq.append(now); return True
+        return False`,
+        practice:["LeetCode #535 — Encode and Decode TinyURL (Medium)","LeetCode #146 — LRU Cache (Medium)","LeetCode #460 — LFU Cache (Hard)"],
+        tip:"System design: always start with requirements (functional + non-functional), then high-level components, then dive into bottlenecks."
+      },
+      { day:111, label:"Sat", topic:"Final Hard Mock", tasks:["3 hard problems","No hints or solutions","Full debrief"],
+        goal:"Final challenge — solve 3 hard problems completely on your own in 2 hours",
+        code:`# Hard Problem 1 — Median of Two Arrays
+def findMedianSortedArrays(nums1,nums2):
+    if len(nums1)>len(nums2): nums1,nums2=nums2,nums1
+    m,n=len(nums1),len(nums2); lo,hi=0,m
+    while lo<=hi:
+        i=(lo+hi)//2; j=(m+n+1)//2-i
+        mxL1=float('-inf') if i==0 else nums1[i-1]
+        mnR1=float('inf') if i==m else nums1[i]
+        mxL2=float('-inf') if j==0 else nums2[j-1]
+        mnR2=float('inf') if j==n else nums2[j]
+        if mxL1<=mnR2 and mxL2<=mnR1:
+            if (m+n)%2: return max(mxL1,mxL2)
+            return (max(mxL1,mxL2)+min(mnR1,mnR2))/2
+        elif mxL1>mnR2: hi=i-1
+        else: lo=i+1
+
+# Hard Problem 2 — Edit Distance
+def minDistance(w1,w2):
+    m,n=len(w1),len(w2)
+    dp=[[0]*(n+1) for _ in range(m+1)]
+    for i in range(m+1): dp[i][0]=i
+    for j in range(n+1): dp[0][j]=j
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            dp[i][j]=dp[i-1][j-1] if w1[i-1]==w2[j-1] else 1+min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1])
+    return dp[m][n]
+
+# Hard Problem 3 — N-Queens
+def solveNQueens(n):
+    res=[]; cols=set(); pd=set(); nd=set()
+    board=[['.']  *n for _ in range(n)]
+    def bt(r):
+        if r==n: res.append([''.join(row) for row in board]); return
+        for c in range(n):
+            if c in cols or r+c in pd or r-c in nd: continue
+            cols.add(c);pd.add(r+c);nd.add(r-c); board[r][c]='Q'
+            bt(r+1)
+            cols.remove(c);pd.remove(r+c);nd.remove(r-c); board[r][c]='.'
+    bt(0); return res`,
+        practice:["LeetCode #4 — Median of Two Sorted Arrays (Hard)","LeetCode #72 — Edit Distance (Hard)","LeetCode #51 — N-Queens (Hard)"],
+        tip:"If stuck in interview: 1) Think aloud 2) Start with brute force 3) Ask for hint politely 4) Never give up — partial credit exists!"
+      },
+      { day:112, label:"Sun", topic:"Graduation Day! 🎓", tasks:["Review full roadmap","Set interview targets","Apply to companies!"],
+        goal:"You've completed the full 16-week DSA roadmap! You are interview ready!",
+        code:`# Congratulations! Here's your complete skill summary:
+
+SKILLS_MASTERED = {
+    "Week 1-2":  ["Python basics", "OOP", "Collections module"],
+    "Week 3":    ["Arrays", "Strings", "Two pointer", "Sliding window"],
+    "Week 4":    ["HashMap", "HashSet", "Counter", "OrderedDict"],
+    "Week 5":    ["Linked List", "Fast/slow pointer", "Reversal", "Merge"],
+    "Week 6":    ["Stack", "Queue", "Monotonic stack", "Deque"],
+    "Week 7":    ["Recursion", "Backtracking", "N-Queens", "Subsets"],
+    "Week 8":    ["Binary Search", "BS on answers", "Rotated array"],
+    "Week 9":    ["Trees", "BST", "DFS patterns", "BFS patterns", "LCA"],
+    "Week 10":   ["Heap", "Top-K", "Two heaps", "Median finder"],
+    "Week 11":   ["Graph BFS/DFS", "Topological sort", "Union Find", "Dijkstra"],
+    "Week 12":   ["1D DP", "Knapsack", "LCS", "Stock DP"],
+    "Week 13":   ["Interval DP", "Tree DP", "LIS", "Regex DP"],
+    "Week 14":   ["Trie", "Segment tree", "BIT", "LFU Cache"],
+    "Week 15":   ["Greedy intervals", "Greedy arrays", "Greedy+Heap"],
+    "Week 16":   ["Mock interviews", "System design basics"],
+}
+
+TOTAL_PROBLEMS_SOLVED = "200+ LeetCode problems"
+TARGET_COMPANIES = ["Amazon", "Flipkart", "Microsoft", "Google", "Swiggy",
+                    "Zomato", "Paytm", "PhonePe", "Razorpay", "Atlassian"]
+
+print("YOU ARE INTERVIEW READY! 🚀")
+print("Start applying NOW. Don't wait for perfection.")`,
+        practice:["Apply to 5 companies this week","Mock interview on Pramp or Interviewing.io","Review your weakest topic one more time"],
+        tip:"You've done the hard work. Now apply aggressively — aim for 20+ applications. Each interview makes you better. You've got this! 💪"
+      }
+    ]
+  }
+];
+
+let activeWeek = WEEKS[0];
+let activeDay = null;
+
+function renderTabs(){
+  const tabs=document.getElementById('tabs'); tabs.innerHTML='';
+  WEEKS.forEach(w=>{
+    const t=document.createElement('div');
+    t.className='week-tab'+(w.num===activeWeek.num?' active':'');
+    t.textContent=w.label+' '+w.title.split(' ')[0];
+    t.style.background=w.num===activeWeek.num?w.color:'';
+    t.onclick=()=>{ activeWeek=w; activeDay=null; closeDetail(); renderAll(); };
+    tabs.appendChild(t);
+  });
+}
+
+function renderWeekHeader(){
+  document.getElementById('week-header').innerHTML=`
+    <div class="week-title" style="color:${activeWeek.color}">Week ${activeWeek.num} — ${activeWeek.title}</div>
+    <div class="week-sub">${activeWeek.sub}</div>
+  `;
+  document.getElementById('week-header').style.background=activeWeek.bg;
+}
+
+function renderDays(){
+  const grid=document.getElementById('daygrid'); grid.innerHTML='';
+  activeWeek.days.forEach(d=>{
+    const card=document.createElement('div');
+    card.className='day-card'+(activeDay&&activeDay.day===d.day?' selected':'');
+    card.style.borderColor=activeDay&&activeDay.day===d.day?activeWeek.color:'';
+    card.innerHTML=`
+      <div class="dlabel" style="color:${activeWeek.color}">${d.label}</div>
+      <div class="dnum">Day ${d.day}</div>
+      <span class="dtopic" style="background:${activeWeek.bg};color:${activeWeek.textDark}">${d.topic}</span>
+      <div>${d.tasks.map(t=>`<div class="dtask">${t}</div>`).join('')}</div>
+    `;
+    card.onclick=()=>showDetail(d);
+    grid.appendChild(card);
+  });
+}
+
+function showDetail(d){
+  if(activeDay&&activeDay.day===d.day){ closeDetail(); return; }
+  activeDay=d;
+  document.getElementById('det-title').textContent=`Day ${d.day} — ${d.topic}`;
+  document.getElementById('det-body').innerHTML=`
+    <div class="slabel">Goal</div>
+    <div style="font-size:12px;color:var(--color-text-primary);margin-bottom:6px;line-height:1.5">${d.goal}</div>
+    <div class="slabel">Code to write today</div>
+    <div class="code">${d.code}</div>
+    <div class="slabel">LeetCode practice</div>
+    ${d.practice.map(p=>`<div class="lc-item">${p}</div>`).join('')}
+    <div class="tip">💡 ${d.tip}</div>
+  `;
+  document.getElementById('detail').classList.add('show');
+  renderDays();
+}
+
+function closeDetail(){
+  activeDay=null;
+  document.getElementById('detail').classList.remove('show');
+  renderDays();
+}
+
+function renderAll(){ renderTabs(); renderWeekHeader(); renderDays(); }
+renderAll();
+</script>
+</body>
+</html>

@@ -782,6 +782,26 @@ body {
 <body data-theme="light">
 
 <!-- ══════════════════════════════════════════
+     LOGIN OVERLAY
+══════════════════════════════════════════ -->
+<div id="login-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <div style="background:var(--bg-secondary); padding:40px; border-radius:16px; border:1px solid var(--border); text-align:center; max-width:400px; width:90%;">
+    <h2 style="margin-bottom:10px; color:var(--fg);">Welcome, Mani!</h2>
+    <p style="color:var(--fg-secondary); margin-bottom:24px;">Enter your email to access the 16-Week DSA Roadmap.</p>
+    
+    <input type="email" id="user-email" placeholder="name@example.com" required 
+           style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--fg); margin-bottom:16px; font-family:var(--font-sans);">
+    
+    <button id="start-btn" onclick="recordEmail()" 
+            style="width:100%; padding:12px; border-radius:8px; background:var(--fg); color:var(--bg-secondary); font-weight:700; border:none; cursor:pointer; font-family:var(--font-sans);">
+      Start Learning
+    </button>
+    <p id="loading-text" style="display:none; color:var(--fg-secondary); font-size: 12px; margin-top: 10px;">Recording...</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
      TOPBAR
 ══════════════════════════════════════════ -->
 <header class="topbar">
@@ -3772,6 +3792,7 @@ function toggleComplete(event, dayId) {
     document.getElementById('det-checkbox').checked = !!completed[dayId];
   }
   updateProgress();
+  renderBanner();
 }
 
 function toggleFromDetail() {
@@ -3786,6 +3807,7 @@ function toggleFromDetail() {
   if (card) card.classList.toggle('completed', isChecked);
   if (checkbox) checkbox.checked = isChecked;
   updateProgress();
+  renderBanner();
 }
 
 // ══════════════════════════════════════════
@@ -3938,6 +3960,64 @@ window.onload = () => {
   initTheme();
   renderAll();
 };
+
+// ══════════════════════════════════════════
+// LOGIN OVERLAY — EMAIL GATE
+// ══════════════════════════════════════════
+
+// Check if the user has already entered their email previously
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('dsa_user_email')) {
+    document.getElementById('login-overlay').style.display = 'none';
+  }
+});
+
+// Function to send email to Formspree
+function recordEmail() {
+  const emailInput = document.getElementById('user-email').value;
+  const btn = document.getElementById('start-btn');
+  const loadingText = document.getElementById('loading-text');
+
+  if (!emailInput || !emailInput.includes('@')) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  loadingText.style.display = 'block';
+
+  const FORMSPREE_URL = "https://formspree.io/f/mwvjezgq";
+
+  fetch(FORMSPREE_URL, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ 
+      email: emailInput,
+      accessedAt: new Date().toLocaleString()
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      localStorage.setItem('dsa_user_email', emailInput);
+      document.getElementById('login-overlay').style.display = 'none';
+    } else {
+      alert("There was an error recording your email. Please try again.");
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      loadingText.style.display = 'none';
+    }
+  })
+  .catch(error => {
+    alert("Network error. Please check your connection.");
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    loadingText.style.display = 'none';
+  });
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,618 @@
+
+<style>
+  .schedule { padding: 1rem 0; font-family: var(--font-sans); }
+  .header { text-align: center; margin-bottom: 1.5rem; }
+  .header h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin: 0; }
+  .phase-badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: #EAF3DE; color: #27500A; margin-top: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day-card { border-radius: 10px; padding: 10px 8px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); cursor: pointer; transition: box-shadow .15s; }
+  .day-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: var(--color-border-secondary); }
+  .day-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .day-num { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .topic-badge { font-size: 11px; font-weight: 500; padding: 3px 7px; border-radius: 20px; margin-bottom: 5px; display: inline-block; }
+  .tasks { margin-top: 6px; }
+  .task { font-size: 11px; color: var(--color-text-secondary); display: flex; align-items: flex-start; gap: 5px; margin-bottom: 3px; line-height: 1.4; }
+  .task::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; margin-top: 4px; }
+  .detail-panel { margin-top: 16px; border-radius: 12px; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); padding: 16px; display: none; }
+  .detail-panel.active { display: block; }
+  .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .detail-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .detail-close { font-size: 12px; color: var(--color-text-tertiary); cursor: pointer; }
+  .code-block { background: var(--color-background-tertiary); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); white-space: pre; overflow-x: auto; margin: 8px 0; }
+  .section-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin: 10px 0 4px; }
+  .tip { font-size: 12px; color: var(--color-text-secondary); background: var(--color-background-tertiary); border-left: 3px solid #3B6D11; padding: 8px 10px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+
+  .d1 .day-label { color: #3B6D11; } .d1 .topic-badge { background: #EAF3DE; color: #27500A; }
+  .d2 .day-label { color: #3B6D11; } .d2 .topic-badge { background: #EAF3DE; color: #27500A; }
+  .d3 .day-label { color: #534AB7; } .d3 .topic-badge { background: #EEEDFE; color: #3C3489; }
+  .d4 .day-label { color: #534AB7; } .d4 .topic-badge { background: #EEEDFE; color: #3C3489; }
+  .d5 .day-label { color: #993C1D; } .d5 .topic-badge { background: #FAECE7; color: #712B13; }
+  .d6 .day-label { color: #993C1D; } .d6 .topic-badge { background: #FAECE7; color: #712B13; }
+  .d7 .day-label { color: #185FA5; } .d7 .topic-badge { background: #E6F1FB; color: #0C447C; }
+
+  @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="schedule">
+  <div class="header">
+    <h2>Week 7 — Recursion &amp; Backtracking</h2>
+    <div class="phase-badge">Phase 2 continues — gateway to Trees, Graphs &amp; DP</div>
+    <p style="margin-top:6px">Click any day to see details, code &amp; LeetCode problems</p>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="detail-panel" id="detail">
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title"></div>
+      <div class="detail-close" onclick="closeDetail()">✕ close</div>
+    </div>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+const days = [
+  {
+    day: 43, label: "Mon", cls: "d1", topic: "Recursion Deep Dive",
+    tasks: ["Call stack visualization", "Memoization intro", "Fibonacci optimized"],
+    detail: {
+      goal: "Truly understand how recursion works under the hood — call stack, base case, return values",
+      code: `import sys
+sys.setrecursionlimit(10000)
+
+# Basic recursion — always 3 parts:
+# 1) Base case  2) Recursive call  3) Build answer
+
+# Fibonacci — naive O(2^n)
+def fib_naive(n):
+    if n <= 1: return n
+    return fib_naive(n-1) + fib_naive(n-2)
+
+# Fibonacci — memoized O(n)
+def fib_memo(n, memo={}):
+    if n in memo: return memo[n]
+    if n <= 1: return n
+    memo[n] = fib_memo(n-1, memo) + fib_memo(n-2, memo)
+    return memo[n]
+
+# Using lru_cache (cleanest way)
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib(n):
+    if n <= 1: return n
+    return fib(n-1) + fib(n-2)
+
+print(fib(50))  # instant!
+
+# Power function — O(log n)
+def power(base, exp):
+    if exp == 0: return 1
+    if exp % 2 == 0:
+        half = power(base, exp // 2)
+        return half * half
+    return base * power(base, exp - 1)
+
+# Sum of digits recursively
+def sumDigits(n):
+    if n < 10: return n
+    return n % 10 + sumDigits(n // 10)
+
+# Count ways to climb stairs (1 or 2 steps)
+@lru_cache(maxsize=None)
+def climbStairs(n):
+    if n <= 2: return n
+    return climbStairs(n-1) + climbStairs(n-2)
+
+print(climbStairs(10))  # 89`,
+      practice: [
+        "LeetCode #70 — Climbing Stairs (Easy)",
+        "LeetCode #509 — Fibonacci Number (Easy)",
+        "LeetCode #50 — Pow(x, n) (Medium)"
+      ],
+      tip: "Draw the recursion tree on paper for every new problem. It makes base cases and overlapping subproblems obvious."
+    }
+  },
+  {
+    day: 44, label: "Tue", cls: "d1", topic: "Subsets & Combinations",
+    tasks: ["Generate all subsets", "Combination sum", "Choose k from n"],
+    detail: {
+      goal: "Subsets and combinations are the foundation of backtracking — master the template",
+      code: `# Subsets — generate all 2^n subsets
+def subsets(nums):
+    result = []
+    def backtrack(start, current):
+        result.append(current[:])   # add copy at every node
+        for i in range(start, len(nums)):
+            current.append(nums[i])
+            backtrack(i + 1, current)
+            current.pop()           # undo (backtrack)
+    backtrack(0, [])
+    return result
+
+print(subsets([1,2,3]))
+# [[],[1],[1,2],[1,2,3],[1,3],[2],[2,3],[3]]
+
+# Subsets II — with duplicates
+def subsetsWithDup(nums):
+    nums.sort()
+    result = []
+    def backtrack(start, current):
+        result.append(current[:])
+        for i in range(start, len(nums)):
+            if i > start and nums[i] == nums[i-1]:
+                continue              # skip duplicates
+            current.append(nums[i])
+            backtrack(i + 1, current)
+            current.pop()
+    backtrack(0, [])
+    return result
+
+# Combinations — choose k from n
+def combine(n, k):
+    result = []
+    def backtrack(start, current):
+        if len(current) == k:
+            result.append(current[:])
+            return
+        for i in range(start, n + 1):
+            current.append(i)
+            backtrack(i + 1, current)
+            current.pop()
+    backtrack(1, [])
+    return result
+
+print(combine(4, 2))
+# [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
+
+# Combination Sum — can reuse elements
+def combinationSum(candidates, target):
+    result = []
+    def backtrack(start, current, remaining):
+        if remaining == 0:
+            result.append(current[:])
+            return
+        for i in range(start, len(candidates)):
+            if candidates[i] > remaining: break
+            current.append(candidates[i])
+            backtrack(i, current, remaining - candidates[i])
+            current.pop()
+    candidates.sort()
+    backtrack(0, [], target)
+    return result`,
+      practice: [
+        "LeetCode #78 — Subsets (Medium)",
+        "LeetCode #90 — Subsets II (Medium)",
+        "LeetCode #39 — Combination Sum (Medium)"
+      ],
+      tip: "Backtracking template: choose → explore → unchoose. The current.pop() at the end is the 'unchoose' — never forget it!"
+    }
+  },
+  {
+    day: 45, label: "Wed", cls: "d2", topic: "Permutations",
+    tasks: ["All permutations", "Permutations with duplicates", "Next permutation"],
+    detail: {
+      goal: "Permutations test your backtracking depth — every element can go in every position",
+      code: `# All permutations — O(n * n!)
+def permute(nums):
+    result = []
+    def backtrack(current, remaining):
+        if not remaining:
+            result.append(current[:])
+            return
+        for i in range(len(remaining)):
+            current.append(remaining[i])
+            backtrack(current, remaining[:i] + remaining[i+1:])
+            current.pop()
+    backtrack([], nums)
+    return result
+
+print(permute([1,2,3]))
+# [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+
+# Permutations using swap (more efficient)
+def permute_swap(nums):
+    result = []
+    def backtrack(start):
+        if start == len(nums):
+            result.append(nums[:])
+            return
+        for i in range(start, len(nums)):
+            nums[start], nums[i] = nums[i], nums[start]
+            backtrack(start + 1)
+            nums[start], nums[i] = nums[i], nums[start]
+    backtrack(0)
+    return result
+
+# Permutations II — with duplicates
+def permuteUnique(nums):
+    nums.sort()
+    result = []
+    used = [False] * len(nums)
+    def backtrack(current):
+        if len(current) == len(nums):
+            result.append(current[:])
+            return
+        for i in range(len(nums)):
+            if used[i]: continue
+            if i > 0 and nums[i] == nums[i-1] and not used[i-1]:
+                continue          # skip duplicate
+            used[i] = True
+            current.append(nums[i])
+            backtrack(current)
+            current.pop()
+            used[i] = False
+    backtrack([])
+    return result
+
+# Next permutation — O(n)
+def nextPermutation(nums):
+    n = len(nums)
+    i = n - 2
+    while i >= 0 and nums[i] >= nums[i+1]: i -= 1
+    if i >= 0:
+        j = n - 1
+        while nums[j] <= nums[i]: j -= 1
+        nums[i], nums[j] = nums[j], nums[i]
+    nums[i+1:] = reversed(nums[i+1:])`,
+      practice: [
+        "LeetCode #46 — Permutations (Medium)",
+        "LeetCode #47 — Permutations II (Medium)",
+        "LeetCode #31 — Next Permutation (Medium)"
+      ],
+      tip: "Permutations use ALL elements, Combinations use SOME. Permutations = order matters, Combinations = order doesn't matter."
+    }
+  },
+  {
+    day: 46, label: "Thu", cls: "d2", topic: "Backtracking on Grids",
+    tasks: ["Word search in grid", "Rat in a maze", "Number of islands intro"],
+    detail: {
+      goal: "Grid backtracking explores all 4 directions — foundation for graph DFS problems",
+      code: `# Word Search in Grid
+def exist(board, word):
+    rows, cols = len(board), len(board[0])
+
+    def dfs(r, c, idx):
+        if idx == len(word): return True
+        if r < 0 or r >= rows or c < 0 or c >= cols:
+            return False
+        if board[r][c] != word[idx]: return False
+
+        temp = board[r][c]
+        board[r][c] = '#'         # mark visited
+
+        found = (dfs(r+1,c,idx+1) or dfs(r-1,c,idx+1) or
+                 dfs(r,c+1,idx+1) or dfs(r,c-1,idx+1))
+
+        board[r][c] = temp        # restore (backtrack)
+        return found
+
+    for r in range(rows):
+        for c in range(cols):
+            if dfs(r, c, 0): return True
+    return False
+
+# Rat in a maze — find all paths
+def ratMaze(maze):
+    n = len(maze)
+    result = []
+    path = ""
+    visited = [[False]*n for _ in range(n)]
+
+    def dfs(r, c):
+        if r == n-1 and c == n-1:
+            result.append(path)
+            return
+        dirs = [('D',1,0),('L',0,-1),('R',0,1),('U',-1,0)]
+        for d, dr, dc in dirs:
+            nr, nc = r+dr, c+dc
+            if (0<=nr<n and 0<=nc<n and
+                maze[nr][nc]==1 and not visited[nr][nc]):
+                visited[nr][nc] = True
+                dfs.__wrapped__ = path
+                nonlocal path
+                path += d
+                dfs(nr, nc)
+                path = path[:-1]
+                visited[nr][nc] = False
+
+    if maze[0][0] == 1:
+        visited[0][0] = True
+        dfs(0, 0)
+    return result
+
+# Flood fill (simpler grid DFS)
+def floodFill(image, sr, sc, color):
+    orig = image[sr][sc]
+    if orig == color: return image
+    def dfs(r, c):
+        if r<0 or r>=len(image) or c<0 or c>=len(image[0]): return
+        if image[r][c] != orig: return
+        image[r][c] = color
+        dfs(r+1,c); dfs(r-1,c); dfs(r,c+1); dfs(r,c-1)
+    dfs(sr, sc)
+    return image`,
+      practice: [
+        "LeetCode #79 — Word Search (Medium)",
+        "LeetCode #733 — Flood Fill (Easy)",
+        "LeetCode #200 — Number of Islands (Medium)"
+      ],
+      tip: "Grid DFS pattern: check bounds → check visited → mark visited → explore 4 dirs → unmark (backtrack). Memorize this!"
+    }
+  },
+  {
+    day: 47, label: "Fri", cls: "d3", topic: "Classic Backtracking",
+    tasks: ["N-Queens problem", "Sudoku solver", "Palindrome partitioning"],
+    detail: {
+      goal: "Classic hard backtracking problems — these appear in FAANG interviews directly",
+      code: `# N-Queens — place N queens so none attack each other
+def solveNQueens(n):
+    result = []
+    cols = set()
+    pos_diag = set()   # r + c
+    neg_diag = set()   # r - c
+
+    board = [['.'] * n for _ in range(n)]
+
+    def backtrack(row):
+        if row == n:
+            result.append([''.join(r) for r in board])
+            return
+        for col in range(n):
+            if col in cols or (row+col) in pos_diag or (row-col) in neg_diag:
+                continue
+            cols.add(col)
+            pos_diag.add(row+col)
+            neg_diag.add(row-col)
+            board[row][col] = 'Q'
+
+            backtrack(row + 1)
+
+            cols.remove(col)
+            pos_diag.remove(row+col)
+            neg_diag.remove(row-col)
+            board[row][col] = '.'
+
+    backtrack(0)
+    return result
+
+print(len(solveNQueens(8)))  # 92 solutions
+
+# Sudoku Solver
+def solveSudoku(board):
+    def is_valid(r, c, val):
+        if val in board[r]: return False
+        if val in [board[i][c] for i in range(9)]: return False
+        br, bc = 3*(r//3), 3*(c//3)
+        for i in range(br, br+3):
+            for j in range(bc, bc+3):
+                if board[i][j] == val: return False
+        return True
+
+    def solve():
+        for r in range(9):
+            for c in range(9):
+                if board[r][c] == '.':
+                    for val in '123456789':
+                        if is_valid(r, c, val):
+                            board[r][c] = val
+                            if solve(): return True
+                            board[r][c] = '.'
+                    return False
+        return True
+    solve()
+
+# Palindrome Partitioning
+def partition(s):
+    result = []
+    def is_pal(sub): return sub == sub[::-1]
+    def backtrack(start, current):
+        if start == len(s):
+            result.append(current[:])
+            return
+        for end in range(start+1, len(s)+1):
+            if is_pal(s[start:end]):
+                current.append(s[start:end])
+                backtrack(end, current)
+                current.pop()
+    backtrack(0, [])
+    return result`,
+      practice: [
+        "LeetCode #51 — N-Queens (Hard)",
+        "LeetCode #37 — Sudoku Solver (Hard)",
+        "LeetCode #131 — Palindrome Partitioning (Medium)"
+      ],
+      tip: "N-Queens uses 3 sets (cols, pos_diag, neg_diag) for O(1) conflict checking. Without sets it would be O(n) per check."
+    }
+  },
+  {
+    day: 48, label: "Sat", cls: "d3", topic: "Pruning & Optimization",
+    tasks: ["Pruning invalid branches", "Letter combinations phone", "Generate parentheses"],
+    detail: {
+      goal: "Pruning cuts invalid branches early — makes backtracking practical for large inputs",
+      code: `# Generate Parentheses — with pruning
+def generateParenthesis(n):
+    result = []
+    def backtrack(current, open_count, close_count):
+        if len(current) == 2 * n:
+            result.append(current)
+            return
+        # Pruning: only add if valid
+        if open_count < n:
+            backtrack(current + '(', open_count+1, close_count)
+        if close_count < open_count:
+            backtrack(current + ')', open_count, close_count+1)
+    backtrack('', 0, 0)
+    return result
+
+print(generateParenthesis(3))
+# ['((()))','(()())','(())()','()(())','()()()']
+
+# Letter Combinations of Phone Number
+def letterCombinations(digits):
+    if not digits: return []
+    phone = {'2':'abc','3':'def','4':'ghi','5':'jkl',
+             '6':'mno','7':'pqrs','8':'tuv','9':'wxyz'}
+    result = []
+    def backtrack(idx, current):
+        if idx == len(digits):
+            result.append(current)
+            return
+        for ch in phone[digits[idx]]:
+            backtrack(idx+1, current+ch)
+    backtrack(0, '')
+    return result
+
+print(letterCombinations("23"))
+# ['ad','ae','af','bd','be','bf','cd','ce','cf']
+
+# Combination Sum II — no reuse, skip duplicates
+def combinationSum2(candidates, target):
+    candidates.sort()
+    result = []
+    def backtrack(start, current, remaining):
+        if remaining == 0:
+            result.append(current[:])
+            return
+        for i in range(start, len(candidates)):
+            if candidates[i] > remaining: break   # prune
+            if i > start and candidates[i] == candidates[i-1]:
+                continue                           # skip dups
+            current.append(candidates[i])
+            backtrack(i+1, current, remaining-candidates[i])
+            current.pop()
+    backtrack(0, [], target)
+    return result
+
+# Beautiful Arrangement — pruning example
+def countArrangement(n):
+    count = [0]
+    used = [False] * (n+1)
+    def backtrack(pos):
+        if pos > n: count[0] += 1; return
+        for i in range(1, n+1):
+            if not used[i] and (i%pos==0 or pos%i==0):
+                used[i] = True
+                backtrack(pos+1)
+                used[i] = False
+    backtrack(1)
+    return count[0]`,
+      practice: [
+        "LeetCode #22 — Generate Parentheses (Medium)",
+        "LeetCode #17 — Letter Combinations Phone Number (Medium)",
+        "LeetCode #40 — Combination Sum II (Medium)"
+      ],
+      tip: "Pruning = adding an 'if' before the recursive call to skip impossible branches. It can reduce time from hours to milliseconds!"
+    }
+  },
+  {
+    day: 49, label: "Sun", cls: "d4", topic: "Week 7 Revision",
+    tasks: ["Revise all BT patterns", "Timed problem session", "Plan Week 8 (Binary Search)"],
+    detail: {
+      goal: "Lock in the universal backtracking template and all its variations",
+      code: `from functools import lru_cache
+
+# THE UNIVERSAL BACKTRACKING TEMPLATE
+# def backtrack(state, choices):
+#     if is_solution(state):
+#         result.append(state.copy())
+#         return
+#     for choice in choices:
+#         if is_valid(choice):
+#             make_choice(state, choice)   # choose
+#             backtrack(state, new_choices)# explore
+#             undo_choice(state, choice)   # unchoose
+
+# Pattern 1: Subsets
+def subsets(nums):
+    res = []
+    def bt(start, cur):
+        res.append(cur[:])
+        for i in range(start, len(nums)):
+            cur.append(nums[i]); bt(i+1, cur); cur.pop()
+    bt(0, []); return res
+
+# Pattern 2: Permutations
+def permute(nums):
+    res = []
+    def bt(cur, rem):
+        if not rem: res.append(cur[:]); return
+        for i in range(len(rem)):
+            cur.append(rem[i])
+            bt(cur, rem[:i]+rem[i+1:])
+            cur.pop()
+    bt([], nums); return res
+
+# Pattern 3: Combination Sum
+def combinationSum(cands, target):
+    cands.sort(); res = []
+    def bt(start, cur, rem):
+        if rem == 0: res.append(cur[:]); return
+        for i in range(start, len(cands)):
+            if cands[i] > rem: break
+            cur.append(cands[i]); bt(i, cur, rem-cands[i]); cur.pop()
+    bt(0, [], target); return res
+
+# Pattern 4: Grid DFS
+def numIslands(grid):
+    count = 0
+    def dfs(r, c):
+        if r<0 or r>=len(grid) or c<0 or c>=len(grid[0]): return
+        if grid[r][c] != '1': return
+        grid[r][c] = '0'
+        dfs(r+1,c); dfs(r-1,c); dfs(r,c+1); dfs(r,c-1)
+    for r in range(len(grid)):
+        for c in range(len(grid[0])):
+            if grid[r][c]=='1': dfs(r,c); count+=1
+    return count
+
+# Pattern 5: Memoized recursion
+@lru_cache(maxsize=None)
+def climbStairs(n):
+    if n<=2: return n
+    return climbStairs(n-1)+climbStairs(n-2)`,
+      practice: [
+        "LeetCode #79 — Word Search (Medium)",
+        "LeetCode #51 — N-Queens (Hard)",
+        "LeetCode #22 — Generate Parentheses (Medium)"
+      ],
+      tip: "You now know 5 backtracking patterns. Week 8 covers Binary Search — a deceptively tricky topic that trips up even experienced devs!"
+    }
+  }
+];
+
+const grid = document.getElementById('grid');
+days.forEach(d => {
+  const card = document.createElement('div');
+  card.className = `day-card ${d.cls}`;
+  card.innerHTML = `
+    <div class="day-label">${d.label}</div>
+    <div class="day-num">Day ${d.day}</div>
+    <span class="topic-badge">${d.topic}</span>
+    <div class="tasks">${d.tasks.map(t => `<div class="task">${t}</div>`).join('')}</div>
+  `;
+  card.onclick = () => showDetail(d);
+  grid.appendChild(card);
+});
+
+let currentDay = null;
+function showDetail(d) {
+  if (currentDay === d.day) { closeDetail(); return; }
+  currentDay = d.day;
+  document.getElementById('detail-title').textContent = `Day ${d.day} — ${d.topic}`;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="section-label">Goal</div>
+    <div style="font-size:13px;color:var(--color-text-primary);margin-bottom:8px">${d.detail.goal}</div>
+    <div class="section-label">Code to write today</div>
+    <div class="code-block">${d.detail.code}</div>
+    <div class="section-label">LeetCode practice</div>
+    ${d.detail.practice.map(p => `<div class="task" style="font-size:12px;color:var(--color-text-primary);margin-bottom:4px">${p}</div>`).join('')}
+    <div class="tip">💡 ${d.detail.tip}</div>
+  `;
+  document.getElementById('detail').classList.add('active');
+}
+function closeDetail() {
+  currentDay = null;
+  document.getElementById('detail').classList.remove('active');
+}
+</script>
