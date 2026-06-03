@@ -1,6 +1,8 @@
 from asyncio.windows_events import NULL
 from operator import truediv
-
+import sys
+print(sys.version)
+print(sys)
 print("Hello World")
 
 a=10
@@ -14,7 +16,34 @@ g=(10,20,30,"Mani")
 h={10,20,30,"Mani"}
 j={"name":"mani","age":20}
 
+# Camel Case
+# Each word, except the first, starts with a capital letter:
+myVariableName = "John"
+print("Camel Case :",myVariableName)
+print(type(myVariableName))
+# Pascal Case
+# Each word starts with a capital letter:
+MyVariableName = "John"
+print("Pascal Case :",MyVariableName)
+print(type(MyVariableName))
+# Snake Case
+# Each word is separated by an underscore character:
+my_variable_name = "John"
+print("Snake Case :",my_variable_name)
+print(type(my_variable_name))
 
+
+x, y, z = "Orange", "Banana", "Cherry"
+print(x,y,z)
+
+x = y = z = "Orange"
+print(x,y,z)
+
+fruits = ["apple", "banana", "cherry"]
+x, y, z = fruits
+print(x)
+print(y)
+print(z)
 
 print(a)
 print(type(a))
@@ -137,3 +166,23 @@ print()
 l[1]=69
 print(l)
 print(l)
+
+a=[5,8,1,6,3,4]
+print(a)
+print(a)
+b=sorted(a)
+print(b)
+print(type(a))
+print(type(b[0]))
+
+#Arithmetic Operators
+x = 15
+y = 4
+
+print(x + y)
+print(x - y)
+print(x * y)
+print(x / y)
+print(x % y)
+print(x ** y)
+print(x // y)
