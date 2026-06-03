@@ -3734,8 +3734,7 @@ function saveCompleted(data) { localStorage.setItem('dsaRoadmap_v2', JSON.string
 // ══════════════════════════════════════════
 function initTheme() {
   const saved = localStorage.getItem('dsaTheme_v2');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const theme = saved || (prefersDark ? 'dark' : 'light');
+  const theme = saved || 'light';
   applyTheme(theme);
 }
 
